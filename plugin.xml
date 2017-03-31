@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+   <extension
+         point="org.eclipse.ui.views">
+      <category
+            name="OPC UA"
+            id="me.steffenjacobs.opcuadisplay">
+      </category>
+      <view
+            name="OPC UA Explorer View"
+            icon="icons/sample.gif"
+            category="me.steffenjacobs.opcuadisplay"
+            class="me.steffenjacobs.opcuadisplay.views.explorer.OpcUaExplorerView"
+            id="me.steffenjacobs.opcuadisplay.views.explorer.OpcUaExplorerView">
+      </view>
+       <view
+            name="OPC UA Attribute View"
+            icon="icons/sample.gif"
+            category="me.steffenjacobs.opcuadisplay"
+            class="me.steffenjacobs.opcuadisplay.views.attribute.AttributeEditorView"
+            id="me.steffenjacobs.opcuadisplay.views.attribute.AttributeEditorView">
+      </view>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension
+            targetID="org.eclipse.jdt.ui.JavaPerspective">
+         <view
+               ratio="0.5"
+               relative="org.eclipse.ui.views.ProblemView"
+               relationship="right"
+               id="me.steffenjacobs.opcuadisplay.views.explorer.OpcUaExplorerView">
+         </view>
+      </perspectiveExtension>
+   </extension>
+   <extension
+         point="org.eclipse.help.contexts">
+      <contexts
+            file="contexts.xml">
+      </contexts>
+   </extension>
+
+</plugin>
