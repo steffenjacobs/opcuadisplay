@@ -23,24 +23,27 @@ public class NodeClassLabelProvider extends LabelProvider {
 		CachedBaseNode cn = (CachedBaseNode) obj;
 
 		if (cn.getNodeClass() == NodeClass.Object) {
-			return Activator.getImage(Images.View.FOLDER.getIdentifier());
+			if(cn.isFolder()){
+				return Activator.getImage(Images.ExplorerView.FOLDER.getIdentifier());
+			}
+			return Activator.getImage(Images.ExplorerView.OBJECT.getIdentifier());
 		}
 
 		else if (cn.getNodeClass() == NodeClass.Method) {
-			return Activator.getImage(Images.View.METHOD.getIdentifier());
+			return Activator.getImage(Images.ExplorerView.METHOD.getIdentifier());
 		}
 
 		else if (cn.getNodeClass() == NodeClass.Variable) {
 			if (cn.hasChildren()) {
-				return Activator.getImage(Images.View.FILE_YELLOW.getIdentifier());
+				return Activator.getImage(Images.ExplorerView.FILE_YELLOW.getIdentifier());
 			}
-			return Activator.getImage(Images.View.FILE.getIdentifier());
+			return Activator.getImage(Images.ExplorerView.FILE.getIdentifier());
 		}
 
-		else if (cn.getNodeClass() == NodeClass.VariableType || cn.getNodeClass() == NodeClass.ObjectType
-				|| cn.getNodeClass() == NodeClass.DataType || cn.getNodeClass() == NodeClass.ReferenceType) {
-			return Activator.getImage(Images.View.TYPE.getIdentifier());
+		else if (/*cn.getNodeClass() == NodeClass.VariableType || cn.getNodeClass() == NodeClass.ObjectType
+				|| */cn.getNodeClass() == NodeClass.DataType /*|| cn.getNodeClass() == NodeClass.ReferenceType*/) {
+			return Activator.getImage(Images.ExplorerView.TYPE.getIdentifier());
 		}
-		return Activator.getImage(Images.View.FILE.getIdentifier());
+		return Activator.getImage(Images.ExplorerView.UNKNOWN.getIdentifier());
 	}
 }
