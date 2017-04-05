@@ -10,6 +10,7 @@ import org.eclipse.milo.opcua.stack.core.types.builtin.NodeId;
 import org.eclipse.milo.opcua.stack.core.types.builtin.QualifiedName;
 import org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.UInteger;
 import org.eclipse.milo.opcua.stack.core.types.enumerated.NodeClass;
+import org.eclipse.milo.opcua.stack.core.types.structured.ReferenceDescription;
 
 public class CachedBaseNode {
 	private final NodeId nodeId;
@@ -21,6 +22,10 @@ public class CachedBaseNode {
 	private UInteger userWriteMask;
 	private List<CachedBaseNode> children;
 	private CachedBaseNode parent;
+
+	private List<CachedBaseNode> references;
+
+	private boolean folder;
 
 	private static CachedBaseNode noDataDummy, loadingDummy, root;
 
@@ -54,6 +59,14 @@ public class CachedBaseNode {
 		return this == noDataDummy || this == loadingDummy;
 	}
 
+	public List<CachedBaseNode> getReferences() {
+		return references;
+	}
+
+	public void setReferences(List<CachedBaseNode> references) {
+		this.references = references;
+	}
+
 	private CachedBaseNode(String text) {
 		nodeId = new NodeId(0, 0);
 		nodeClass = NodeClass.Unspecified;
@@ -63,8 +76,21 @@ public class CachedBaseNode {
 		writeMask = UInteger.valueOf(0);
 		userWriteMask = UInteger.valueOf(0);
 		children = new ArrayList<>();
+		references = new ArrayList<>();
 		parent = null;
 
+	}
+
+	public CachedBaseNode(ReferenceDescription descr) {
+		children = new ArrayList<>();
+		this.nodeId = descr.getNodeId().local().orElse(null);
+		this.nodeClass = descr.getNodeClass();
+		this.browseName = descr.getBrowseName();
+		this.displayName = descr.getDisplayName();
+		this.description = null;
+		this.writeMask = null;
+		this.userWriteMask = null;
+		references = new ArrayList<>();
 	}
 
 	public CachedBaseNode(Node node) throws InterruptedException, ExecutionException {
@@ -78,6 +104,15 @@ public class CachedBaseNode {
 		this.description = node.getDescription().get();
 		this.writeMask = node.getWriteMask().get();
 		this.userWriteMask = node.getUserWriteMask().get();
+		references = new ArrayList<>();
+	}
+
+	public boolean isFolder() {
+		return folder;
+	}
+
+	public void setFolder(boolean folder) {
+		this.folder = folder;
 	}
 
 	public void setParent(CachedBaseNode parent) {
@@ -125,8 +160,16 @@ public class CachedBaseNode {
 	}
 
 	public CachedBaseNode[] getChildren() {
-		CachedBaseNode[] childs = new CachedBaseNode[children.size()];
-		return children.toArray(childs);
+		CachedBaseNode[] childs = new CachedBaseNode[children.size()/* + references.size()*/];
+		childs = children.toArray(childs);
+
+//		// TODO: remove
+//		if (references.size() > 0) {
+//			for (int j = 0; j < references.size(); j++) {
+//				childs[children.size() + j] = references.get(j);
+//			}
+//		}
+		return childs;
 	}
 
 	public void setNodeClass(NodeClass nodeClass) {

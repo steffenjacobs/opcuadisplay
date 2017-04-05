@@ -60,7 +60,7 @@ public class LoadVariablesDialog extends TitleAreaDialog {
 
 		txtUrl = new Text(container, SWT.BORDER);
 		txtUrl.setLayoutData(dataURL);
-		txtUrl.setText("opc.tcp://localhost:12686/example");
+		txtUrl.setText("opc.tcp://192.168.1.181:48400/freeopcua/uamodeler/");
 
 		txtUrl.setFocus();
 		txtUrl.setSelection(0, txtUrl.getText().length());

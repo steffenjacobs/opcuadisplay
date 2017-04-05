@@ -13,7 +13,6 @@ public class CachedObjectNode extends CachedBaseNode {
 
 	public CachedObjectNode(UaObjectNode node) throws InterruptedException, ExecutionException {
 		super(node);
-
 		this.eventNotifier = FutureResolver.resolveFutureSafe(node.getEventNotifier());
 	}
 
