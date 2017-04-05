@@ -23,9 +23,7 @@ public class CachedBaseNode {
 	private List<CachedBaseNode> children;
 	private CachedBaseNode parent;
 
-	private List<CachedBaseNode> references;
-
-	private boolean folder;
+	private List<CachedReference> references;
 
 	private static CachedBaseNode noDataDummy, loadingDummy, root;
 
@@ -59,11 +57,11 @@ public class CachedBaseNode {
 		return this == noDataDummy || this == loadingDummy;
 	}
 
-	public List<CachedBaseNode> getReferences() {
-		return references;
+	public List<CachedReference> getReferences() {
+		return references == null ? new ArrayList<CachedReference>() : references;
 	}
 
-	public void setReferences(List<CachedBaseNode> references) {
+	public void setReferences(List<CachedReference> references) {
 		this.references = references;
 	}
 
@@ -105,14 +103,6 @@ public class CachedBaseNode {
 		this.writeMask = node.getWriteMask().get();
 		this.userWriteMask = node.getUserWriteMask().get();
 		references = new ArrayList<>();
-	}
-
-	public boolean isFolder() {
-		return folder;
-	}
-
-	public void setFolder(boolean folder) {
-		this.folder = folder;
 	}
 
 	public void setParent(CachedBaseNode parent) {
@@ -160,15 +150,16 @@ public class CachedBaseNode {
 	}
 
 	public CachedBaseNode[] getChildren() {
-		CachedBaseNode[] childs = new CachedBaseNode[children.size()/* + references.size()*/];
+		CachedBaseNode[] childs = new CachedBaseNode[children
+				.size()/* + references.size() */];
 		childs = children.toArray(childs);
 
-//		// TODO: remove
-//		if (references.size() > 0) {
-//			for (int j = 0; j < references.size(); j++) {
-//				childs[children.size() + j] = references.get(j);
-//			}
-//		}
+		// // TODO: remove
+		// if (references.size() > 0) {
+		// for (int j = 0; j < references.size(); j++) {
+		// childs[children.size() + j] = references.get(j);
+		// }
+		// }
 		return childs;
 	}
 

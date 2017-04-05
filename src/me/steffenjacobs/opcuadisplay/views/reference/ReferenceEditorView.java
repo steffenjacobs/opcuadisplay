@@ -1,5 +1,7 @@
 package me.steffenjacobs.opcuadisplay.views.reference;
 
+import java.util.ArrayList;
+
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
@@ -14,11 +16,10 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.part.ViewPart;
 
+import me.steffenjacobs.opcuadisplay.shared.domain.CachedReference;
 import me.steffenjacobs.opcuadisplay.shared.util.EventBus;
 import me.steffenjacobs.opcuadisplay.shared.util.EventBus.EventListener;
 import me.steffenjacobs.opcuadisplay.views.explorer.events.SelectedNodeChangedEvent;
-import me.steffenjacobs.opcuadisplay.views.reference.domain.ReferenceEntryFactory;
-import me.steffenjacobs.opcuadisplay.views.reference.domain.ReferenceEntryFactory.ReferenceEntry;
 
 public class ReferenceEditorView extends ViewPart {
 
@@ -44,7 +45,8 @@ public class ReferenceEditorView extends ViewPart {
 
 					@Override
 					public void onAction(SelectedNodeChangedEvent event) {
-						viewer.setInput(ReferenceEntryFactory.fromBaseNode(event.getNode()));
+						viewer.setInput(event.getNode() == null ? new ArrayList<CachedReference>()
+								: event.getNode().getReferences());
 						viewer.refresh();
 					}
 				});
@@ -87,7 +89,7 @@ public class ReferenceEditorView extends ViewPart {
 		col.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				ReferenceEntry n = (ReferenceEntry) element;
+				CachedReference n = (CachedReference) element;
 				return n.getReferenceType();
 			}
 		});
@@ -97,7 +99,7 @@ public class ReferenceEditorView extends ViewPart {
 		col.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				ReferenceEntry n = (ReferenceEntry) element;
+				CachedReference n = (CachedReference) element;
 				return ReferenceValueParser.asString(n.getBrowseName());
 			}
 		});
@@ -107,7 +109,7 @@ public class ReferenceEditorView extends ViewPart {
 		col.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				ReferenceEntry n = (ReferenceEntry) element;
+				CachedReference n = (CachedReference) element;
 				return n.getTypeDefinition();
 			}
 		});
@@ -117,7 +119,7 @@ public class ReferenceEditorView extends ViewPart {
 		col.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				ReferenceEntry n = (ReferenceEntry) element;
+				CachedReference n = (CachedReference) element;
 
 				return ReferenceValueParser.asString(n.getNodeId());
 			}

@@ -23,7 +23,7 @@ public class NodeClassLabelProvider extends LabelProvider {
 		CachedBaseNode cn = (CachedBaseNode) obj;
 
 		if (cn.getNodeClass() == NodeClass.Object) {
-			if(cn.isFolder()){
+			if (isFolder(cn)) {
 				return Activator.getImage(Images.ExplorerView.FOLDER.getIdentifier());
 			}
 			return Activator.getImage(Images.ExplorerView.OBJECT.getIdentifier());
@@ -40,10 +40,22 @@ public class NodeClassLabelProvider extends LabelProvider {
 			return Activator.getImage(Images.ExplorerView.FILE.getIdentifier());
 		}
 
-		else if (/*cn.getNodeClass() == NodeClass.VariableType || cn.getNodeClass() == NodeClass.ObjectType
-				|| */cn.getNodeClass() == NodeClass.DataType /*|| cn.getNodeClass() == NodeClass.ReferenceType*/) {
+		else if (/*
+					 * cn.getNodeClass() == NodeClass.VariableType ||
+					 * cn.getNodeClass() == NodeClass.ObjectType ||
+					 */cn
+				.getNodeClass() == NodeClass.DataType /*
+														 * || cn.getNodeClass()
+														 * == NodeClass.
+														 * ReferenceType
+														 */) {
 			return Activator.getImage(Images.ExplorerView.TYPE.getIdentifier());
 		}
 		return Activator.getImage(Images.ExplorerView.UNKNOWN.getIdentifier());
+	}
+
+	private boolean isFolder(CachedBaseNode cn) {
+		return cn.getReferences().stream().filter(ref -> ref.getBrowseName().getName().equals("FolderType"))
+				.count() > 0;
 	}
 }
