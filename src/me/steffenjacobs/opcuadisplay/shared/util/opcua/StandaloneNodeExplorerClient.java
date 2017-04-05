@@ -172,59 +172,51 @@ public class StandaloneNodeExplorerClient {
 		try {
 			node = client.getAddressSpace().getNodeInstance(nodeId).get();
 
-			if (node instanceof UaDataTypeNode) {
-				return new CachedDataTypeNode((UaDataTypeNode) node);
-			} else if (node instanceof UaMethodNode) {
-				return new CachedMethodNode((UaMethodNode) node);
-			} else if (node instanceof UaObjectNode) {
-				return new CachedObjectNode((UaObjectNode) node);
-			} else if (node instanceof UaObjectTypeNode) {
-				return new CachedObjectTypeNode((UaObjectTypeNode) node);
-			} else if (node instanceof UaReferenceTypeNode) {
-				return new CachedReferenceTypeNode((UaReferenceTypeNode) node);
-			} else if (node instanceof UaVariableNode) {
-				return new CachedVariableNode((UaVariableNode) node);
-			} else if (node instanceof UaVariableTypeNode) {
-				return new CachedVariableTypeNode((UaVariableTypeNode) node);
-			} else if (node instanceof UaViewNode) {
-				return new CachedViewNode((UaViewNode) node);
-			} else {
-				return new CachedBaseNode(node);
-			}
+			return parseNode(node);
 		} catch (InterruptedException | ExecutionException e) {
 			// e.printStackTrace();
 		}
 		return null;
 	}
 
+	private CachedBaseNode parseNode(Node node) throws InterruptedException, ExecutionException {
+		if (node instanceof UaDataTypeNode) {
+			return new CachedDataTypeNode((UaDataTypeNode) node);
+		} else if (node instanceof UaMethodNode) {
+			return new CachedMethodNode((UaMethodNode) node);
+		} else if (node instanceof UaObjectNode) {
+			return new CachedObjectNode((UaObjectNode) node);
+		} else if (node instanceof UaObjectTypeNode) {
+			return new CachedObjectTypeNode((UaObjectTypeNode) node);
+		} else if (node instanceof UaReferenceTypeNode) {
+			return new CachedReferenceTypeNode((UaReferenceTypeNode) node);
+		} else if (node instanceof UaVariableNode) {
+			return new CachedVariableNode((UaVariableNode) node);
+		} else if (node instanceof UaVariableTypeNode) {
+			return new CachedVariableTypeNode((UaVariableTypeNode) node);
+		} else if (node instanceof UaViewNode) {
+			return new CachedViewNode((UaViewNode) node);
+		} else {
+			return new CachedBaseNode(node);
+		}
+	}
+
 	private CachedBaseNode retrieveNodes(CachedBaseNode parent, OpcUaClient client, NodeId browseRoot) {
 		try {
+
+			// TODO: retrieve root, if necessary
+			if (parent == null) {
+				//FIXME: cannot find root node with i=84 on OPC UA Server 
+				parent = parseNode(client.getAddressSpace().getNodeInstance(browseRoot).get());
+			}
 
 			// retrieve node
 			List<Node> nodes = client.getAddressSpace().browse(browseRoot).get();
 
 			for (Node node : nodes) {
+
 				// cache node
-				CachedBaseNode cn;
-				if (node instanceof UaDataTypeNode) {
-					cn = new CachedDataTypeNode((UaDataTypeNode) node);
-				} else if (node instanceof UaMethodNode) {
-					cn = new CachedMethodNode((UaMethodNode) node);
-				} else if (node instanceof UaObjectNode) {
-					cn = new CachedObjectNode((UaObjectNode) node);
-				} else if (node instanceof UaObjectTypeNode) {
-					cn = new CachedObjectTypeNode((UaObjectTypeNode) node);
-				} else if (node instanceof UaReferenceTypeNode) {
-					cn = new CachedReferenceTypeNode((UaReferenceTypeNode) node);
-				} else if (node instanceof UaVariableNode) {
-					cn = new CachedVariableNode((UaVariableNode) node);
-				} else if (node instanceof UaVariableTypeNode) {
-					cn = new CachedVariableTypeNode((UaVariableTypeNode) node);
-				} else if (node instanceof UaViewNode) {
-					cn = new CachedViewNode((UaViewNode) node);
-				} else {
-					cn = new CachedBaseNode(node);
-				}
+				CachedBaseNode cn = parseNode(node);
 
 				// set parent
 				cn.setParent(parent);
@@ -242,11 +234,7 @@ public class StandaloneNodeExplorerClient {
 				retrieveNodes(cn, client, cn.getNodeId());
 
 				// add child to parent
-				if (parent == CachedBaseNode.getRoot()) {
-					parent.addChild(cn);
-				} else {
-					parent.addChild(cn);
-				}
+				parent.addChild(cn);
 			}
 		} catch (InterruptedException | ExecutionException e) {
 			logger.error("Browsing nodeId={} failed: {}", browseRoot, e.getMessage(), e);

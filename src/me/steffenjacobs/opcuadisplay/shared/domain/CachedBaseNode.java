@@ -3,6 +3,7 @@ package me.steffenjacobs.opcuadisplay.shared.domain;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 import org.eclipse.milo.opcua.sdk.client.api.nodes.Node;
 import org.eclipse.milo.opcua.stack.core.types.builtin.LocalizedText;
@@ -11,6 +12,8 @@ import org.eclipse.milo.opcua.stack.core.types.builtin.QualifiedName;
 import org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.UInteger;
 import org.eclipse.milo.opcua.stack.core.types.enumerated.NodeClass;
 import org.eclipse.milo.opcua.stack.core.types.structured.ReferenceDescription;
+
+import com.google.common.collect.Lists;
 
 public class CachedBaseNode {
 	private final NodeId nodeId;
@@ -36,12 +39,17 @@ public class CachedBaseNode {
 
 	public static CachedBaseNode createNewRoot() {
 		root = new CachedBaseNode("Root");
+		CachedReference f = new CachedReference("HasTypeDefinition", new QualifiedName(0, "FolderType"), null, null);
+		CachedReference oo = new CachedReference("Organizes", new QualifiedName(0, "Objects"), "FolderType", null);
+		CachedReference ot = new CachedReference("Organizes", new QualifiedName(0, "Types"), "FolderType", null);
+		CachedReference ov = new CachedReference("Organizes", new QualifiedName(0, "Views"), "FolderType", null);
+		root.setReferences(Lists.newArrayList(f, oo, ot, ov));
 		return root;
 	}
 
 	public static CachedBaseNode getRoot() {
 		if (root == null) {
-			root = new CachedBaseNode("Root");
+			createNewRoot();
 		}
 		return root;
 	}
@@ -150,16 +158,14 @@ public class CachedBaseNode {
 	}
 
 	public CachedBaseNode[] getChildren() {
-		CachedBaseNode[] childs = new CachedBaseNode[children
-				.size()/* + references.size() */];
-		childs = children.toArray(childs);
+		// clean up if necessary
+		final List<QualifiedName> names = this.getReferences().stream().map(CachedReference::getBrowseName)
+				.collect(Collectors.toList());
+		children = children.stream().filter(c -> names.contains(c.getBrowseName())).collect(Collectors.toList());
 
-		// // TODO: remove
-		// if (references.size() > 0) {
-		// for (int j = 0; j < references.size(); j++) {
-		// childs[children.size() + j] = references.get(j);
-		// }
-		// }
+		// return children
+		CachedBaseNode[] childs = new CachedBaseNode[children.size()];
+		childs = children.toArray(childs);
 		return childs;
 	}
 
