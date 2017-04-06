@@ -25,7 +25,6 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 
 import me.steffenjacobs.opcuadisplay.Activator;
-import me.steffenjacobs.opcuadisplay.dialogs.ShowNodeDialog;
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedBaseNode;
 import me.steffenjacobs.opcuadisplay.shared.util.EventBus;
 import me.steffenjacobs.opcuadisplay.shared.util.EventBus.Event;
@@ -198,12 +197,7 @@ public class OpcUaExplorerView extends ViewPart {
 				handleLoadVariableAction();
 			} else {
 				EventBus.getInstance().fireEvent(new SelectedNodeChangedEvent((CachedBaseNode) obj));
-				ShowNodeDialog dialog = new ShowNodeDialog(viewer.getControl().getShell());
-				dialog.create();
-				dialog.setDisplayedNode((CachedBaseNode) obj);
-				if (dialog.open() == Window.OK) {
-					viewer.refresh();
-				}
+				viewer.setExpandedState(obj, !viewer.getExpandedState(obj));
 			}
 		}
 	}
