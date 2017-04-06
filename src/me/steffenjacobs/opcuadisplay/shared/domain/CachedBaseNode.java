@@ -6,6 +6,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 import org.eclipse.milo.opcua.sdk.client.api.nodes.Node;
+import org.eclipse.milo.opcua.stack.core.Identifiers;
 import org.eclipse.milo.opcua.stack.core.types.builtin.LocalizedText;
 import org.eclipse.milo.opcua.stack.core.types.builtin.NodeId;
 import org.eclipse.milo.opcua.stack.core.types.builtin.QualifiedName;
@@ -74,7 +75,11 @@ public class CachedBaseNode {
 	}
 
 	private CachedBaseNode(String text) {
-		nodeId = new NodeId(0, 0);
+		if (text.equals("Root")) {
+			nodeId = Identifiers.RootFolder;
+		} else {
+			nodeId = new NodeId(0, 0);
+		}
 		nodeClass = NodeClass.Unspecified;
 		browseName = new QualifiedName(0, "dummy");
 		displayName = new LocalizedText("en", text);
