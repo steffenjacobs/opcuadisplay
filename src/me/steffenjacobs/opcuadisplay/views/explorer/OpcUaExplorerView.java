@@ -22,16 +22,15 @@ import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.part.DrillDownAdapter;
 import org.eclipse.ui.part.ViewPart;
 
 import me.steffenjacobs.opcuadisplay.Activator;
 import me.steffenjacobs.opcuadisplay.dialogs.ShowNodeDialog;
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedBaseNode;
 import me.steffenjacobs.opcuadisplay.shared.util.EventBus;
-import me.steffenjacobs.opcuadisplay.shared.util.Images;
 import me.steffenjacobs.opcuadisplay.shared.util.EventBus.Event;
 import me.steffenjacobs.opcuadisplay.shared.util.EventBus.EventListener;
+import me.steffenjacobs.opcuadisplay.shared.util.Images;
 import me.steffenjacobs.opcuadisplay.views.attribute.events.AttributeModifiedEvent;
 import me.steffenjacobs.opcuadisplay.views.explorer.dialogs.LoadVariablesDialog;
 import me.steffenjacobs.opcuadisplay.views.explorer.events.SelectedNodeChangedEvent;
@@ -59,7 +58,6 @@ public class OpcUaExplorerView extends ViewPart {
 	public static final String ID = "me.steffenjacobs.opcuadisplay.views.explorer.OpcUaExplorerView";
 
 	private TreeViewer viewer;
-	private DrillDownAdapter drillDownAdapter;
 	private Action doubleClickAction, selectionChangedAction;
 	private Action openLoadVariablesView;
 	private Action collapseAllAction, expandAllAction;
@@ -95,7 +93,6 @@ public class OpcUaExplorerView extends ViewPart {
 	@Override
 	public void createPartControl(Composite parent) {
 		viewer = new TreeViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
-		drillDownAdapter = new DrillDownAdapter(viewer);
 
 		connector = new OpcUaConnector(this.viewer.getControl().getShell());
 		connector.overwriteRoot(CachedBaseNode.getDummyNoData());
@@ -155,7 +152,6 @@ public class OpcUaExplorerView extends ViewPart {
 		manager.add(collapseAllAction);
 		manager.add(expandAllAction);
 		manager.add(new Separator());
-		drillDownAdapter.addNavigationActions(manager);
 		// Other plug-ins can contribute there actions here
 		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 	}
@@ -166,7 +162,6 @@ public class OpcUaExplorerView extends ViewPart {
 		manager.add(collapseAllAction);
 		manager.add(expandAllAction);
 		manager.add(new Separator());
-		drillDownAdapter.addNavigationActions(manager);
 	}
 
 	private void handleLoadVariableAction() {
