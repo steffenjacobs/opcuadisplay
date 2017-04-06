@@ -5,8 +5,12 @@ import static org.eclipse.milo.opcua.stack.core.util.ConversionUtil.toList;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import org.eclipse.milo.opcua.sdk.client.OpcUaClient;
 import org.eclipse.milo.opcua.sdk.client.api.config.OpcUaClientConfig;
@@ -33,7 +37,6 @@ import org.eclipse.milo.opcua.stack.core.types.enumerated.NodeClass;
 import org.eclipse.milo.opcua.stack.core.types.structured.BrowseDescription;
 import org.eclipse.milo.opcua.stack.core.types.structured.BrowseResult;
 import org.eclipse.milo.opcua.stack.core.types.structured.EndpointDescription;
-import org.eclipse.milo.opcua.stack.core.types.structured.ReferenceDescription;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,6 +55,8 @@ public class StandaloneNodeExplorerClient {
 
 	private static final Logger logger = LoggerFactory.getLogger(StandaloneNodeExplorerClient.class);
 
+	private final HashMap<NodeId, String> typeNames = new HashMap<>();
+
 	public static void main(String[] args) throws Exception {
 		new StandaloneNodeExplorerClient().retrieveNodes("opc.tcp://localhost:12686/example");
 	}
@@ -65,7 +70,33 @@ public class StandaloneNodeExplorerClient {
 
 		// start browsing at root folder
 		long start = System.currentTimeMillis();
-		CachedBaseNode root = retrieveNodes(CachedBaseNode.createNewRoot(), client, Identifiers.RootFolder);
+		ExecutorService exec = Executors.newFixedThreadPool(8);
+
+		final CachedBaseNode root = retrieveSubNodes(CachedBaseNode.createNewRoot(), client, Identifiers.RootFolder);
+
+		toList(root.getChildren()).forEach(c -> {
+			if (c.getNodeId().equals(Identifiers.ObjectsFolder)) {
+				exec.submit(() -> retrieveNodes(c, client, Identifiers.ObjectsFolder));
+			} else if (c.getNodeId().equals(Identifiers.TypesFolder)) {
+				CachedBaseNode typeNode = retrieveSubNodes(c, client, Identifiers.TypesFolder);
+				toList(typeNode.getChildren()).forEach(tc -> {
+					if (Identifiers.DataTypesFolder.equals(tc.getNodeId())) {
+						CachedBaseNode dataType = retrieveSubNodes(tc, client, tc.getNodeId());
+
+						toList(dataType.getChildren()).forEach(dtc -> {
+							exec.submit(() -> retrieveNodes(dtc, client, dtc.getNodeId()));
+						});
+					} else {
+						retrieveNodes(tc, client, tc.getNodeId());
+					}
+				});
+			} else if (c.getNodeId().equals(Identifiers.ViewsFolder)) {
+				retrieveNodes(c, client, Identifiers.ViewsFolder);
+			}
+		});
+
+		exec.shutdown();
+		exec.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
 		System.out.println("download complete (" + (System.currentTimeMillis() - start) + "ms). ");
 
 		// disconnect
@@ -77,7 +108,7 @@ public class StandaloneNodeExplorerClient {
 	private boolean isInTypesFolder(CachedBaseNode node) {
 
 		while ((node = node.getParent()) != null) {
-			if (node.getBrowseName().getName().equals("Types")) {
+			if (Identifiers.TypesFolder.equals(node.getNodeId())) {
 				return true;
 			}
 		}
@@ -99,16 +130,14 @@ public class StandaloneNodeExplorerClient {
 
 			BrowseResult browseResult = client.browse(browse).get();
 
-			List<ReferenceDescription> references = toList(browseResult.getReferences());
-
-			for (ReferenceDescription rd : references) {
+			toList(browseResult.getReferences()).forEach(rd -> {
 
 				CachedReference cr = new CachedReference(getNameOfNode(rd.getReferenceTypeId(), client),
 						rd.getBrowseName(), getNameOfNode(rd.getTypeDefinition().local().orElse(null), client),
 						rd.getNodeId().local().get());
 				ref.add(cr);
 
-			}
+			});
 		} catch (InterruptedException | ExecutionException e) {
 			logger.error("Browsing references for nodeId={} failed: {}", node, e.getMessage(), e);
 		}
@@ -120,6 +149,11 @@ public class StandaloneNodeExplorerClient {
 		if (id == null) {
 			return "null";
 		}
+
+		if (typeNames.containsKey(id)) {
+			return typeNames.get(id);
+		}
+
 		CachedBaseNode node = retrieveTypeNode(id, client);
 
 		if (node == null) {
@@ -128,6 +162,8 @@ public class StandaloneNodeExplorerClient {
 		if (node.getDisplayName() == null) {
 			return "null";
 		}
+		typeNames.put(id, node.getDisplayName().getText());
+
 		return node.getDisplayName().getText();
 	}
 
@@ -144,10 +180,8 @@ public class StandaloneNodeExplorerClient {
 
 			BrowseResult browseResult = client.browse(browse).get();
 
-			List<ReferenceDescription> references = toList(browseResult.getReferences());
-			List<CachedReference> refs = new ArrayList<>();
-
-			for (ReferenceDescription rd : references) {
+			final List<CachedReference> refs = new ArrayList<>();
+			toList(browseResult.getReferences()).forEach(rd -> {
 
 				CachedBaseNode cbn = retrieveTypeNode(rd.getNodeId().local().orElse(null), client);
 				if (cbn != null) {
@@ -158,7 +192,40 @@ public class StandaloneNodeExplorerClient {
 				refs.add(new CachedReference(getNameOfNode(rd.getReferenceTypeId(), client), rd.getBrowseName(),
 						getNameOfNode(rd.getTypeDefinition().local().orElse(null), client),
 						rd.getNodeId().local().get()));
-			}
+			});
+
+			node.setReferences(refs);
+		} catch (InterruptedException | ExecutionException | NullPointerException e) {
+			logger.error("Browsing references for nodeId={} failed: {}", node, e.getMessage(), e);
+		}
+		return ref;
+	}
+
+	private List<CachedBaseNode> browseSubReferences(CachedBaseNode node, OpcUaClient client) {
+		List<CachedBaseNode> ref = new ArrayList<>();
+		try {
+			BrowseDescription browse = new BrowseDescription(node.getNodeId(), BrowseDirection.Forward,
+					Identifiers.References, true,
+					uint(NodeClass.Object.getValue() | NodeClass.DataType.getValue() | NodeClass.ObjectType.getValue()
+							| NodeClass.VariableType.getValue() | NodeClass.ReferenceType.getValue()
+							| NodeClass.Method.getValue() | NodeClass.Variable.getValue()),
+
+					uint(BrowseResultMask.All.getValue()));
+
+			BrowseResult browseResult = client.browse(browse).get();
+
+			final List<CachedReference> refs = new ArrayList<>();
+			toList(browseResult.getReferences()).forEach(rd -> {
+
+				CachedBaseNode cbn = retrieveTypeNode(rd.getNodeId().local().orElse(null), client);
+				if (cbn != null) {
+					ref.add(cbn);
+				}
+
+				refs.add(new CachedReference(getNameOfNode(rd.getReferenceTypeId(), client), rd.getBrowseName(),
+						getNameOfNode(rd.getTypeDefinition().local().orElse(null), client),
+						rd.getNodeId().local().get()));
+			});
 
 			node.setReferences(refs);
 		} catch (InterruptedException | ExecutionException | NullPointerException e) {
@@ -201,41 +268,77 @@ public class StandaloneNodeExplorerClient {
 		}
 	}
 
-	private CachedBaseNode retrieveNodes(CachedBaseNode parent, OpcUaClient client, NodeId browseRoot) {
+	private CachedBaseNode retrieveNodes(final CachedBaseNode parent, OpcUaClient client, NodeId browseRoot) {
 		try {
-
 			// TODO: retrieve root, if necessary
-			if (parent == null) {
-				//FIXME: cannot find root node with i=84 on OPC UA Server 
-				parent = parseNode(client.getAddressSpace().getNodeInstance(browseRoot).get());
-			}
 
 			// retrieve node
-			List<Node> nodes = client.getAddressSpace().browse(browseRoot).get();
+			client.getAddressSpace().browse(browseRoot).get().forEach(node -> {
 
-			for (Node node : nodes) {
+				try {
+					// cache node
+					CachedBaseNode cn = parseNode(node);
 
-				// cache node
-				CachedBaseNode cn = parseNode(node);
+					// set parent
+					cn.setParent(parent);
 
-				// set parent
-				cn.setParent(parent);
-
-				// references
-				if (isInTypesFolder(cn)) {
-					browseReferencesRecursive(cn, client)
-							.forEach(ref -> cn.addChild(retrieveNodes(ref, client, ref.getNodeId())));
+					// references
+					if (isInTypesFolder(cn)) {
+						browseReferencesRecursive(cn, client)
+								.forEach(ref -> cn.addChild(retrieveNodes(ref, client, ref.getNodeId())));
+					}
 					cn.setReferences(browseAllReferences(cn, client));
-				} else {
-					cn.setReferences(browseAllReferences(cn, client));
+
+					// retrieve children
+					retrieveNodes(cn, client, cn.getNodeId());
+
+					// add child to parent
+					parent.addChild(cn);
+				} catch (InterruptedException | ExecutionException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
 
-				// retrieve children
-				retrieveNodes(cn, client, cn.getNodeId());
+			});
+		} catch (InterruptedException | ExecutionException e) {
+			logger.error("Browsing nodeId={} failed: {}", browseRoot, e.getMessage(), e);
+		}
 
-				// add child to parent
-				parent.addChild(cn);
-			}
+		return parent;
+	}
+
+	private CachedBaseNode retrieveSubNodes(final CachedBaseNode parent, OpcUaClient client, NodeId browseRoot) {
+		try {
+			// TODO: retrieve root, if necessary
+
+			// retrieve node
+			client.getAddressSpace().browse(browseRoot).get().forEach(node -> {
+
+				try {
+					// cache node
+					CachedBaseNode cn = parseNode(node);
+
+					// set parent
+					cn.setParent(parent);
+
+					// references
+					if (isInTypesFolder(cn)) {
+						browseReferencesRecursive(cn, client)
+								.forEach(ref -> cn.addChild(retrieveNodes(ref, client, ref.getNodeId())));
+					}
+					cn.setReferences(browseAllReferences(cn, client));
+
+					// retrieve children
+					// retrieveNodes(cn, client, cn.getNodeId());
+
+					// add child to parent
+					parent.addChild(cn);
+				} catch (InterruptedException | ExecutionException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+			});
 		} catch (InterruptedException | ExecutionException e) {
 			logger.error("Browsing nodeId={} failed: {}", browseRoot, e.getMessage(), e);
 		}
