@@ -27,9 +27,14 @@ public enum Images {
 
 	public static enum ExplorerView {
 		TYPE("icons/view/type.png", "variabletype"), FILE("icons/view/file.png", "file"), FILE_YELLOW(
-				"icons/view/file_yellow.png", "fileyellow"), FOLDER("icons/view/folder.png",
-						"folder"), METHOD("icons/view/method.png", "method"), OBJECT("icons/view/object.png",
-								"object"), UNKNOWN("icons/view/unknown.png", "unknown");
+				"icons/view/file_yellow.png",
+				"fileyellow"), FOLDER("icons/view/folder.png", "folder"), METHOD("icons/view/method.png",
+						"method"), OBJECT("icons/view/object.png", "object"), OBJECT_TYPE("icons/view/objectType.png",
+								"objectType"), REFERENCE_TYPE("icons/view/referenceType.png",
+										"referenceType"), REFERENCE("icons/view/reference.png", "reference"), DATA_TYPE(
+												"icons/view/dataType.png",
+												"dataType"), VARIABLE_TYPE("icons/view/variableType.png",
+														"variableType"), UNKNOWN("icons/view/unknown.png", "unknown");
 
 		private final String path, identifier;
 

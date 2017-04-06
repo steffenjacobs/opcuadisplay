@@ -33,6 +33,22 @@ public class NodeClassLabelProvider extends LabelProvider {
 			return Activator.getImage(Images.ExplorerView.METHOD.getIdentifier());
 		}
 
+		else if (cn.getNodeClass() == NodeClass.ObjectType) {
+			return Activator.getImage(Images.ExplorerView.OBJECT_TYPE.getIdentifier());
+		}
+
+		else if (cn.getNodeClass() == NodeClass.DataType) {
+			return Activator.getImage(Images.ExplorerView.DATA_TYPE.getIdentifier());
+		}
+
+		else if (cn.getNodeClass() == NodeClass.ReferenceType) {
+			return Activator.getImage(Images.ExplorerView.REFERENCE_TYPE.getIdentifier());
+		}
+
+		else if (cn.getNodeClass() == NodeClass.VariableType) {
+			return Activator.getImage(Images.ExplorerView.VARIABLE_TYPE.getIdentifier());
+		}
+
 		else if (cn.getNodeClass() == NodeClass.Variable) {
 			if (cn.hasChildren()) {
 				return Activator.getImage(Images.ExplorerView.FILE_YELLOW.getIdentifier());

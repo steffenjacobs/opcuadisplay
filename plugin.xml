@@ -10,21 +10,21 @@
       </category>
       <view
             name="OPC UA Explorer View"
-            icon="icons/sample.gif"
+            icon="icons/view/folder.png"
             category="me.steffenjacobs.opcuadisplay"
             class="me.steffenjacobs.opcuadisplay.views.explorer.OpcUaExplorerView"
             id="me.steffenjacobs.opcuadisplay.views.explorer.OpcUaExplorerView">
       </view>
        <view
             name="OPC UA Attribute View"
-            icon="icons/sample.gif"
+            icon="icons/attributes.png"
             category="me.steffenjacobs.opcuadisplay"
             class="me.steffenjacobs.opcuadisplay.views.attribute.AttributeEditorView"
             id="me.steffenjacobs.opcuadisplay.views.attribute.AttributeEditorView">
       </view>
        <view
             name="OPC UA References View"
-            icon="icons/sample.gif"
+            icon="icons/view/reference.png"
             category="me.steffenjacobs.opcuadisplay"
             class="me.steffenjacobs.opcuadisplay.views.reference.ReferenceEditorView"
             id="me.steffenjacobs.opcuadisplay.views.reference.ReferenceEditorView">
