@@ -1,8 +1,11 @@
-package me.steffenjacobs.opcuadisplay.dialogs.wizard.imp;
+package me.steffenjacobs.opcuadisplay.wizard.imp;
 
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchWizard;
 
-public class OpcUaImportWizard extends Wizard {
+public class OpcUaImportWizard extends Wizard implements IWorkbenchWizard{
 
 	public ImportTypeSelectionPage selectionPage;
 	public ImportFromXmlPage xmlPage;
@@ -46,5 +49,10 @@ public class OpcUaImportWizard extends Wizard {
 
 	public String getImportUrl() {
 		return importUrl;
+	}
+
+	@Override
+	public void init(IWorkbench arg0, IStructuredSelection arg1) {
+		
 	}
 }

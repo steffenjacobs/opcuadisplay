@@ -26,7 +26,6 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 
 import me.steffenjacobs.opcuadisplay.Activator;
-import me.steffenjacobs.opcuadisplay.dialogs.wizard.imp.OpcUaImportWizard;
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedBaseNode;
 import me.steffenjacobs.opcuadisplay.shared.util.EventBus;
 import me.steffenjacobs.opcuadisplay.shared.util.EventBus.Event;
@@ -34,6 +33,7 @@ import me.steffenjacobs.opcuadisplay.shared.util.EventBus.EventListener;
 import me.steffenjacobs.opcuadisplay.shared.util.Images;
 import me.steffenjacobs.opcuadisplay.views.attribute.events.AttributeModifiedEvent;
 import me.steffenjacobs.opcuadisplay.views.explorer.events.SelectedNodeVisibleAttributeChangedEvent;
+import me.steffenjacobs.opcuadisplay.wizard.imp.OpcUaImportWizard;
 
 /**
  * This sample class demonstrates how to plug-in a new workbench view. The view

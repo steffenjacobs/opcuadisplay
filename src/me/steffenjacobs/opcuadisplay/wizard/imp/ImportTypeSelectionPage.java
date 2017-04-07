@@ -1,4 +1,4 @@
-package me.steffenjacobs.opcuadisplay.dialogs.wizard.imp;
+package me.steffenjacobs.opcuadisplay.wizard.imp;
 
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
