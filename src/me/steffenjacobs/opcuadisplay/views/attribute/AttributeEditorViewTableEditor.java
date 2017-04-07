@@ -23,11 +23,12 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 
+import me.steffenjacobs.opcuadisplay.shared.domain.BetterValueRank;
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedMethodNode;
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedReferenceTypeNode;
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedVariableNode;
-import me.steffenjacobs.opcuadisplay.shared.domain.CachedVariableTypeNode;
 import me.steffenjacobs.opcuadisplay.shared.domain.HasOnlyAbstract;
+import me.steffenjacobs.opcuadisplay.shared.domain.HasValueRank;
 import me.steffenjacobs.opcuadisplay.shared.util.EventBus;
 import me.steffenjacobs.opcuadisplay.shared.widgets.DropDownCheckedListBox;
 import me.steffenjacobs.opcuadisplay.shared.widgets.GenericComboBox;
@@ -204,37 +205,11 @@ public class AttributeEditorViewTableEditor {
 					}
 					// Integer -> ValueRank (Variable, VariableType)
 					else if (entry.getValue().getClass() == Integer.class) {
-						Consumer<String> setter = null;
-						Supplier<Object> getter = null;
-
 						switch (entry.getText()) {
 						case "ValueRank":
-							setter = new Consumer<String>() {
-								@Override
-								public void accept(String t) {
-									if (entry.getCachedNode() instanceof CachedVariableNode) {
-										((CachedVariableNode) entry.getCachedNode()).setValueRank(Integer.parseInt(t));
-									} else if (entry.getCachedNode() instanceof CachedVariableTypeNode) {
-										((CachedVariableTypeNode) entry.getCachedNode())
-												.setValueRank(Integer.parseInt(t));
-									}
-								}
-							};
-
-							getter = new Supplier<Object>() {
-								@Override
-								public Object get() {
-									if (entry.getCachedNode() instanceof CachedVariableNode) {
-										return ((CachedVariableNode) entry.getCachedNode()).getValueRank();
-									} else if (entry.getCachedNode() instanceof CachedVariableTypeNode) {
-										return ((CachedVariableTypeNode) entry.getCachedNode()).getValueRank();
-									}
-									return null;
-								}
-							};
+							valueRankEditor(table, entry, editableColumn, item);
 							break;
 						}
-						textEditor(table, entry, editableColumn, item, setter, getter);
 					}
 					// Double -> MinimumSamplingInterval
 					else if (entry.getValue().getClass() == Double.class) {
@@ -459,6 +434,35 @@ public class AttributeEditorViewTableEditor {
 				UInteger value = UInteger.valueOf(newEditor.getText());
 				entry.setValue(value);
 				setter.accept(value);
+				editor.getEditor().dispose();
+			}
+
+			@Override
+			public void widgetDefaultSelected(SelectionEvent arg0) {
+			}
+		});
+
+		editor.setEditor(newEditor, item, editableColumn);
+	}
+
+	private void valueRankEditor(Table table, NodeEntry<Object> entry, int editableColumn, TableItem item) {
+		GenericComboBox<BetterValueRank> newEditor = new GenericComboBox<BetterValueRank>(table, SWT.NONE,
+				new Renderer<BetterValueRank>() {
+
+					@Override
+					public String render(BetterValueRank obj) {
+						return obj.name();
+					}
+				});
+		newEditor.setItems(BetterValueRank.values());
+		newEditor.setSelected((BetterValueRank) BetterValueRank.valueOf((Integer) entry.getValue()));
+		newEditor.addSelectionListener(new SelectionListener() {
+
+			@Override
+			public void widgetSelected(SelectionEvent arg0) {
+				editor.getItem().setText(editableColumn, newEditor.getSelected().toString());
+				entry.setValue(newEditor.getSelected());
+				((HasValueRank) entry.getCachedNode()).setValueRank(newEditor.getSelected().getValue());
 				editor.getEditor().dispose();
 			}
 

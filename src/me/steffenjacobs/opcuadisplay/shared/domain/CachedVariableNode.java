@@ -9,7 +9,7 @@ import org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.UInteger;
 
 import me.steffenjacobs.opcuadisplay.shared.util.FutureResolver;
 
-public class CachedVariableNode extends CachedBaseNode {
+public class CachedVariableNode extends CachedBaseNode implements HasValueRank{
 
 	private Object value;
 	private NodeId dataType;

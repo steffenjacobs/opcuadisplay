@@ -8,7 +8,7 @@ import org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.UInteger;
 
 import me.steffenjacobs.opcuadisplay.shared.util.FutureResolver;
 
-public class CachedVariableTypeNode extends CachedBaseNode implements HasOnlyAbstract {
+public class CachedVariableTypeNode extends CachedBaseNode implements HasOnlyAbstract, HasValueRank {
 
 	private Object value;
 	private NodeId dataType;
