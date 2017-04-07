@@ -26,9 +26,9 @@ public enum Images {
 	}
 
 	public static enum ExplorerView {
-		TYPE("icons/view/type.png", "variabletype"),
-		FILE("icons/view/file.png", "file"),
-		FILE_YELLOW("icons/view/file_yellow.png", "fileyellow"),
+		TYPE("icons/view/type.png", "type"),
+		PROPERTY("icons/view/file.png", "property"),
+		VARIABLE("icons/view/file_yellow.png", "variable"),
 		FOLDER("icons/view/folder.png", "folder"),
 		METHOD("icons/view/method.png", "method"),
 		OBJECT("icons/view/object.png", "object"),

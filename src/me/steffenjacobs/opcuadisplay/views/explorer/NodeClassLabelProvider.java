@@ -52,9 +52,9 @@ public class NodeClassLabelProvider extends LabelProvider {
 
 		else if (cn.getNodeClass() == NodeClass.Variable) {
 			if (cn.getReferences().contains(CachedReference.PROPERTY_TYPE)) {
-				return Activator.getImage(Images.ExplorerView.FILE.getIdentifier());
+				return Activator.getImage(Images.ExplorerView.PROPERTY.getIdentifier());
 			}
-			return Activator.getImage(Images.ExplorerView.FILE_YELLOW.getIdentifier());
+			return Activator.getImage(Images.ExplorerView.VARIABLE.getIdentifier());
 		}
 
 		else if (cn.getNodeClass() == NodeClass.DataType) {
