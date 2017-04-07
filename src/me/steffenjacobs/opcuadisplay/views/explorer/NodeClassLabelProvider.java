@@ -6,6 +6,7 @@ import org.eclipse.swt.graphics.Image;
 
 import me.steffenjacobs.opcuadisplay.Activator;
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedBaseNode;
+import me.steffenjacobs.opcuadisplay.shared.domain.CachedReference;
 import me.steffenjacobs.opcuadisplay.shared.util.Images;
 
 public class NodeClassLabelProvider extends LabelProvider {
@@ -50,21 +51,13 @@ public class NodeClassLabelProvider extends LabelProvider {
 		}
 
 		else if (cn.getNodeClass() == NodeClass.Variable) {
-			if (cn.hasChildren()) {
-				return Activator.getImage(Images.ExplorerView.FILE_YELLOW.getIdentifier());
+			if (cn.getReferences().contains(CachedReference.PROPERTY_TYPE)) {
+				return Activator.getImage(Images.ExplorerView.FILE.getIdentifier());
 			}
-			return Activator.getImage(Images.ExplorerView.FILE.getIdentifier());
+			return Activator.getImage(Images.ExplorerView.FILE_YELLOW.getIdentifier());
 		}
 
-		else if (/*
-					 * cn.getNodeClass() == NodeClass.VariableType ||
-					 * cn.getNodeClass() == NodeClass.ObjectType ||
-					 */cn
-				.getNodeClass() == NodeClass.DataType /*
-														 * || cn.getNodeClass()
-														 * == NodeClass.
-														 * ReferenceType
-														 */) {
+		else if (cn.getNodeClass() == NodeClass.DataType) {
 			return Activator.getImage(Images.ExplorerView.TYPE.getIdentifier());
 		}
 		return Activator.getImage(Images.ExplorerView.UNKNOWN.getIdentifier());
