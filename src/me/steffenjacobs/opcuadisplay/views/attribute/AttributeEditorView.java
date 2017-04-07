@@ -18,7 +18,7 @@ import me.steffenjacobs.opcuadisplay.shared.util.EventBus;
 import me.steffenjacobs.opcuadisplay.shared.util.EventBus.EventListener;
 import me.steffenjacobs.opcuadisplay.views.attribute.domain.NodeEntryFactory;
 import me.steffenjacobs.opcuadisplay.views.attribute.domain.NodeEntryFactory.NodeEntry;
-import me.steffenjacobs.opcuadisplay.views.explorer.events.SelectedNodeChangedEvent;
+import me.steffenjacobs.opcuadisplay.views.explorer.events.SelectedNodeVisibleAttributeChangedEvent;
 
 public class AttributeEditorView extends ViewPart {
 
@@ -41,11 +41,11 @@ public class AttributeEditorView extends ViewPart {
 	}
 
 	private void registerListeners() {
-		EventBus.getInstance().addListener(SelectedNodeChangedEvent.IDENTIFIER,
-				new EventListener<SelectedNodeChangedEvent>() {
+		EventBus.getInstance().addListener(SelectedNodeVisibleAttributeChangedEvent.IDENTIFIER,
+				new EventListener<SelectedNodeVisibleAttributeChangedEvent>() {
 
 					@Override
-					public void onAction(SelectedNodeChangedEvent event) {
+					public void onAction(SelectedNodeVisibleAttributeChangedEvent event) {
 						tableEditor.clearTableEditor();
 						viewer.setInput(NodeEntryFactory.fromNode(event.getNode()));
 						viewer.refresh();

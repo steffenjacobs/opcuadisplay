@@ -4,13 +4,13 @@ import me.steffenjacobs.opcuadisplay.shared.domain.CachedBaseNode;
 import me.steffenjacobs.opcuadisplay.shared.util.EventBus.Event;
 import me.steffenjacobs.opcuadisplay.shared.util.EventBus.EventArgs;
 
-public class SelectedNodeChangedEvent extends Event {
+public class SelectedNodeVisibleAttributeChangedEvent extends Event {
 
-	public static String IDENTIFIER = "selectedNodeChangedEvent";
+	public static String IDENTIFIER = "selectedNodeVisibleAttributeChangedEvent";
 	
 	private final CachedBaseNode node;
 
-	public SelectedNodeChangedEvent(CachedBaseNode selectedNode) {
+	public SelectedNodeVisibleAttributeChangedEvent(CachedBaseNode selectedNode) {
 		super(IDENTIFIER, EventArgs.NONE);
 		this.node = selectedNode;
 	}

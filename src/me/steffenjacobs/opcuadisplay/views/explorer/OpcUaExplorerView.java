@@ -32,7 +32,7 @@ import me.steffenjacobs.opcuadisplay.shared.util.EventBus.EventListener;
 import me.steffenjacobs.opcuadisplay.shared.util.Images;
 import me.steffenjacobs.opcuadisplay.views.attribute.events.AttributeModifiedEvent;
 import me.steffenjacobs.opcuadisplay.views.explorer.dialogs.LoadVariablesDialog;
-import me.steffenjacobs.opcuadisplay.views.explorer.events.SelectedNodeChangedEvent;
+import me.steffenjacobs.opcuadisplay.views.explorer.events.SelectedNodeVisibleAttributeChangedEvent;
 
 /**
  * This sample class demonstrates how to plug-in a new workbench view. The view
@@ -173,7 +173,7 @@ public class OpcUaExplorerView extends ViewPart {
 
 		int result = dialog.open();
 		if (result == Window.OK) {
-			EventBus.getInstance().fireEvent(new SelectedNodeChangedEvent(null));
+			EventBus.getInstance().fireEvent(new SelectedNodeVisibleAttributeChangedEvent(null));
 			connector.loadVariables(dialog.getURL());
 			viewer.refresh();
 			expandToDefaultState();
@@ -196,7 +196,7 @@ public class OpcUaExplorerView extends ViewPart {
 			if (((CachedBaseNode) obj).isDummy()) {
 				handleLoadVariableAction();
 			} else {
-				EventBus.getInstance().fireEvent(new SelectedNodeChangedEvent((CachedBaseNode) obj));
+				EventBus.getInstance().fireEvent(new SelectedNodeVisibleAttributeChangedEvent((CachedBaseNode) obj));
 				viewer.setExpandedState(obj, !viewer.getExpandedState(obj));
 			}
 		}
@@ -208,7 +208,7 @@ public class OpcUaExplorerView extends ViewPart {
 		Object obj = ((IStructuredSelection) selection).getFirstElement();
 		if (obj instanceof CachedBaseNode) {
 			if (!((CachedBaseNode) obj).isDummy()) {
-				EventBus.getInstance().fireEvent(new SelectedNodeChangedEvent((CachedBaseNode) obj));
+				EventBus.getInstance().fireEvent(new SelectedNodeVisibleAttributeChangedEvent((CachedBaseNode) obj));
 			}
 		}
 	}
