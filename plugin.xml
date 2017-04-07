@@ -48,5 +48,20 @@
             file="contexts.xml">
       </contexts>
    </extension>
+   
+   <extension point="org.eclipse.ui.importWizards">
+      <category
+            name="OPC UA"
+            id="me.steffenjacobs.opcuadisplay">
+      </category>
+      
+      <wizard
+            name="Import OPC UA Model"
+            class="me.steffenjacobs.opcuadisplay.wizard.imp.OpcUaImportWizard"
+            category="me.steffenjacobs.opcuadisplay"
+            id="me.steffenjacobs.opcuadisplay.wizard.imp.OpcUaImportWizard">
+            
+      </wizard>      
+   </extension>
 
 </plugin>
