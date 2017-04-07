@@ -145,6 +145,32 @@ public class OpcUaExplorerView extends ViewPart {
 		manager.add(expandAllAction);
 	}
 
+	/**adds the available edit options*/
+	private void addAvailableEditOptions(IMenuManager manager, CachedBaseNode selectedNode) {
+		//TODO: maybe copy & paste
+		if (ConstraintChecker.getIntsance().isAddObjectAllowed(selectedNode)) {
+			manager.add(addObject);
+		}
+		if (ConstraintChecker.getIntsance().isAddMethodAllowed(selectedNode)) {
+			manager.add(addMethod);
+		}
+		if (ConstraintChecker.getIntsance().isAddVariableAllowed(selectedNode)) {
+			manager.add(addVariable);
+		}
+		if (ConstraintChecker.getIntsance().isAddPropertyAllowed(selectedNode)) {
+			manager.add(addProperty);
+		}
+		if (ConstraintChecker.getIntsance().isAddDataTypeAllowed(selectedNode)) {
+			manager.add(addDataType);
+		}
+		if (ConstraintChecker.getIntsance().isAddObjectTypeAllowed(selectedNode)) {
+			manager.add(addObjectType);
+		}
+		if (ConstraintChecker.getIntsance().isAddVariableTypeAllowed(selectedNode)) {
+			manager.add(addVariableType);
+		}
+	}
+
 	private void fillContextMenu(IMenuManager manager) {
 		manager.add(openLoadVariablesView);
 		manager.add(new Separator());
@@ -153,6 +179,13 @@ public class OpcUaExplorerView extends ViewPart {
 		manager.add(new Separator());
 		// Other plug-ins can contribute there actions here
 		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+
+		ISelection selection = viewer.getSelection();
+		Object obj = ((IStructuredSelection) selection).getFirstElement();
+
+		if (obj instanceof CachedBaseNode) {
+			addAvailableEditOptions(manager, (CachedBaseNode) obj);
+		}
 	}
 
 	private void fillLocalToolBar(IToolBarManager manager) {
@@ -221,8 +254,7 @@ public class OpcUaExplorerView extends ViewPart {
 		};
 		addVariable.setText("Add Variable");
 		addVariable.setToolTipText("Add Variable");
-		addVariable.setImageDescriptor(
-				PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_ELEMENT));
+		addVariable.setImageDescriptor(Activator.getImageDescriptor(Images.ExplorerView.VARIABLE.getIdentifier()));
 
 		// add method action
 		addMethod = new Action() {
@@ -231,8 +263,7 @@ public class OpcUaExplorerView extends ViewPart {
 		};
 		addMethod.setText("Add Method");
 		addMethod.setToolTipText("Add Method");
-		addMethod.setImageDescriptor(
-				PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_ELEMENT));
+		addMethod.setImageDescriptor(Activator.getImageDescriptor(Images.ExplorerView.METHOD.getIdentifier()));
 
 		// add object action
 		addObject = new Action() {
@@ -241,8 +272,7 @@ public class OpcUaExplorerView extends ViewPart {
 		};
 		addObject.setText("Add Object");
 		addObject.setToolTipText("Add Object");
-		addObject.setImageDescriptor(
-				PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_ELEMENT));
+		addObject.setImageDescriptor(Activator.getImageDescriptor(Images.ExplorerView.OBJECT.getIdentifier()));
 
 		// add Property action
 		addProperty = new Action() {
@@ -251,8 +281,7 @@ public class OpcUaExplorerView extends ViewPart {
 		};
 		addProperty.setText("Add Property");
 		addProperty.setToolTipText("Add Property");
-		addProperty.setImageDescriptor(
-				PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_ELEMENT));
+		addProperty.setImageDescriptor(Activator.getImageDescriptor(Images.ExplorerView.PROPERTY.getIdentifier()));
 
 		// add ObjectType action
 		addObjectType = new Action() {
@@ -261,8 +290,7 @@ public class OpcUaExplorerView extends ViewPart {
 		};
 		addObjectType.setText("Add ObjectType");
 		addObjectType.setToolTipText("Add ObjectType");
-		addObjectType.setImageDescriptor(
-				PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_ELEMENT));
+		addObjectType.setImageDescriptor(Activator.getImageDescriptor(Images.ExplorerView.OBJECT_TYPE.getIdentifier()));
 
 		// add VariableType action
 		addVariableType = new Action() {
@@ -271,8 +299,8 @@ public class OpcUaExplorerView extends ViewPart {
 		};
 		addVariableType.setText("Add VariableType");
 		addVariableType.setToolTipText("Add VariableType");
-		addVariableType.setImageDescriptor(
-				PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_ELEMENT));
+		addVariableType
+				.setImageDescriptor(Activator.getImageDescriptor(Images.ExplorerView.VARIABLE_TYPE.getIdentifier()));
 
 		// add DataType action
 		addDataType = new Action() {
@@ -281,8 +309,7 @@ public class OpcUaExplorerView extends ViewPart {
 		};
 		addDataType.setText("Add DataType");
 		addDataType.setToolTipText("Add DataType");
-		addDataType.setImageDescriptor(
-				PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_ELEMENT));
+		addDataType.setImageDescriptor(Activator.getImageDescriptor(Images.ExplorerView.DATA_TYPE.getIdentifier()));
 	}
 
 	private void makeActions() {
