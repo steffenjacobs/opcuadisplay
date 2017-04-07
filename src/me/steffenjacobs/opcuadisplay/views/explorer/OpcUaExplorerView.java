@@ -14,6 +14,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.window.Window;
+import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
@@ -25,13 +26,13 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 
 import me.steffenjacobs.opcuadisplay.Activator;
+import me.steffenjacobs.opcuadisplay.dialogs.wizard.imp.OpcUaImportWizard;
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedBaseNode;
 import me.steffenjacobs.opcuadisplay.shared.util.EventBus;
 import me.steffenjacobs.opcuadisplay.shared.util.EventBus.Event;
 import me.steffenjacobs.opcuadisplay.shared.util.EventBus.EventListener;
 import me.steffenjacobs.opcuadisplay.shared.util.Images;
 import me.steffenjacobs.opcuadisplay.views.attribute.events.AttributeModifiedEvent;
-import me.steffenjacobs.opcuadisplay.views.explorer.dialogs.LoadVariablesDialog;
 import me.steffenjacobs.opcuadisplay.views.explorer.events.SelectedNodeVisibleAttributeChangedEvent;
 
 /**
@@ -201,21 +202,27 @@ public class OpcUaExplorerView extends ViewPart {
 	}
 
 	private void handleLoadVariableAction() {
-		LoadVariablesDialog dialog = new LoadVariablesDialog(new Shell());
-		dialog.create();
+
+		OpcUaImportWizard importWizard = new OpcUaImportWizard();
+		WizardDialog wizardDialog = new WizardDialog(new Shell(), importWizard);
 
 		CachedBaseNode root = connector.getRoot();
 		connector.overwriteRoot(CachedBaseNode.getDummyLoading());
 		viewer.refresh();
 
-		int result = dialog.open();
-		if (result == Window.OK) {
-			EventBus.getInstance().fireEvent(new SelectedNodeVisibleAttributeChangedEvent(null));
-			connector.loadVariables(dialog.getURL());
+		if (wizardDialog.open() != Window.OK) {
+			connector.overwriteRoot(root);
 			viewer.refresh();
 			expandToDefaultState();
+			return;
+		}
+
+		if (!importWizard.isType()) {
+			throw new IllegalArgumentException("XML import not supported");
 		} else {
-			connector.overwriteRoot(root);
+
+			EventBus.getInstance().fireEvent(new SelectedNodeVisibleAttributeChangedEvent(null));
+			connector.loadVariables(importWizard.getImportUrl());
 			viewer.refresh();
 			expandToDefaultState();
 		}
