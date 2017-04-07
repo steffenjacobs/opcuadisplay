@@ -61,6 +61,7 @@ public class OpcUaExplorerView extends ViewPart {
 	private Action openLoadVariablesView;
 	private Action collapseAllAction, expandAllAction;
 	private Action addVariable, addMethod, addObject, addProperty, addObjectType, addVariableType, addDataType;
+	private Action deleteAction;
 	private OpcUaConnector connector;
 
 	/**
@@ -145,9 +146,12 @@ public class OpcUaExplorerView extends ViewPart {
 		manager.add(expandAllAction);
 	}
 
-	/**adds the available edit options*/
+	/** adds the available edit options */
 	private void addAvailableEditOptions(IMenuManager manager, CachedBaseNode selectedNode) {
-		//TODO: maybe copy & paste
+		// TODO: maybe copy & paste
+		if (ConstraintChecker.getIntsance().isDeleteAllowed(selectedNode)) {
+			manager.add(deleteAction);
+		}
 		if (ConstraintChecker.getIntsance().isAddObjectAllowed(selectedNode)) {
 			manager.add(addObject);
 		}
@@ -247,6 +251,15 @@ public class OpcUaExplorerView extends ViewPart {
 	}
 
 	private void makeEditActions() {
+		// delete node action
+		deleteAction = new Action() {
+			public void run() {
+			}
+		};
+		deleteAction.setText("Delete Node");
+		deleteAction.setToolTipText("Deletes a Node.");
+		deleteAction.setImageDescriptor(Activator.getImageDescriptor(Images.ExplorerView.DELETE.getIdentifier()));
+
 		// add variable action
 		addVariable = new Action() {
 			public void run() {
