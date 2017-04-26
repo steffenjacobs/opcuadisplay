@@ -32,6 +32,7 @@ import me.steffenjacobs.opcuadisplay.shared.util.EventBus.EventListener;
 import me.steffenjacobs.opcuadisplay.shared.util.Images;
 import me.steffenjacobs.opcuadisplay.views.attribute.events.AttributeModifiedEvent;
 import me.steffenjacobs.opcuadisplay.views.explorer.events.RootUpdatedEvent;
+import me.steffenjacobs.opcuadisplay.views.explorer.events.SelectedNodeChangedEvent;
 import me.steffenjacobs.opcuadisplay.views.explorer.events.SelectedNodeVisibleAttributeChangedEvent;
 import me.steffenjacobs.opcuadisplay.wizard.events.WizardCancelEvent;
 import me.steffenjacobs.opcuadisplay.wizard.events.WizardFinishEvent;
@@ -127,16 +128,26 @@ public class OpcUaExplorerView extends ViewPart {
 			}
 		});
 
+		// listener when the selection in the tree viewer should change or had changed
+		EventBus.getInstance().addListener(SelectedNodeChangedEvent.IDENTIFIER,
+				new EventListener<SelectedNodeChangedEvent>() {
+					@Override
+					public void onAction(SelectedNodeChangedEvent event) {
+						onSelectedNodeChanged(event);
+					}
+				});
+
 		// listener for import finished
 		EventBus.getInstance().addListener(RootUpdatedEvent.IDENTIFIER, new EventListener<RootUpdatedEvent>() {
 			@Override
 			public void onAction(RootUpdatedEvent event) {
 				viewer.refresh();
 				expandToDefaultState();
+				EventBus.getInstance().fireEvent(new SelectedNodeChangedEvent(event.getNode(), false));
 			}
 		});
 
-		// listener for import wizard
+		// listeners for import wizard
 		EventBus.getInstance().addListener(WizardOpenEvent.IDENTIFIER, new EventListener<WizardOpenEvent>() {
 			@Override
 			public void onAction(WizardOpenEvent event) {
@@ -157,6 +168,18 @@ public class OpcUaExplorerView extends ViewPart {
 				onWizardFinish(event.getUrl(), event.isServer());
 			}
 		});
+	}
+
+	public void onSelectedNodeChanged(SelectedNodeChangedEvent event) {
+		// TODO: jump to correct node
+		viewer.getTree().setSelection(viewer.getTree().getItem(0));
+		if (event.isRevealInTree()) {
+			viewer.setSelection(viewer.getSelection(), event.isRevealInTree());
+		}
+
+		if (event.getNode() != null && !event.getNode().isDummy()) {
+			EventBus.getInstance().fireEvent(new SelectedNodeVisibleAttributeChangedEvent(event.getNode()));
+		}
 	}
 
 	private void hookContextMenu() {
@@ -250,6 +273,13 @@ public class OpcUaExplorerView extends ViewPart {
 		viewer.refresh();
 	}
 
+	/** can be called, when the import wizard had been canceled */
+	public void onWizardCancel() {
+		connector.overwriteRoot(cachedRoot);
+		viewer.refresh();
+		expandToDefaultState();
+	}
+
 	/** can be called, after the import wizard has finished */
 	public void onWizardFinish(String importUrl, boolean server) {
 		if (!server) {
@@ -261,13 +291,6 @@ public class OpcUaExplorerView extends ViewPart {
 			connector.loadVariables(importUrl);
 			// this will call an event which will then be catched above
 		}
-	}
-
-	/** can be called, when the import wizard had been canceled */
-	public void onWizardCancel() {
-		connector.overwriteRoot(cachedRoot);
-		viewer.refresh();
-		expandToDefaultState();
 	}
 
 	private void expandToDefaultState() {
@@ -292,11 +315,7 @@ public class OpcUaExplorerView extends ViewPart {
 	private void handleSelectionChangedAction() {
 		ISelection selection = viewer.getSelection();
 		Object obj = ((IStructuredSelection) selection).getFirstElement();
-		if (obj instanceof CachedBaseNode) {
-			if (!((CachedBaseNode) obj).isDummy()) {
-				EventBus.getInstance().fireEvent(new SelectedNodeVisibleAttributeChangedEvent((CachedBaseNode) obj));
-			}
-		}
+		EventBus.getInstance().fireEvent(new SelectedNodeChangedEvent((CachedBaseNode) obj, false));
 	}
 
 	private void makeEditActions() {

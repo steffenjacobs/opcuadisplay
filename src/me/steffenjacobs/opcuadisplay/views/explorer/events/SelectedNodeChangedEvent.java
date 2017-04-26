@@ -4,18 +4,25 @@ import me.steffenjacobs.opcuadisplay.shared.domain.CachedBaseNode;
 import me.steffenjacobs.opcuadisplay.shared.util.EventBus.Event;
 import me.steffenjacobs.opcuadisplay.shared.util.EventBus.EventArgs;
 
-public class RootUpdatedEvent extends Event {
+public class SelectedNodeChangedEvent extends Event {
 
-	public static String IDENTIFIER = "rootUpdatedEvent";
+	public static String IDENTIFIER = "selectedNodeChangedEvent";
 
 	private final CachedBaseNode node;
 
-	public RootUpdatedEvent(CachedBaseNode selectedNode) {
+	private final boolean revealInTree;
+
+	public SelectedNodeChangedEvent(CachedBaseNode selectedNode, boolean revealInTree) {
 		super(IDENTIFIER, EventArgs.NONE);
 		this.node = selectedNode;
+		this.revealInTree = revealInTree;
 	}
 
 	public CachedBaseNode getNode() {
 		return node;
+	}
+
+	public boolean isRevealInTree() {
+		return revealInTree;
 	}
 }
