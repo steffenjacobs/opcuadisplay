@@ -76,12 +76,12 @@ public class Activator extends AbstractUIPlugin {
 	public static ImageDescriptor getImageDescriptor(String identifier) {
 		return Activator.getDefault().getImageRegistry().getDescriptor(identifier);
 	}
-	
-	public static Image getImage(String identifier){
+
+	public static Image getImage(String identifier) {
 		return Activator.getDefault().getImageRegistry().get(identifier);
 	}
-	
-	private void loadImage(Bundle bundle, ImageRegistry registry, String strPath, String strName){
+
+	private void loadImage(Bundle bundle, ImageRegistry registry, String strPath, String strName) {
 		IPath path = new Path(strPath);
 		URL url = FileLocator.find(bundle, path, null);
 		ImageDescriptor desc = ImageDescriptor.createFromURL(url);
@@ -92,13 +92,13 @@ public class Activator extends AbstractUIPlugin {
 	protected void initializeImageRegistry(ImageRegistry registry) {
 		Bundle bundle = Platform.getBundle(PLUGIN_ID);
 
-		//load base images
+		// load base images
 		for (Images img : Images.values()) {
 			loadImage(bundle, registry, img.getPath(), img.getIdentifier());
 		}
-		
-		//load view images
-		for(Images.ExplorerView img : Images.ExplorerView.values()){
+
+		// load view images
+		for (Images.ExplorerView img : Images.ExplorerView.values()) {
 			loadImage(bundle, registry, img.getPath(), img.getIdentifier());
 		}
 	}
