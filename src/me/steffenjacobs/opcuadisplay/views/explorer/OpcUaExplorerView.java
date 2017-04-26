@@ -13,7 +13,6 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
@@ -32,7 +31,11 @@ import me.steffenjacobs.opcuadisplay.shared.util.EventBus.Event;
 import me.steffenjacobs.opcuadisplay.shared.util.EventBus.EventListener;
 import me.steffenjacobs.opcuadisplay.shared.util.Images;
 import me.steffenjacobs.opcuadisplay.views.attribute.events.AttributeModifiedEvent;
+import me.steffenjacobs.opcuadisplay.views.explorer.events.RootUpdatedEvent;
 import me.steffenjacobs.opcuadisplay.views.explorer.events.SelectedNodeVisibleAttributeChangedEvent;
+import me.steffenjacobs.opcuadisplay.wizard.events.WizardCancelEvent;
+import me.steffenjacobs.opcuadisplay.wizard.events.WizardFinishEvent;
+import me.steffenjacobs.opcuadisplay.wizard.events.WizardOpenEvent;
 import me.steffenjacobs.opcuadisplay.wizard.imp.OpcUaImportWizard;
 
 /**
@@ -64,6 +67,8 @@ public class OpcUaExplorerView extends ViewPart {
 	private Action addVariable, addMethod, addObject, addProperty, addObjectType, addVariableType, addDataType;
 	private Action deleteAction;
 	private OpcUaConnector connector;
+
+	private CachedBaseNode cachedRoot;
 
 	/**
 	 * The constructor.
@@ -112,11 +117,44 @@ public class OpcUaExplorerView extends ViewPart {
 	}
 
 	private void registerListeners() {
+
+		// listener for attribute modification
 		EventBus.getInstance().addListener(AttributeModifiedEvent.IDENTIFIER, new EventListener<EventBus.Event>() {
 			@Override
 			public void onAction(Event event) {
 				connector.overwriteRoot(connector.getRoot());
 				viewer.refresh();
+			}
+		});
+
+		// listener for import finished
+		EventBus.getInstance().addListener(RootUpdatedEvent.IDENTIFIER, new EventListener<RootUpdatedEvent>() {
+			@Override
+			public void onAction(RootUpdatedEvent event) {
+				viewer.refresh();
+				expandToDefaultState();
+			}
+		});
+
+		// listener for import wizard
+		EventBus.getInstance().addListener(WizardOpenEvent.IDENTIFIER, new EventListener<WizardOpenEvent>() {
+			@Override
+			public void onAction(WizardOpenEvent event) {
+				onWizardOpen();
+			}
+		});
+
+		EventBus.getInstance().addListener(WizardCancelEvent.IDENTIFIER, new EventListener<WizardCancelEvent>() {
+			@Override
+			public void onAction(WizardCancelEvent event) {
+				onWizardCancel();
+			}
+		});
+
+		EventBus.getInstance().addListener(WizardFinishEvent.IDENTIFIER, new EventListener<WizardFinishEvent>() {
+			@Override
+			public void onAction(WizardFinishEvent event) {
+				onWizardFinish(event.getUrl(), event.isServer());
 			}
 		});
 	}
@@ -202,30 +240,34 @@ public class OpcUaExplorerView extends ViewPart {
 	}
 
 	private void handleLoadVariableAction() {
+		new WizardDialog(new Shell(), new OpcUaImportWizard()).open();
+	}
 
-		OpcUaImportWizard importWizard = new OpcUaImportWizard();
-		WizardDialog wizardDialog = new WizardDialog(new Shell(), importWizard);
-
-		CachedBaseNode root = connector.getRoot();
+	/** can be called, when the import wizard is started */
+	public void onWizardOpen() {
+		cachedRoot = connector.getRoot();
 		connector.overwriteRoot(CachedBaseNode.getDummyLoading());
 		viewer.refresh();
+	}
 
-		if (wizardDialog.open() != Window.OK) {
-			connector.overwriteRoot(root);
-			viewer.refresh();
-			expandToDefaultState();
-			return;
-		}
-
-		if (!importWizard.isType()) {
+	/** can be called, after the import wizard has finished */
+	public void onWizardFinish(String importUrl, boolean server) {
+		if (!server) {
 			throw new IllegalArgumentException("XML import not supported");
-		} else {
-
-			EventBus.getInstance().fireEvent(new SelectedNodeVisibleAttributeChangedEvent(null));
-			connector.loadVariables(importWizard.getImportUrl());
-			viewer.refresh();
-			expandToDefaultState();
 		}
+
+		else {
+			EventBus.getInstance().fireEvent(new SelectedNodeVisibleAttributeChangedEvent(null));
+			connector.loadVariables(importUrl);
+			// this will call an event which will then be catched above
+		}
+	}
+
+	/** can be called, when the import wizard had been canceled */
+	public void onWizardCancel() {
+		connector.overwriteRoot(cachedRoot);
+		viewer.refresh();
+		expandToDefaultState();
 	}
 
 	private void expandToDefaultState() {

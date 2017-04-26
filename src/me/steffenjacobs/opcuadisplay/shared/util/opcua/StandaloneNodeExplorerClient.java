@@ -12,6 +12,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.milo.opcua.sdk.client.OpcUaClient;
 import org.eclipse.milo.opcua.sdk.client.api.config.OpcUaClientConfig;
 import org.eclipse.milo.opcua.sdk.client.api.identity.AnonymousProvider;
@@ -61,10 +62,13 @@ public class StandaloneNodeExplorerClient {
 	 * @return all nodes from an opc server specified in <i>url</i> linked to
 	 *         their parents
 	 */
-	public CachedBaseNode retrieveNodes(String url) throws Exception {
+	public CachedBaseNode retrieveNodes(String url, final IProgressMonitor monitor) throws Exception {
+
+		monitor.beginTask("Establishing connection with " + url + "...", 2);
 
 		OpcUaClient client = createClient(url);
 
+		monitor.worked(1);
 		// synchronous connect
 		client.connect().get();
 
@@ -72,6 +76,9 @@ public class StandaloneNodeExplorerClient {
 		long start = System.currentTimeMillis();
 		ExecutorService exec = Executors.newFixedThreadPool(8);
 
+		monitor.worked(1);
+
+		monitor.beginTask("Downloading Models...", 100);
 		// receive sub folders of root
 		final CachedBaseNode root = retrieveNodes(CachedBaseNode.createNewRoot(), client, false);
 
@@ -79,7 +86,7 @@ public class StandaloneNodeExplorerClient {
 			// Objects
 			if (c.getNodeId().equals(Identifiers.ObjectsFolder)) {
 				// retrieve objects async
-				exec.submit(() -> retrieveNodes(c, client, true));
+				exec.submit(() -> retrieveNodesMonitored(c, client, true, monitor, 20));
 			}
 			// Types
 			else if (c.getNodeId().equals(Identifiers.TypesFolder)) {
@@ -93,7 +100,7 @@ public class StandaloneNodeExplorerClient {
 
 						// retrieve each sub type of DataTypes async
 						toList(dataType.getChildren()).forEach(dtc -> {
-							exec.submit(() -> retrieveNodes(dtc, client, true));
+							exec.submit(() -> retrieveNodesMonitored(dtc, client, true, monitor, 26));
 						});
 					}
 					// EventTypes, ObjectTypes, ReferenceTypes, VariableTypes
@@ -115,7 +122,15 @@ public class StandaloneNodeExplorerClient {
 		// disconnect
 		client.disconnect();
 
+		monitor.worked(2);
+
 		return root;
+	}
+
+	private void retrieveNodesMonitored(final CachedBaseNode parent, OpcUaClient client, boolean recursive,
+			IProgressMonitor monitor, int value) {
+		retrieveNodes(parent, client, recursive);
+		monitor.worked(value);
 	}
 
 	/** @return true, if <i>node</i> is in the Types folder. */
