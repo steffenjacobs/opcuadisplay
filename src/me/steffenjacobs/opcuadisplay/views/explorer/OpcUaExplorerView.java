@@ -12,6 +12,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.SWT;
@@ -31,9 +32,9 @@ import me.steffenjacobs.opcuadisplay.shared.util.EventBus.Event;
 import me.steffenjacobs.opcuadisplay.shared.util.EventBus.EventListener;
 import me.steffenjacobs.opcuadisplay.shared.util.Images;
 import me.steffenjacobs.opcuadisplay.views.attribute.events.AttributeModifiedEvent;
+import me.steffenjacobs.opcuadisplay.views.explorer.events.ChangeSelectedNodeEvent;
 import me.steffenjacobs.opcuadisplay.views.explorer.events.RootUpdatedEvent;
 import me.steffenjacobs.opcuadisplay.views.explorer.events.SelectedNodeChangedEvent;
-import me.steffenjacobs.opcuadisplay.views.explorer.events.SelectedNodeVisibleAttributeChangedEvent;
 import me.steffenjacobs.opcuadisplay.wizard.events.WizardCancelEvent;
 import me.steffenjacobs.opcuadisplay.wizard.events.WizardFinishEvent;
 import me.steffenjacobs.opcuadisplay.wizard.events.WizardOpenEvent;
@@ -128,12 +129,12 @@ public class OpcUaExplorerView extends ViewPart {
 			}
 		});
 
-		// listener when the selection in the tree viewer should change or had changed
-		EventBus.getInstance().addListener(SelectedNodeChangedEvent.IDENTIFIER,
-				new EventListener<SelectedNodeChangedEvent>() {
+		// listener when the selection in the tree viewer should change
+		EventBus.getInstance().addListener(ChangeSelectedNodeEvent.IDENTIFIER,
+				new EventListener<ChangeSelectedNodeEvent>() {
 					@Override
-					public void onAction(SelectedNodeChangedEvent event) {
-						onSelectedNodeChanged(event);
+					public void onAction(ChangeSelectedNodeEvent event) {
+						onChangeSelectedNode(event);
 					}
 				});
 
@@ -143,7 +144,7 @@ public class OpcUaExplorerView extends ViewPart {
 			public void onAction(RootUpdatedEvent event) {
 				viewer.refresh();
 				expandToDefaultState();
-				EventBus.getInstance().fireEvent(new SelectedNodeChangedEvent(event.getNode(), false));
+				EventBus.getInstance().fireEvent(new ChangeSelectedNodeEvent(event.getNode(), false));
 			}
 		});
 
@@ -170,16 +171,10 @@ public class OpcUaExplorerView extends ViewPart {
 		});
 	}
 
-	public void onSelectedNodeChanged(SelectedNodeChangedEvent event) {
-		// TODO: jump to correct node
-		viewer.getTree().setSelection(viewer.getTree().getItem(0));
-		if (event.isRevealInTree()) {
-			viewer.setSelection(viewer.getSelection(), event.isRevealInTree());
-		}
-
-		if (event.getNode() != null && !event.getNode().isDummy()) {
-			EventBus.getInstance().fireEvent(new SelectedNodeVisibleAttributeChangedEvent(event.getNode()));
-		}
+	public void onChangeSelectedNode(ChangeSelectedNodeEvent event) {
+		viewer.setSelection(new StructuredSelection(event.getNode()), event.isRevealInTree());
+		// not necessary to fire SelectedNodeChangedEvent, because it will be
+		// fired by SelectionListener of Treeviewer
 	}
 
 	private void hookContextMenu() {
@@ -287,7 +282,7 @@ public class OpcUaExplorerView extends ViewPart {
 		}
 
 		else {
-			EventBus.getInstance().fireEvent(new SelectedNodeVisibleAttributeChangedEvent(null));
+			EventBus.getInstance().fireEvent(new SelectedNodeChangedEvent(null));
 			connector.loadVariables(importUrl);
 			// this will call an event which will then be catched above
 		}
@@ -305,17 +300,10 @@ public class OpcUaExplorerView extends ViewPart {
 			if (((CachedBaseNode) obj).isDummy()) {
 				handleLoadVariableAction();
 			} else {
-				EventBus.getInstance().fireEvent(new SelectedNodeVisibleAttributeChangedEvent((CachedBaseNode) obj));
+				EventBus.getInstance().fireEvent(new SelectedNodeChangedEvent((CachedBaseNode) obj));
 				viewer.setExpandedState(obj, !viewer.getExpandedState(obj));
 			}
 		}
-	}
-
-	/** called, when the selection changed. Updates the attribute view. */
-	private void handleSelectionChangedAction() {
-		ISelection selection = viewer.getSelection();
-		Object obj = ((IStructuredSelection) selection).getFirstElement();
-		EventBus.getInstance().fireEvent(new SelectedNodeChangedEvent((CachedBaseNode) obj, false));
 	}
 
 	private void makeEditActions() {
@@ -417,7 +405,10 @@ public class OpcUaExplorerView extends ViewPart {
 		// click action
 		selectionChangedAction = new Action() {
 			public void run() {
-				handleSelectionChangedAction();
+				// translate the event to update the attribute view.
+				Object obj = ((IStructuredSelection) viewer.getSelection()).getFirstElement();
+				EventBus.getInstance().fireEvent(new SelectedNodeChangedEvent((CachedBaseNode) obj));
+
 			}
 		};
 

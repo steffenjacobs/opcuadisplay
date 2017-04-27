@@ -19,7 +19,7 @@ import org.eclipse.ui.part.ViewPart;
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedReference;
 import me.steffenjacobs.opcuadisplay.shared.util.EventBus;
 import me.steffenjacobs.opcuadisplay.shared.util.EventBus.EventListener;
-import me.steffenjacobs.opcuadisplay.views.explorer.events.SelectedNodeVisibleAttributeChangedEvent;
+import me.steffenjacobs.opcuadisplay.views.explorer.events.SelectedNodeChangedEvent;
 
 public class ReferenceEditorView extends ViewPart {
 
@@ -40,11 +40,11 @@ public class ReferenceEditorView extends ViewPart {
 	}
 
 	private void registerListeners() {
-		EventBus.getInstance().addListener(SelectedNodeVisibleAttributeChangedEvent.IDENTIFIER,
-				new EventListener<SelectedNodeVisibleAttributeChangedEvent>() {
+		EventBus.getInstance().addListener(SelectedNodeChangedEvent.IDENTIFIER,
+				new EventListener<SelectedNodeChangedEvent>() {
 
 					@Override
-					public void onAction(SelectedNodeVisibleAttributeChangedEvent event) {
+					public void onAction(SelectedNodeChangedEvent event) {
 						viewer.setInput(event.getNode() == null ? new ArrayList<CachedReference>()
 								: event.getNode().getReferences());
 						viewer.refresh();

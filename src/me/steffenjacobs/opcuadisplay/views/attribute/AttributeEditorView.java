@@ -18,14 +18,14 @@ import me.steffenjacobs.opcuadisplay.shared.util.EventBus;
 import me.steffenjacobs.opcuadisplay.shared.util.EventBus.EventListener;
 import me.steffenjacobs.opcuadisplay.views.attribute.domain.NodeEntryFactory;
 import me.steffenjacobs.opcuadisplay.views.attribute.domain.NodeEntryFactory.NodeEntry;
-import me.steffenjacobs.opcuadisplay.views.explorer.events.SelectedNodeVisibleAttributeChangedEvent;
+import me.steffenjacobs.opcuadisplay.views.explorer.events.SelectedNodeChangedEvent;
 
 public class AttributeEditorView extends ViewPart {
 
 	public static final String ID = "me.steffenjacobs.opcuadisplay.views.attribute.AttributeEditorView";
 
 	private TableViewer viewer;
-	
+
 	private AttributeEditorViewTableEditor tableEditor;
 
 	@Override
@@ -41,11 +41,11 @@ public class AttributeEditorView extends ViewPart {
 	}
 
 	private void registerListeners() {
-		EventBus.getInstance().addListener(SelectedNodeVisibleAttributeChangedEvent.IDENTIFIER,
-				new EventListener<SelectedNodeVisibleAttributeChangedEvent>() {
+		EventBus.getInstance().addListener(SelectedNodeChangedEvent.IDENTIFIER,
+				new EventListener<SelectedNodeChangedEvent>() {
 
 					@Override
-					public void onAction(SelectedNodeVisibleAttributeChangedEvent event) {
+					public void onAction(SelectedNodeChangedEvent event) {
 						tableEditor.clearTableEditor();
 						viewer.setInput(NodeEntryFactory.fromNode(event.getNode()));
 						viewer.refresh();
@@ -76,8 +76,6 @@ public class AttributeEditorView extends ViewPart {
 
 		tableEditor = new AttributeEditorViewTableEditor(table, this.getViewer());
 	}
-
-	
 
 	public TableViewer getViewer() {
 		return viewer;
