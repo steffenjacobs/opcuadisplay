@@ -22,6 +22,7 @@ public class OpcUaImportWizard extends Wizard implements IWorkbenchWizard {
 	public OpcUaImportWizard() {
 		super();
 		setNeedsProgressMonitor(true);
+		EventBus.getInstance().fireEvent(new WizardOpenEvent());
 	}
 
 	@Override
@@ -65,6 +66,5 @@ public class OpcUaImportWizard extends Wizard implements IWorkbenchWizard {
 
 	@Override
 	public void init(IWorkbench arg0, IStructuredSelection arg1) {
-		EventBus.getInstance().fireEvent(new WizardOpenEvent());
 	}
 }
