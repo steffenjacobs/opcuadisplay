@@ -164,7 +164,9 @@ public class CachedBaseNode {
 
 	public CachedBaseNode[] getChildren() {
 		// clean up if necessary
-		final List<QualifiedName> names = this.getReferences().stream().map(CachedReference::getBrowseName)
+		final List<QualifiedName> names = this.getReferences().stream()
+				.filter(ref -> !ref.getReferenceType().equals("HasTypeDefinition"))
+				.map(CachedReference::getBrowseName)
 				.collect(Collectors.toList());
 		children = children.stream().filter(c -> names.contains(c.getBrowseName())).collect(Collectors.toList());
 
