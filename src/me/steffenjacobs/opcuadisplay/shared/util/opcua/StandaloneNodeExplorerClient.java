@@ -224,6 +224,9 @@ public class StandaloneNodeExplorerClient {
 					browseReferencesRecursive(cbn, client).forEach(nd -> cbn.addChild(nd));
 					ref.add(cbn);
 				}
+				else{
+					ref.add(new CachedBaseNode(rd));
+				}
 
 				refs.add(new CachedReference(getNameOfNode(rd.getReferenceTypeId(), client), rd.getBrowseName(),
 						getNameOfNode(rd.getTypeDefinition().local().orElse(null), client),
