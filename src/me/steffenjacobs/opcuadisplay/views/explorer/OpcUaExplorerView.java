@@ -65,7 +65,7 @@ public class OpcUaExplorerView extends ViewPart {
 
 	private TreeViewer viewer;
 	private Action doubleClickAction, selectionChangedAction;
-	private Action openLoadVariablesView;
+	private Action openImportWizard;
 	private Action collapseAllAction, expandAllAction;
 	private Action addVariable, addMethod, addObject, addProperty, addObjectType, addVariableType, addDataType;
 	private Action deleteAction;
@@ -197,7 +197,7 @@ public class OpcUaExplorerView extends ViewPart {
 	}
 
 	private void fillLocalPullDown(IMenuManager manager) {
-		manager.add(openLoadVariablesView);
+		manager.add(openImportWizard);
 		manager.add(new Separator());
 		manager.add(collapseAllAction);
 		manager.add(expandAllAction);
@@ -233,7 +233,7 @@ public class OpcUaExplorerView extends ViewPart {
 	}
 
 	private void fillContextMenu(IMenuManager manager) {
-		manager.add(openLoadVariablesView);
+		manager.add(openImportWizard);
 		manager.add(new Separator());
 		manager.add(collapseAllAction);
 		manager.add(expandAllAction);
@@ -250,15 +250,11 @@ public class OpcUaExplorerView extends ViewPart {
 	}
 
 	private void fillLocalToolBar(IToolBarManager manager) {
-		manager.add(openLoadVariablesView);
+		manager.add(openImportWizard);
 		manager.add(new Separator());
 		manager.add(collapseAllAction);
 		manager.add(expandAllAction);
 		manager.add(new Separator());
-	}
-
-	private void handleLoadVariableAction() {
-		new WizardDialog(new Shell(), new OpcUaImportWizard()).open();
 	}
 
 	/** can be called, when the import wizard is started */
@@ -298,7 +294,8 @@ public class OpcUaExplorerView extends ViewPart {
 		Object obj = ((IStructuredSelection) selection).getFirstElement();
 		if (obj instanceof CachedBaseNode) {
 			if (((CachedBaseNode) obj).isDummy()) {
-				handleLoadVariableAction();
+				// open import wizard
+				new WizardDialog(new Shell(), new OpcUaImportWizard()).open();
 			} else {
 				EventBus.getInstance().fireEvent(new SelectedNodeChangedEvent((CachedBaseNode) obj));
 				viewer.setExpandedState(obj, !viewer.getExpandedState(obj));
@@ -384,15 +381,15 @@ public class OpcUaExplorerView extends ViewPart {
 	private void makeActions() {
 		makeEditActions();
 
-		// open load variables view
-		openLoadVariablesView = new Action() {
+		// open import wizard
+		openImportWizard = new Action() {
 			public void run() {
-				handleLoadVariableAction();
+				new WizardDialog(new Shell(), new OpcUaImportWizard()).open();
 			}
 		};
-		openLoadVariablesView.setText("Load Variables...");
-		openLoadVariablesView.setToolTipText("Load Variables...");
-		openLoadVariablesView.setImageDescriptor(
+		openImportWizard.setText("Import OPC UA Model...");
+		openImportWizard.setToolTipText("Import OPC UA Model...");
+		openImportWizard.setImageDescriptor(
 				PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_ELEMENT));
 
 		// double click action
