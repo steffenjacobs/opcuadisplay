@@ -51,6 +51,7 @@ import me.steffenjacobs.opcuadisplay.shared.domain.CachedReferenceTypeNode;
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedVariableNode;
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedVariableTypeNode;
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedViewNode;
+import me.steffenjacobs.opcuadisplay.shared.util.SharedStorage;
 
 public class StandaloneNodeExplorerClient {
 
@@ -63,6 +64,7 @@ public class StandaloneNodeExplorerClient {
 	 *         their parents
 	 */
 	public CachedBaseNode retrieveNodes(String url, final IProgressMonitor monitor) throws Exception {
+		SharedStorage.getInstance().removeValue(SharedStorage.SharedField.HighestNodeId);
 
 		monitor.beginTask("Establishing connection with " + url + "...", 2);
 
@@ -117,7 +119,8 @@ public class StandaloneNodeExplorerClient {
 
 		exec.shutdown();
 		exec.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-		logger.info("download complete (" + (System.currentTimeMillis() - start) + "ms). ");
+		logger.info("download complete (" + (System.currentTimeMillis() - start) + "ms). Highest Node Id: "
+				+ SharedStorage.getInstance().getValue(SharedStorage.SharedField.HighestNodeId));
 
 		// disconnect
 		client.disconnect();
@@ -221,10 +224,9 @@ public class StandaloneNodeExplorerClient {
 
 				CachedBaseNode cbn = retrieveNodeDetails(rd.getNodeId().local().orElse(null), client);
 				if (cbn != null) {
-					browseReferencesRecursive(cbn, client).forEach(nd -> cbn.addChild(nd));
+					browseReferencesRecursive(cbn, client).forEach(nd -> addChildToNode(cbn, nd));
 					ref.add(cbn);
-				}
-				else{
+				} else {
 					ref.add(new CachedBaseNode(rd));
 				}
 
@@ -238,6 +240,11 @@ public class StandaloneNodeExplorerClient {
 			logger.error("Browsing references for nodeId={} failed: {}", node, e.getMessage(), e);
 		}
 		return ref;
+	}
+
+	private void addChildToNode(CachedBaseNode parent, CachedBaseNode child) {
+		parent.addChild(child);
+		SharedStorage.getInstance().increaseHighestNodeIdIfNecessarySafe(child);
 	}
 
 	/** retrieves the attributes of a node associated to <i>nodeId</i> */
@@ -294,6 +301,7 @@ public class StandaloneNodeExplorerClient {
 	 * @return <i>parent</i> with the associated children linked to it
 	 */
 	private CachedBaseNode retrieveNodes(final CachedBaseNode parent, OpcUaClient client, boolean recursive) {
+
 		try {
 			// TODO: retrieve root, if necessary
 
@@ -312,7 +320,7 @@ public class StandaloneNodeExplorerClient {
 					// and add them as children
 					if (isInTypesFolder(cn)) {
 						browseReferencesRecursive(cn, client)
-								.forEach(ref -> cn.addChild(retrieveNodes(ref, client, true)));
+								.forEach(ref -> addChildToNode(cn, retrieveNodes(ref, client, true)));
 					}
 					cn.setReferences(browseAllReferences(cn, client));
 
@@ -322,7 +330,7 @@ public class StandaloneNodeExplorerClient {
 					}
 
 					// add child to parent
-					parent.addChild(cn);
+					addChildToNode(parent, cn);
 				} catch (InterruptedException | ExecutionException e) {
 					e.printStackTrace();
 				}
