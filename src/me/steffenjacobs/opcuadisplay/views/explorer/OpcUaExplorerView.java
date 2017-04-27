@@ -33,6 +33,7 @@ import me.steffenjacobs.opcuadisplay.shared.util.EventBus.EventListener;
 import me.steffenjacobs.opcuadisplay.shared.util.Images;
 import me.steffenjacobs.opcuadisplay.shared.util.SharedStorage;
 import me.steffenjacobs.opcuadisplay.views.attribute.events.AttributeModifiedEvent;
+import me.steffenjacobs.opcuadisplay.views.explorer.dialogs.AddObjectDialog;
 import me.steffenjacobs.opcuadisplay.views.explorer.events.ChangeSelectedNodeEvent;
 import me.steffenjacobs.opcuadisplay.views.explorer.events.RootUpdatedEvent;
 import me.steffenjacobs.opcuadisplay.views.explorer.events.SelectedNodeChangedEvent;
@@ -334,6 +335,7 @@ public class OpcUaExplorerView extends ViewPart {
 		// add object action
 		addObject = new Action() {
 			public void run() {
+				new AddObjectDialog(new Shell()).open();
 			}
 		};
 		addObject.setText("Add Object");
