@@ -11,6 +11,7 @@ import org.eclipse.swt.widgets.Shell;
 
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedBaseNode;
 import me.steffenjacobs.opcuadisplay.shared.util.EventBus;
+import me.steffenjacobs.opcuadisplay.shared.util.SharedStorage;
 import me.steffenjacobs.opcuadisplay.shared.util.opcua.StandaloneNodeExplorerClient;
 import me.steffenjacobs.opcuadisplay.views.explorer.events.RootUpdatedEvent;
 
@@ -22,29 +23,23 @@ public class OpcUaConnector implements ITreeContentProvider {
 		this.parentShell = parentShell;
 	}
 
-	private CachedBaseNode root;
-
 	public void overwriteRoot(CachedBaseNode newRoot) {
-		this.root = newRoot;
-	}
-
-	public CachedBaseNode getRoot() {
-		return root;
+		SharedStorage.getInstance().setValue(SharedStorage.SharedField.RootNode, newRoot);
 	}
 
 	public void loadVariables(final String url) {
 		Job job = new Job("Downloading OPC UA nodes...") {
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
-				// // Set total number of work units
-				// monitor.beginTask("retrieving root node...", 0);
 				try {
-					root = new StandaloneNodeExplorerClient().retrieveNodes(url, monitor);
+					SharedStorage.getInstance().setValue(SharedStorage.SharedField.RootNode,
+							new StandaloneNodeExplorerClient().retrieveNodes(url, monitor));
 
 					Display.getDefault().syncExec(new Runnable() {
 						@Override
 						public void run() {
-							EventBus.getInstance().fireEvent(new RootUpdatedEvent(root));
+							EventBus.getInstance()
+									.fireEvent(new RootUpdatedEvent(SharedStorage.getInstance().getRoot()));
 						}
 					});
 					return Status.OK_STATUS;
@@ -76,7 +71,7 @@ public class OpcUaConnector implements ITreeContentProvider {
 
 	@Override
 	public Object[] getElements(Object arg0) {
-		return new CachedBaseNode[] { root };
+		return new CachedBaseNode[] { SharedStorage.getInstance().getRoot() };
 	}
 
 	@Override

@@ -31,6 +31,7 @@ import me.steffenjacobs.opcuadisplay.shared.util.EventBus;
 import me.steffenjacobs.opcuadisplay.shared.util.EventBus.Event;
 import me.steffenjacobs.opcuadisplay.shared.util.EventBus.EventListener;
 import me.steffenjacobs.opcuadisplay.shared.util.Images;
+import me.steffenjacobs.opcuadisplay.shared.util.SharedStorage;
 import me.steffenjacobs.opcuadisplay.views.attribute.events.AttributeModifiedEvent;
 import me.steffenjacobs.opcuadisplay.views.explorer.events.ChangeSelectedNodeEvent;
 import me.steffenjacobs.opcuadisplay.views.explorer.events.RootUpdatedEvent;
@@ -124,7 +125,6 @@ public class OpcUaExplorerView extends ViewPart {
 		EventBus.getInstance().addListener(AttributeModifiedEvent.IDENTIFIER, new EventListener<EventBus.Event>() {
 			@Override
 			public void onAction(Event event) {
-				connector.overwriteRoot(connector.getRoot());
 				viewer.refresh();
 			}
 		});
@@ -263,7 +263,7 @@ public class OpcUaExplorerView extends ViewPart {
 
 	/** can be called, when the import wizard is started */
 	public void onWizardOpen() {
-		cachedRoot = connector.getRoot();
+		cachedRoot = SharedStorage.getInstance().getRoot();
 		connector.overwriteRoot(CachedBaseNode.getDummyLoading());
 		viewer.refresh();
 	}
@@ -289,11 +289,11 @@ public class OpcUaExplorerView extends ViewPart {
 	}
 
 	private void expandToDefaultState() {
-		viewer.setExpandedElements(connector.getRoot().getChildren());
-		viewer.setExpandedState(connector.getRoot(), true);
+		viewer.setExpandedElements(SharedStorage.getInstance().getRoot().getChildren());
+		viewer.setExpandedState(SharedStorage.getInstance().getRoot(), true);
 	}
 
-	private void handleDoubleClickAction() {
+	private void onExplorerDoubleClick() {
 		ISelection selection = viewer.getSelection();
 		Object obj = ((IStructuredSelection) selection).getFirstElement();
 		if (obj instanceof CachedBaseNode) {
@@ -398,7 +398,7 @@ public class OpcUaExplorerView extends ViewPart {
 		// double click action
 		doubleClickAction = new Action() {
 			public void run() {
-				handleDoubleClickAction();
+				onExplorerDoubleClick();
 			}
 		};
 
@@ -437,6 +437,7 @@ public class OpcUaExplorerView extends ViewPart {
 	/**
 	 * Passing the focus request to the viewer's control.
 	 */
+	@Override
 	public void setFocus() {
 		viewer.getControl().setFocus();
 	}

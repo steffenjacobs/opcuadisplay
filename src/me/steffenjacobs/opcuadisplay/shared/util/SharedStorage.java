@@ -24,7 +24,6 @@ public class SharedStorage {
 		return instance;
 	}
 
-
 	public void setValue(SharedField key, Object value) {
 		variables.put(key, value);
 	}
@@ -55,8 +54,12 @@ public class SharedStorage {
 		variables.putIfAbsent(SharedField.HighestNodeId, nodeId);
 		variables.computeIfPresent(SharedField.HighestNodeId, (k, v) -> v = (Integer) v > nodeId ? v : nodeId);
 	}
+	
+	public CachedBaseNode getRoot(){
+		return (CachedBaseNode) getValue(SharedField.RootNode);
+	}
 
 	public static enum SharedField {
-		HighestNodeId;
+		HighestNodeId, RootNode;
 	}
 }
