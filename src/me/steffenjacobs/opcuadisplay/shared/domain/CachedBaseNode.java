@@ -48,6 +48,10 @@ public class CachedBaseNode {
 		return root;
 	}
 
+	public static CachedBaseNode createEmptyDummy() {
+		return new CachedBaseNode("");
+	}
+
 	public static CachedBaseNode getRoot() {
 		if (root == null) {
 			createNewRoot();
@@ -75,7 +79,7 @@ public class CachedBaseNode {
 	}
 
 	private CachedBaseNode(String text) {
-		if (text.equals("Root")) {
+		if ("Root".equals(text)) {
 			nodeId = Identifiers.RootFolder;
 		} else {
 			nodeId = new NodeId(0, 0);
@@ -164,11 +168,11 @@ public class CachedBaseNode {
 
 	public CachedBaseNode[] getChildren() {
 		// clean up if necessary
+		//TODO: remove hack
 		final List<QualifiedName> names = this.getReferences().stream()
-				.filter(ref -> !ref.getReferenceType().equals("HasTypeDefinition"))
-				.map(CachedReference::getBrowseName)
+				.filter(ref -> ref.getReferenceType().equals("HasTypeDefinition")).map(CachedReference::getBrowseName)
 				.collect(Collectors.toList());
-		children = children.stream().filter(c -> names.contains(c.getBrowseName())).collect(Collectors.toList());
+		children = children.stream().filter(c -> !names.contains(c.getBrowseName())).collect(Collectors.toList());
 
 		// return children
 		CachedBaseNode[] childs = new CachedBaseNode[children.size()];
