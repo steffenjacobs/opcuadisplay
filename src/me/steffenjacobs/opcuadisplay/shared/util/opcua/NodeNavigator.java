@@ -10,8 +10,11 @@ import me.steffenjacobs.opcuadisplay.shared.domain.CachedBaseNode;
 public class NodeNavigator {
 
 	private static NodeNavigator instance;
-	
+
 	private CachedBaseNode root;
+
+	// does not work for multiple clients simultaniously!
+	private AtomicInteger highestNodeId = new AtomicInteger(-1);
 
 	private NodeNavigator() {
 		// singleton
@@ -57,8 +60,7 @@ public class NodeNavigator {
 		this.root = newRoot;
 	}
 
-	private AtomicInteger highestNodeId = new AtomicInteger(-1);
-
+	// does not work for multiple clients simultaniously!
 	public void increaseHighestNodeIdIfNecessarySafe(CachedBaseNode cn) {
 
 		if (cn == null || cn.getNodeId() == null || cn.getNodeId().getIdentifier() == null
@@ -76,12 +78,17 @@ public class NodeNavigator {
 
 		highestNodeId.getAndUpdate(x -> x = x > nodeId ? x : nodeId);
 	}
-	
-	public void resetHighestNodeId(){
+
+	// does not work for multiple clients simultaniously!
+	public int generateNewNodeId() {
+		return highestNodeId.incrementAndGet();
+	}
+
+	public void resetHighestNodeId() {
 		highestNodeId.set(-1);
 	}
-	
-	public int getHighestNodeId(){
+
+	public int getHighestNodeId() {
 		return highestNodeId.get();
 	}
 }
