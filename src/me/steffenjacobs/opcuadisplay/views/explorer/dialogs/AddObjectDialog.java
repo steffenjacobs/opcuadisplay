@@ -101,7 +101,7 @@ public class AddObjectDialog extends TitleAreaDialog {
 
 		txtNodeId = new Text(container, SWT.BORDER);
 		txtNodeId.setLayoutData(gridData);
-		txtNodeId.setText("" + NodeNavigator.getInstance().getHighestNodeId());
+		txtNodeId.setText("" + (NodeNavigator.getInstance().getHighestNodeId() + 1));
 
 		txtNodeId.setFocus();
 		txtNodeId.setSelection(0, txtNodeId.getText().length());
