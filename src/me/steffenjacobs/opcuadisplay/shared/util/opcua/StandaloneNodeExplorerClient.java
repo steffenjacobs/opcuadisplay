@@ -51,7 +51,6 @@ import me.steffenjacobs.opcuadisplay.shared.domain.CachedReferenceTypeNode;
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedVariableNode;
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedVariableTypeNode;
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedViewNode;
-import me.steffenjacobs.opcuadisplay.shared.util.SharedStorage;
 
 public class StandaloneNodeExplorerClient {
 
@@ -64,7 +63,7 @@ public class StandaloneNodeExplorerClient {
 	 *         their parents
 	 */
 	public CachedBaseNode retrieveNodes(String url, final IProgressMonitor monitor) throws Exception {
-		SharedStorage.getInstance().removeValue(SharedStorage.SharedField.HighestNodeId);
+		NodeNavigator.getInstance().resetHighestNodeId();
 
 		monitor.beginTask("Establishing connection with " + url + "...", 2);
 
@@ -120,7 +119,7 @@ public class StandaloneNodeExplorerClient {
 		exec.shutdown();
 		exec.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
 		logger.info("download complete (" + (System.currentTimeMillis() - start) + "ms). Highest Node Id: "
-				+ SharedStorage.getInstance().getValue(SharedStorage.SharedField.HighestNodeId));
+				+ NodeNavigator.getInstance().getHighestNodeId());
 
 		// disconnect
 		client.disconnect();
@@ -244,7 +243,7 @@ public class StandaloneNodeExplorerClient {
 
 	private void addChildToNode(CachedBaseNode parent, CachedBaseNode child) {
 		parent.addChild(child);
-		SharedStorage.getInstance().increaseHighestNodeIdIfNecessarySafe(child);
+		NodeNavigator.getInstance().increaseHighestNodeIdIfNecessarySafe(child);
 	}
 
 	/** retrieves the attributes of a node associated to <i>nodeId</i> */

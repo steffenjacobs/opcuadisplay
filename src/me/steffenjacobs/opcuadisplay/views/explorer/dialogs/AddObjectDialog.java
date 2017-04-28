@@ -2,6 +2,7 @@ package me.steffenjacobs.opcuadisplay.views.explorer.dialogs;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -14,12 +15,15 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-import me.steffenjacobs.opcuadisplay.shared.util.SharedStorage;
-import me.steffenjacobs.opcuadisplay.shared.util.SharedStorage.SharedField;
+import me.steffenjacobs.opcuadisplay.shared.domain.CachedBaseNode;
+import me.steffenjacobs.opcuadisplay.shared.util.opcua.NodeNavigator;
+import me.steffenjacobs.opcuadisplay.views.explorer.NodeClassLabelProvider;
+import me.steffenjacobs.opcuadisplay.views.explorer.SimpleOpcUaTreeProvider;
 
 public class AddObjectDialog extends TitleAreaDialog {
 
 	private Text txtName, txtNameSpace, txtNodeId;
+	private TreeViewer viewer;
 
 	public AddObjectDialog(Shell parentShell) {
 		super(parentShell);
@@ -49,7 +53,13 @@ public class AddObjectDialog extends TitleAreaDialog {
 		createNameSpaceField(container);
 		createNameField(container);
 		createNodeIdField(container);
-		createTypeSelector(container);
+
+		Composite containerBottom = new Composite(area, SWT.NONE);
+		containerBottom.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		GridLayout layoutBottom = new GridLayout(1, false);
+		containerBottom.setLayout(layoutBottom);
+
+		createObjectTypeTree(containerBottom);
 
 		return area;
 	}
@@ -78,7 +88,7 @@ public class AddObjectDialog extends TitleAreaDialog {
 			public void widgetSelected(SelectionEvent e) {
 				txtNodeId.setEnabled(!btn.getSelection());
 				if (btn.getSelection()) {
-					txtNodeId.setText("" + SharedStorage.getInstance().getValue(SharedField.HighestNodeId));
+					txtNodeId.setText("" + NodeNavigator.getInstance().getHighestNodeId());
 				}
 				super.widgetSelected(e);
 			}
@@ -99,7 +109,7 @@ public class AddObjectDialog extends TitleAreaDialog {
 
 		txtNodeId = new Text(container, SWT.BORDER);
 		txtNodeId.setLayoutData(gridData);
-		txtNodeId.setText("" + SharedStorage.getInstance().getValue(SharedField.HighestNodeId));
+		txtNodeId.setText("" + NodeNavigator.getInstance().getHighestNodeId());
 
 		txtNodeId.setFocus();
 		txtNodeId.setSelection(0, txtNodeId.getText().length());
@@ -118,7 +128,7 @@ public class AddObjectDialog extends TitleAreaDialog {
 		txtNameSpace = new Text(container, SWT.BORDER);
 		txtNameSpace.setLayoutData(gridData);
 		txtNameSpace
-				.setText("" + SharedStorage.getInstance().getRoot().getChildren()[0].getNodeId().getNamespaceIndex());
+				.setText("" + NodeNavigator.getInstance().getRoot().getChildren()[0].getNodeId().getNamespaceIndex());
 
 		txtNameSpace.setFocus();
 		txtNameSpace.setSelection(0, txtNameSpace.getText().length());
@@ -139,6 +149,24 @@ public class AddObjectDialog extends TitleAreaDialog {
 
 		txtName.setFocus();
 		txtName.setSelection(0, txtName.getText().length());
+	}
+
+	private void createObjectTypeTree(Composite container) {
+
+		viewer = new TreeViewer(container, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
+
+		viewer.setContentProvider(new SimpleOpcUaTreeProvider());
+		CachedBaseNode cbn = CachedBaseNode.createEmptyDummy();
+		cbn.addChild(NodeNavigator.getInstance().navigateByName("Types/ObjectTypes/BaseObjectType"));
+		viewer.setInput(cbn);
+		viewer.setLabelProvider(new NodeClassLabelProvider());
+
+		GridData gridData = new GridData();
+		gridData.grabExcessHorizontalSpace = true;
+		gridData.horizontalAlignment = GridData.FILL;
+		gridData.heightHint = 250;
+
+		viewer.getControl().setLayoutData(gridData);
 	}
 
 	@Override

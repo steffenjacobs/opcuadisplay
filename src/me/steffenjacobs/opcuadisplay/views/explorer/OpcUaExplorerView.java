@@ -31,7 +31,7 @@ import me.steffenjacobs.opcuadisplay.shared.util.EventBus;
 import me.steffenjacobs.opcuadisplay.shared.util.EventBus.Event;
 import me.steffenjacobs.opcuadisplay.shared.util.EventBus.EventListener;
 import me.steffenjacobs.opcuadisplay.shared.util.Images;
-import me.steffenjacobs.opcuadisplay.shared.util.SharedStorage;
+import me.steffenjacobs.opcuadisplay.shared.util.opcua.NodeNavigator;
 import me.steffenjacobs.opcuadisplay.views.attribute.events.AttributeModifiedEvent;
 import me.steffenjacobs.opcuadisplay.views.explorer.dialogs.AddObjectDialog;
 import me.steffenjacobs.opcuadisplay.views.explorer.events.ChangeSelectedNodeEvent;
@@ -105,7 +105,7 @@ public class OpcUaExplorerView extends ViewPart {
 		viewer = new TreeViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
 
 		connector = new OpcUaConnector(this.viewer.getControl().getShell());
-		connector.overwriteRoot(CachedBaseNode.getDummyNoData());
+		NodeNavigator.getInstance().setRoot(CachedBaseNode.getDummyNoData());
 		viewer.setContentProvider(connector);
 		viewer.setInput(getViewSite());
 		viewer.setLabelProvider(new NodeClassLabelProvider());
@@ -260,14 +260,14 @@ public class OpcUaExplorerView extends ViewPart {
 
 	/** can be called, when the import wizard is started */
 	public void onWizardOpen() {
-		cachedRoot = SharedStorage.getInstance().getRoot();
-		connector.overwriteRoot(CachedBaseNode.getDummyLoading());
+		cachedRoot = NodeNavigator.getInstance().getRoot();
+		NodeNavigator.getInstance().setRoot(CachedBaseNode.getDummyLoading());
 		viewer.refresh();
 	}
 
 	/** can be called, when the import wizard had been canceled */
 	public void onWizardCancel() {
-		connector.overwriteRoot(cachedRoot);
+		NodeNavigator.getInstance().setRoot(cachedRoot);
 		viewer.refresh();
 		expandToDefaultState();
 	}
@@ -286,8 +286,8 @@ public class OpcUaExplorerView extends ViewPart {
 	}
 
 	private void expandToDefaultState() {
-		viewer.setExpandedElements(SharedStorage.getInstance().getRoot().getChildren());
-		viewer.setExpandedState(SharedStorage.getInstance().getRoot(), true);
+		viewer.setExpandedElements(NodeNavigator.getInstance().getRoot().getChildren());
+		viewer.setExpandedState(NodeNavigator.getInstance().getRoot(), true);
 	}
 
 	private void onExplorerDoubleClick() {
