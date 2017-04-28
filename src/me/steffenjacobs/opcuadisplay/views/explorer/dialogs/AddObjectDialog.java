@@ -2,6 +2,7 @@ package me.steffenjacobs.opcuadisplay.views.explorer.dialogs;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -16,6 +17,8 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedBaseNode;
+import me.steffenjacobs.opcuadisplay.shared.domain.CachedObjectTypeNode;
+import me.steffenjacobs.opcuadisplay.shared.util.opcua.NodeGenerator;
 import me.steffenjacobs.opcuadisplay.shared.util.opcua.NodeNavigator;
 import me.steffenjacobs.opcuadisplay.views.explorer.NodeClassLabelProvider;
 import me.steffenjacobs.opcuadisplay.views.explorer.SimpleOpcUaTreeProvider;
@@ -25,8 +28,11 @@ public class AddObjectDialog extends TitleAreaDialog {
 	private Text txtName, txtNameSpace, txtNodeId;
 	private TreeViewer viewer;
 
-	public AddObjectDialog(Shell parentShell) {
+	private CachedBaseNode base;
+
+	public AddObjectDialog(Shell parentShell, CachedBaseNode base) {
 		super(parentShell);
+		this.base = base;
 	}
 
 	@Override
@@ -62,20 +68,6 @@ public class AddObjectDialog extends TitleAreaDialog {
 		createObjectTypeTree(containerBottom);
 
 		return area;
-	}
-
-	private void createTypeSelector(Composite container) {
-		final Button btn = new Button(container, SWT.PUSH);
-		btn.setText("Select ObjectType");
-		btn.addSelectionListener(new SelectionAdapter() {
-
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				btn.setText("test");
-				super.widgetSelected(e);
-			}
-		});
-		btn.setSelection(true);
 	}
 
 	private void createNodeIdField(Composite container) {
@@ -167,6 +159,9 @@ public class AddObjectDialog extends TitleAreaDialog {
 		gridData.heightHint = 250;
 
 		viewer.getControl().setLayoutData(gridData);
+
+		viewer.setExpandedElements(cbn.getChildren());
+		viewer.setExpandedState(cbn, true);
 	}
 
 	@Override
@@ -176,7 +171,20 @@ public class AddObjectDialog extends TitleAreaDialog {
 
 	@Override
 	protected void okPressed() {
-		// TODO: copy values from fields into string or do other stuff
+		Integer nameSpaceIndex;
+		String name = txtName.getText();
+
+		CachedObjectTypeNode node;
+		int nextNodeId;
+		try {
+			nameSpaceIndex = Integer.parseInt(txtNameSpace.getText());
+			nextNodeId = Integer.parseInt(txtNodeId.getText());
+			node = ((CachedObjectTypeNode) ((IStructuredSelection) viewer.getSelection()).getFirstElement());
+		} catch (ClassCastException cce) {
+			return;
+		}
+
+		NodeGenerator.createAndInsert(nameSpaceIndex, name, nextNodeId, node, base);
 		super.okPressed();
 	}
 }

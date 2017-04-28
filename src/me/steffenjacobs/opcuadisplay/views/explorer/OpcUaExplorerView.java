@@ -335,7 +335,8 @@ public class OpcUaExplorerView extends ViewPart {
 		// add object action
 		addObject = new Action() {
 			public void run() {
-				new AddObjectDialog(new Shell()).open();
+				new AddObjectDialog(new Shell(),
+						(CachedBaseNode) (((IStructuredSelection) viewer.getSelection()).getFirstElement())).open();
 			}
 		};
 		addObject.setText("Add Object");
