@@ -121,6 +121,14 @@ public class CachedBaseNode {
 		this.userWriteMask = node.getUserWriteMask().get();
 		references = new ArrayList<>();
 	}
+	
+	protected CachedBaseNode(NodeId nodeId, NodeClass nodeClass){
+		super();
+		children = new ArrayList<>();
+		this.nodeId = nodeId;
+		this.nodeClass = nodeClass;
+		references = new ArrayList<>();
+	}
 
 	public void setParent(CachedBaseNode parent) {
 		this.parent = parent;
