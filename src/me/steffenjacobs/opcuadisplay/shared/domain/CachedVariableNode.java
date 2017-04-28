@@ -33,6 +33,19 @@ public class CachedVariableNode extends CachedBaseNode implements HasValueRank{
 		historizing = FutureResolver.resolveFutureSafe(node.getHistorizing());
 	}
 
+	protected CachedVariableNode(CachedVariableNode node, NodeId nodeId) {
+		super(node, nodeId);
+		this.value = node.value;
+		this.dataType = node.dataType;
+		this.valueRank = node.valueRank;
+		this.arrayDimensions = node.arrayDimensions.clone();
+		this.accessLevel = UByte.valueOf(node.accessLevel.intValue());
+		this.userAccessLevel = UByte.valueOf(node.userAccessLevel.intValue());
+		this.minimumSamplingInterval = node.minimumSamplingInterval;
+		this.historizing = node.historizing;
+	}
+
+
 	public Object getValue() {
 		return value;
 	}

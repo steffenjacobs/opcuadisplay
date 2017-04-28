@@ -121,13 +121,27 @@ public class CachedBaseNode {
 		this.userWriteMask = node.getUserWriteMask().get();
 		references = new ArrayList<>();
 	}
-	
-	protected CachedBaseNode(NodeId nodeId, NodeClass nodeClass){
+
+	protected CachedBaseNode(NodeId nodeId, NodeClass nodeClass) {
 		super();
 		children = new ArrayList<>();
 		this.nodeId = nodeId;
 		this.nodeClass = nodeClass;
 		references = new ArrayList<>();
+	}
+
+	protected CachedBaseNode(CachedBaseNode cbn, NodeId nodeId) {
+		super();
+		this.browseName = new QualifiedName(cbn.browseName.getNamespaceIndex(), cbn.browseName.getName());
+		this.children = cbn.children;
+		this.description = new LocalizedText(cbn.description.getLocale(), cbn.description.getText());
+		this.displayName = new LocalizedText(cbn.displayName.getLocale(), cbn.displayName.getText());
+		this.nodeClass = cbn.nodeClass;
+		this.nodeId = nodeId;
+		this.references = new ArrayList<CachedReference>();
+		this.references.addAll(cbn.references);
+		this.userWriteMask = UInteger.valueOf(cbn.getUserWriteMask().longValue());
+		this.writeMask = UInteger.valueOf(cbn.getWriteMask().longValue());
 	}
 
 	public void setParent(CachedBaseNode parent) {
@@ -176,7 +190,7 @@ public class CachedBaseNode {
 
 	public CachedBaseNode[] getChildren() {
 		// clean up if necessary
-		//TODO: remove hack
+		// TODO: remove hack
 		final List<QualifiedName> names = this.getReferences().stream()
 				.filter(ref -> ref.getReferenceType().equals("HasTypeDefinition")).map(CachedReference::getBrowseName)
 				.collect(Collectors.toList());

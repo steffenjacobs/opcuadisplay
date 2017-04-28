@@ -3,10 +3,11 @@ package me.steffenjacobs.opcuadisplay.shared.domain;
 import java.util.concurrent.ExecutionException;
 
 import org.eclipse.milo.opcua.sdk.client.nodes.UaDataTypeNode;
+import org.eclipse.milo.opcua.stack.core.types.builtin.NodeId;
 
 import me.steffenjacobs.opcuadisplay.shared.util.FutureResolver;
 
-public class CachedDataTypeNode extends CachedBaseNode implements HasOnlyAbstract{
+public class CachedDataTypeNode extends CachedBaseNode implements HasOnlyAbstract {
 
 	private boolean isAbstract;
 
@@ -14,6 +15,11 @@ public class CachedDataTypeNode extends CachedBaseNode implements HasOnlyAbstrac
 		super(node);
 
 		isAbstract = FutureResolver.resolveFutureSafe(node.getIsAbstract());
+	}
+
+	protected CachedDataTypeNode(CachedDataTypeNode node, NodeId nodeId) {
+		super(node, nodeId);
+		this.isAbstract = node.isAbstract;
 	}
 
 	public boolean isAbstract() {

@@ -12,6 +12,7 @@ import org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.UByte;
 import org.eclipse.milo.opcua.stack.core.types.enumerated.NodeClass;
 
 import me.steffenjacobs.opcuadisplay.shared.util.FutureResolver;
+import me.steffenjacobs.opcuadisplay.shared.util.opcua.NodeNavigator;
 
 public class CachedObjectNode extends CachedBaseNode {
 
@@ -34,13 +35,18 @@ public class CachedObjectNode extends CachedBaseNode {
 		this.eventNotifier = eventNotifier;
 	}
 
+	protected CachedObjectNode(CachedObjectNode node, NodeId newNodeId) {
+		super(node, newNodeId);
+		this.setEventNotifier(UByte.valueOf(node.eventNotifier.intValue()));
+	}
+
 	public static CachedObjectNode create(int namespaceIndex, String name, int nodeId, CachedObjectTypeNode type) {
 		NodeId id = new NodeId(namespaceIndex, nodeId);
 		CachedObjectNode cbn = new CachedObjectNode(id);
 		cbn.setDisplayName(new LocalizedText("en", name));
 		cbn.setBrowseName(new QualifiedName(namespaceIndex, name));
 		List<CachedReference> refs = new ArrayList<>();
-		CachedReference ref = new CachedReference("HasTypeDefinition", type.getBrowseName(), null, type.getNodeId());
+		CachedReference ref = new CachedReference("HasTypeDefinition", type.getBrowseName(), "null", type.getNodeId());
 		refs.add(ref);
 		refs.addAll(type.getReferences());
 		cbn.setReferences(refs);
