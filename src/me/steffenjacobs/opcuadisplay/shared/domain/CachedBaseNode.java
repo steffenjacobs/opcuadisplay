@@ -83,13 +83,16 @@ public class CachedBaseNode {
 	private CachedBaseNode(String text) {
 		if ("Root".equals(text)) {
 			nodeId = Identifiers.RootFolder;
+			nodeClass = NodeClass.Object;
+			browseName = new QualifiedName(0, text);
+			description = new LocalizedText("null", "The root of the server address space.");
 		} else {
 			nodeId = new NodeId(0, 0);
+			nodeClass = NodeClass.Unspecified;
+			browseName = new QualifiedName(0, "Dummy");
+			description = new LocalizedText("null", "This is a dummy node.");
 		}
-		nodeClass = NodeClass.Unspecified;
-		browseName = new QualifiedName(0, "dummy");
-		displayName = new LocalizedText("en", text);
-		description = new LocalizedText("en", "");
+		displayName = new LocalizedText("null", text);
 		writeMask = UInteger.valueOf(0);
 		userWriteMask = UInteger.valueOf(0);
 		children = new ArrayList<>();
