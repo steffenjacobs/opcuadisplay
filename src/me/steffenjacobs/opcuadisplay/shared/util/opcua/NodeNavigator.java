@@ -2,6 +2,7 @@ package me.steffenjacobs.opcuadisplay.shared.util.opcua;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.eclipse.milo.opcua.stack.core.Identifiers;
 import org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.UInteger;
 import org.eclipse.milo.opcua.stack.core.types.enumerated.IdType;
 
@@ -90,5 +91,18 @@ public class NodeNavigator {
 
 	public int getHighestNodeId() {
 		return highestNodeId.get();
+	}
+
+
+	/** @return true, if <i>node</i> is in the Types folder. */
+	public boolean isInTypesFolder(CachedBaseNode node) {
+
+		while ((node = node.getParent()) != null) {
+			if (Identifiers.TypesFolder.equals(node.getNodeId())) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 }

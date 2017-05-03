@@ -143,19 +143,6 @@ public class StandaloneNodeExplorerClient {
 		monitor.worked(value);
 	}
 
-	/** @return true, if <i>node</i> is in the Types folder. */
-	private boolean isInTypesFolder(CachedBaseNode node) {
-
-		while ((node = node.getParent()) != null) {
-			if (Identifiers.TypesFolder.equals(node.getNodeId())) {
-				return true;
-			}
-		}
-
-		return false;
-
-	}
-
 	/** @returns a list of all references associated with <i>node</i> */
 	private List<CachedReference> browseAllReferences(CachedBaseNode node, OpcUaClient client) {
 		List<CachedReference> ref = new ArrayList<>();
@@ -325,7 +312,7 @@ public class StandaloneNodeExplorerClient {
 					// references
 					// if in type folder, retrieve all references recursively
 					// and add them as children
-					if (isInTypesFolder(cn)) {
+					if (NodeNavigator.getInstance().isInTypesFolder(cn)) {
 						browseReferencesRecursive(cn, client)
 								.forEach(ref -> addChildToNode(cn, retrieveNodes(ref, client, true)));
 					}
