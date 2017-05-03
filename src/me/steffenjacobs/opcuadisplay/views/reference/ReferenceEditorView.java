@@ -121,7 +121,7 @@ public class ReferenceEditorView extends ViewPart {
 			public String getText(Object element) {
 				CachedReference n = (CachedReference) element;
 
-				return ReferenceValueParser.asString(n.getNodeId());
+				return ReferenceValueParser.asString(n.getRefNodeId());
 			}
 		});
 	}

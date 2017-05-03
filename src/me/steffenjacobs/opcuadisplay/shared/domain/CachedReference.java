@@ -12,14 +12,14 @@ public class CachedReference {
 	private String referenceType;
 	private QualifiedName browseName;
 	private String typeDefinition;
-	private NodeId nodeId;
+	private NodeId refNodeId;
 
-	public CachedReference(String referenceType, QualifiedName browseName, String typeDefinition, NodeId nodeId) {
+	public CachedReference(String referenceType, QualifiedName browseName, String typeDefinition, NodeId refNodeId) {
 		super();
 		this.referenceType = referenceType;
 		this.browseName = browseName;
 		this.typeDefinition = typeDefinition;
-		this.nodeId = nodeId;
+		this.refNodeId = refNodeId;
 	}
 
 	public String getReferenceType() {
@@ -34,15 +34,15 @@ public class CachedReference {
 		return typeDefinition;
 	}
 
-	public NodeId getNodeId() {
-		return nodeId;
+	public NodeId getRefNodeId() {
+		return refNodeId;
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((nodeId == null) ? 0 : nodeId.hashCode());
+		result = prime * result + ((refNodeId == null) ? 0 : refNodeId.hashCode());
 		return result;
 	}
 
@@ -55,10 +55,10 @@ public class CachedReference {
 		if (getClass() != obj.getClass())
 			return false;
 		CachedReference other = (CachedReference) obj;
-		if (nodeId == null) {
-			if (other.nodeId != null)
+		if (refNodeId == null) {
+			if (other.refNodeId != null)
 				return false;
-		} else if (!nodeId.equals(other.nodeId))
+		} else if (!refNodeId.equals(other.refNodeId))
 			return false;
 		return true;
 	}
