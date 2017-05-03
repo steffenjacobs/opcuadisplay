@@ -45,7 +45,7 @@ public class NodeEntryFactory {
 
 	private static Iterable<NodeEntry<?>> fromBaseNode(CachedBaseNode node) {
 		ArrayList<NodeEntry<?>> list = new ArrayList<>();
-		if (node == null) {
+		if (node == null || node.isDummy()) {
 			return list;
 		}
 
