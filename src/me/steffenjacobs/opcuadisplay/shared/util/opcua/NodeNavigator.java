@@ -1,8 +1,13 @@
 package me.steffenjacobs.opcuadisplay.shared.util.opcua;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Stack;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.eclipse.milo.opcua.stack.core.Identifiers;
+import org.eclipse.milo.opcua.stack.core.types.builtin.LocalizedText;
+import org.eclipse.milo.opcua.stack.core.types.builtin.QualifiedName;
 import org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.UInteger;
 import org.eclipse.milo.opcua.stack.core.types.enumerated.IdType;
 
@@ -93,8 +98,11 @@ public class NodeNavigator {
 		return highestNodeId.get();
 	}
 
-
-	/** @return true, if <i>node</i> is in the Types folder. */
+	/**
+	 * @return true, if <i>node</i> is in the Types folder. <br>
+	 *         false, if <i>node</i> is the Types folder or not in the Types
+	 *         folder.
+	 */
 	public boolean isInTypesFolder(CachedBaseNode node) {
 
 		while ((node = node.getParent()) != null) {
@@ -104,5 +112,50 @@ public class NodeNavigator {
 		}
 
 		return false;
+	}
+
+	/**
+	 * @return true, if <i>node</i> is cyclic by checking, if the BrowseName is
+	 *         already present in the tree.
+	 */
+	public boolean isCyclic(CachedBaseNode node) {
+		List<QualifiedName> path = new ArrayList<>();
+		path.add(node.getBrowseName());
+		while ((node = node.getParent()) != null) {
+			if (path.contains(node.getBrowseName())) {
+				return true;
+			}
+			path.add(node.getBrowseName());
+		}
+
+		return false;
+	}
+
+	public String pathAsString(CachedBaseNode node) {
+		StringBuilder sb = new StringBuilder();
+
+		List<CachedBaseNode> names = this.getPath(node);
+		names.forEach(n -> {
+			sb.append("/");
+			sb.append(n);
+		});
+		return sb.toString();
+	}
+
+	public List<CachedBaseNode> getPath(CachedBaseNode node) {
+		Stack<CachedBaseNode> path = new Stack<>();
+		path.add(node);
+		while ((node = node.getParent()) != null) {
+			final CachedBaseNode nc = node;
+			if (path.stream().filter(n -> n.isSimilar(nc)).count() > 0) {
+				CachedBaseNode cbn = CachedBaseNode.createEmptyDummy();
+				cbn.setBrowseName(new QualifiedName(0, "RECURSIVE"));
+				cbn.setDisplayName(new LocalizedText("null", "RECURSIVE"));
+				path.add(cbn);
+				return path;
+			}
+			path.add(nc);
+		}
+		return path;
 	}
 }
