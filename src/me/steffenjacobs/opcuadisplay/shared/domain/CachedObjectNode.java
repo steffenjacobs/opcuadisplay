@@ -61,6 +61,7 @@ public class CachedObjectNode extends CachedBaseNode {
 
 		for (CachedBaseNode child : type.getChildren()) {
 			cbn.addChild(child);
+			child.setParent(cbn);
 		}
 		
 		//rewire references & duplicate children recursive

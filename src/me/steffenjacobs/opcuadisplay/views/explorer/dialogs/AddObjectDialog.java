@@ -149,7 +149,11 @@ public class AddObjectDialog extends TitleAreaDialog {
 
 		viewer.setContentProvider(new SimpleOpcUaTreeProvider());
 		CachedBaseNode cbn = CachedBaseNode.createEmptyDummy();
-		cbn.addChild(NodeNavigator.getInstance().navigateByName("Types/ObjectTypes/BaseObjectType"));
+
+		CachedBaseNode typeNode = NodeNavigator.getInstance().navigateByName("Types/ObjectTypes/BaseObjectType");
+		cbn.addChild(typeNode);
+		typeNode.setParent(cbn);
+
 		viewer.setInput(cbn);
 		viewer.setLabelProvider(new NodeClassLabelProvider());
 
