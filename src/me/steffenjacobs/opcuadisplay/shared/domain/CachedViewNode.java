@@ -3,7 +3,6 @@ package me.steffenjacobs.opcuadisplay.shared.domain;
 import java.util.concurrent.ExecutionException;
 
 import org.eclipse.milo.opcua.sdk.client.nodes.UaViewNode;
-import org.eclipse.milo.opcua.stack.core.types.builtin.NodeId;
 import org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.UByte;
 
 import me.steffenjacobs.opcuadisplay.shared.util.FutureResolver;
@@ -20,10 +19,15 @@ public class CachedViewNode extends CachedBaseNode {
 		eventNotifier = FutureResolver.resolveFutureSafe(node.getEventNotifier());
 	}
 
-	protected CachedViewNode(CachedViewNode node, NodeId nodeId) {
-		super(node, nodeId);
+	protected CachedViewNode(CachedViewNode node) {
+		super(node);
 		this.containsNoLoop = node.containsNoLoop;
 		this.eventNotifier = UByte.valueOf(node.eventNotifier.intValue());
+	}
+
+	@Override
+	public CachedViewNode duplicate() {
+		return new CachedViewNode(this);
 	}
 
 	public boolean isContainsNoLoop() {

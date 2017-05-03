@@ -35,9 +35,15 @@ public class CachedObjectNode extends CachedBaseNode {
 		this.eventNotifier = eventNotifier;
 	}
 
-	protected CachedObjectNode(CachedObjectNode node, NodeId newNodeId) {
-		super(node, newNodeId);
-		this.setEventNotifier(UByte.valueOf(node.eventNotifier.intValue()));
+	protected CachedObjectNode(CachedObjectNode node) {
+		super(node);
+		this.setEventNotifier(
+				node.eventNotifier != null ? UByte.valueOf(node.eventNotifier.intValue()) : UByte.valueOf(0));
+	}
+
+	@Override
+	public CachedObjectNode duplicate() {
+		return new CachedObjectNode(this);
 	}
 
 	public static CachedObjectNode create(int namespaceIndex, String name, int nodeId, CachedObjectTypeNode type) {
@@ -50,6 +56,14 @@ public class CachedObjectNode extends CachedBaseNode {
 		refs.add(ref);
 		refs.addAll(type.getReferences());
 		cbn.setReferences(refs);
-		return cbn;
+
+		NodeNavigator.getInstance().increaseHighestNodeIdIfNecessarySafe(cbn);
+
+		for (CachedBaseNode child : type.getChildren()) {
+			cbn.addChild(child);
+		}
+		
+		//rewire references & duplicate children recursive
+		return cbn.duplicate();
 	}
 }

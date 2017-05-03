@@ -26,13 +26,18 @@ public class CachedVariableTypeNode extends CachedBaseNode implements HasOnlyAbs
 		isAbstract = FutureResolver.resolveFutureSafe(node.getIsAbstract());
 	}
 
-	protected CachedVariableTypeNode(CachedVariableTypeNode node, NodeId nodeId) {
-		super(node, nodeId);
+	protected CachedVariableTypeNode(CachedVariableTypeNode node) {
+		super(node);
 		this.value = node.value;
 		this.dataType = node.dataType;
 		this.valueRank = node.valueRank;
 		this.arrayDimensions = node.arrayDimensions.clone();
 		this.isAbstract = node.isAbstract;
+	}
+
+	@Override
+	public CachedVariableTypeNode duplicate() {
+		return new CachedVariableTypeNode(this);
 	}
 
 	public Object getValue() {
