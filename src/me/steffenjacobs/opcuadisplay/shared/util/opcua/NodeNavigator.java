@@ -144,13 +144,16 @@ public class NodeNavigator {
 
 	public List<CachedBaseNode> getPath(CachedBaseNode node) {
 		Stack<CachedBaseNode> path = new Stack<>();
+		if (node == null) {
+			return path;
+		}
 		path.add(node);
 		while ((node = node.getParent()) != null) {
 			final CachedBaseNode nc = node;
 			if (path.stream().filter(n -> n.isSimilar(nc)).count() > 0) {
 				CachedBaseNode cbn = CachedBaseNode.createEmptyDummy();
-				cbn.setBrowseName(new QualifiedName(0, "RECURSIVE"));
-				cbn.setDisplayName(new LocalizedText("null", "RECURSIVE"));
+				cbn.setBrowseName(new QualifiedName(0, "CYCLIC"));
+				cbn.setDisplayName(new LocalizedText("null", "CYCLIC"));
 				path.add(cbn);
 				return path;
 			}
