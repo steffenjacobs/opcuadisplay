@@ -232,6 +232,7 @@ public class StandaloneNodeExplorerClient {
 			toList(browseResult.getReferences()).forEach(rd -> {
 
 				CachedBaseNode cbn = retrieveNodeDetails(rd.getNodeId().local().orElse(null), client);
+
 				if (cbn != null) {
 					if (recursive) {
 						browseReferencesRecursive(cbn, client, recursive)
@@ -254,10 +255,7 @@ public class StandaloneNodeExplorerClient {
 		return ref;
 	}
 
-	private void addChildToNode(CachedBaseNode parent, CachedBaseNode child, final Boolean recursive) {
-		if (child.getBrowseName().getName().equals("BaseObjectType")) {
-			System.out.println("here child");
-		}
+	private void addChildToNode(CachedBaseNode parent, CachedBaseNode child) {
 		parent.addChild(child);
 		child.setParent(parent);
 		NodeNavigator.getInstance().increaseHighestNodeIdIfNecessarySafe(child);
@@ -318,20 +316,14 @@ public class StandaloneNodeExplorerClient {
 	 */
 	private CachedBaseNode retrieveNodes(final CachedBaseNode parent, OpcUaClient client, final boolean recursive) {
 
-		if (parent.getBrowseName().getName().equals("ObjectTypes")
-				|| parent.getBrowseName().getName().equals("Types")) {
-			System.out.println("here");
-		}
-
 		try {
 			// TODO: retrieve root, if necessary
 
 			List<Node> lst = client.getAddressSpace().browse(parent.getNodeId()).get();
-			System.out.println("received " + lst.size() + " nodes for " + parent);
 
 			if (NodeNavigator.getInstance().isInTypesFolder(parent)) {
 				List<CachedBaseNode> lstRef = browseReferencesRecursive(parent, client, recursive);
-				lstRef.forEach(n -> addChildToNode(parent, n, recursive));
+				lstRef.forEach(n -> addChildToNode(parent, n));
 
 				List<QualifiedName> names = lstRef.stream().map(CachedBaseNode::getBrowseName)
 						.collect(Collectors.toList());
@@ -340,11 +332,6 @@ public class StandaloneNodeExplorerClient {
 			}
 
 			lst.forEach(node -> {
-
-				if (parent.getBrowseName().getName().equals("ObjectTypes")
-						|| parent.getBrowseName().getName().equals("Types")) {
-					System.out.println("here2 " + recursive);
-				}
 
 				try {
 					// cache node
@@ -358,11 +345,7 @@ public class StandaloneNodeExplorerClient {
 					// if in type folder, retrieve all references recursively
 					// and add them as children
 					if (NodeNavigator.getInstance().isInTypesFolder(cn)) {
-						browseReferencesRecursive(cn, client, recursive).forEach(ref -> addChildToNode(cn,
-								/*
-								 * recursive ? retrieveNodes(ref, client,
-								 * recursive) :
-								 */ ref, recursive));
+						browseReferencesRecursive(cn, client, recursive).forEach(ref -> addChildToNode(cn, ref));
 					}
 					cn.setReferences(browseAllReferences(cn, client));
 
@@ -372,7 +355,7 @@ public class StandaloneNodeExplorerClient {
 					}
 
 					// add child to parent
-					addChildToNode(parent, cn, recursive);
+					addChildToNode(parent, cn);
 				} catch (InterruptedException | ExecutionException e) {
 					e.printStackTrace();
 				}
