@@ -11,6 +11,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.milo.opcua.sdk.client.OpcUaClient;
@@ -31,6 +32,7 @@ import org.eclipse.milo.opcua.stack.core.Identifiers;
 import org.eclipse.milo.opcua.stack.core.security.SecurityPolicy;
 import org.eclipse.milo.opcua.stack.core.types.builtin.LocalizedText;
 import org.eclipse.milo.opcua.stack.core.types.builtin.NodeId;
+import org.eclipse.milo.opcua.stack.core.types.builtin.QualifiedName;
 import org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.Unsigned;
 import org.eclipse.milo.opcua.stack.core.types.enumerated.BrowseDirection;
 import org.eclipse.milo.opcua.stack.core.types.enumerated.BrowseResultMask;
@@ -91,36 +93,49 @@ public class StandaloneNodeExplorerClient {
 		// receive sub folders of root
 		final CachedBaseNode root = retrieveNodes(CachedBaseNode.createNewRoot(), client, false);
 
-		toList(root.getChildren()).forEach(c -> {
+		toList(root.getChildren()).forEach(root_xxx -> {
+
 			// Objects
-			if (c.getNodeId().equals(Identifiers.ObjectsFolder)) {
+			if (root_xxx.getNodeId().equals(Identifiers.ObjectsFolder)) {
 				// retrieve objects async
-				exec.submit(() -> retrieveNodesMonitored(c, client, true, monitor, 20));
+				exec.submit(() -> retrieveNodesMonitored(root_xxx, client, true, monitor, 20));
 			}
 			// Types
-			else if (c.getNodeId().equals(Identifiers.TypesFolder)) {
+			else if (root_xxx.getNodeId().equals(Identifiers.TypesFolder)) {
 				// retrieve sub types
-				CachedBaseNode typeNode = retrieveNodes(c, client, false);
-				toList(typeNode.getChildren()).forEach(tc -> {
+				retrieveNodes(root_xxx, client, false);
+
+				toList(root_xxx.getChildren()).forEach(root_types_xxx -> {
+
 					// Data Types
-					if (Identifiers.DataTypesFolder.equals(tc.getNodeId())) {
+					if (Identifiers.DataTypesFolder.equals(root_types_xxx.getNodeId())) {
 						// retrieve sub types of DataTypes
-						CachedBaseNode dataType = retrieveNodes(tc, client, false);
+
+						// clear children, because they were not recursive and
+						// will now be overwritten anyway
+						root_types_xxx.setChildren(new ArrayList<>());
+						retrieveNodes(root_types_xxx, client, false);
 
 						// retrieve each sub type of DataTypes async
-						toList(dataType.getChildren()).forEach(dtc -> {
-							exec.submit(() -> retrieveNodesMonitored(dtc, client, true, monitor, 26));
+						toList(root_types_xxx.getChildren()).forEach(root_types_datatypes_xxx -> {
+							exec.submit(
+									() -> retrieveNodesMonitored(root_types_datatypes_xxx, client, true, monitor, 26));
 						});
+
 					}
 					// EventTypes, ObjectTypes, ReferenceTypes, VariableTypes
 					else {
-						retrieveNodes(tc, client, true);
+
+						// clear children, because they were not recursive and
+						// will now be overwritten anyway
+						root_types_xxx.setChildren(new ArrayList<>());
+						retrieveNodes(root_types_xxx, client, true);
 					}
 				});
 			}
 			// Views
-			else if (c.getNodeId().equals(Identifiers.ViewsFolder)) {
-				retrieveNodes(c, client, true);
+			else if (root_xxx.getNodeId().equals(Identifiers.ViewsFolder)) {
+				retrieveNodes(root_xxx, client, true);
 			}
 		});
 
@@ -200,7 +215,7 @@ public class StandaloneNodeExplorerClient {
 		return node.getDisplayName().getText();
 	}
 
-	private List<CachedBaseNode> browseReferencesRecursive(CachedBaseNode node, OpcUaClient client) {
+	private List<CachedBaseNode> browseReferencesRecursive(CachedBaseNode node, OpcUaClient client, boolean recursive) {
 		List<CachedBaseNode> ref = new ArrayList<>();
 		try {
 			BrowseDescription browse = new BrowseDescription(node.getNodeId(), BrowseDirection.Forward,
@@ -218,7 +233,10 @@ public class StandaloneNodeExplorerClient {
 
 				CachedBaseNode cbn = retrieveNodeDetails(rd.getNodeId().local().orElse(null), client);
 				if (cbn != null) {
-					browseReferencesRecursive(cbn, client).forEach(nd -> addChildToNode(cbn, nd));
+					if (recursive) {
+						browseReferencesRecursive(cbn, client, recursive)
+								.forEach(nd -> addChildToNode(cbn, nd, recursive));
+					}
 					ref.add(cbn);
 				} else {
 					ref.add(new CachedBaseNode(rd));
@@ -236,8 +254,12 @@ public class StandaloneNodeExplorerClient {
 		return ref;
 	}
 
-	private void addChildToNode(CachedBaseNode parent, CachedBaseNode child) {
+	private void addChildToNode(CachedBaseNode parent, CachedBaseNode child, final Boolean recursive) {
+		if (child.getBrowseName().getName().equals("BaseObjectType")) {
+			System.out.println("here child");
+		}
 		parent.addChild(child);
+		child.setParent(parent);
 		NodeNavigator.getInstance().increaseHighestNodeIdIfNecessarySafe(child);
 	}
 
@@ -289,18 +311,40 @@ public class StandaloneNodeExplorerClient {
 	 * @param client
 	 *            the OpcUaClient which is holding the connection open
 	 * @param recursive
-	 *            whether the child nodes should be retrieved recursivelyS
+	 *            whether the child nodes should be retrieved recursively
 	 * 
 	 * 
 	 * @return <i>parent</i> with the associated children linked to it
 	 */
-	private CachedBaseNode retrieveNodes(final CachedBaseNode parent, OpcUaClient client, boolean recursive) {
+	private CachedBaseNode retrieveNodes(final CachedBaseNode parent, OpcUaClient client, final boolean recursive) {
+
+		if (parent.getBrowseName().getName().equals("ObjectTypes")
+				|| parent.getBrowseName().getName().equals("Types")) {
+			System.out.println("here");
+		}
 
 		try {
 			// TODO: retrieve root, if necessary
 
-			// retrieve node
-			client.getAddressSpace().browse(parent.getNodeId()).get().forEach(node -> {
+			List<Node> lst = client.getAddressSpace().browse(parent.getNodeId()).get();
+			System.out.println("received " + lst.size() + " nodes for " + parent);
+
+			if (NodeNavigator.getInstance().isInTypesFolder(parent)) {
+				List<CachedBaseNode> lstRef = browseReferencesRecursive(parent, client, recursive);
+				lstRef.forEach(n -> addChildToNode(parent, n, recursive));
+
+				List<QualifiedName> names = lstRef.stream().map(CachedBaseNode::getBrowseName)
+						.collect(Collectors.toList());
+
+				lst.stream().filter(n -> names.contains(n.getBrowseName()));
+			}
+
+			lst.forEach(node -> {
+
+				if (parent.getBrowseName().getName().equals("ObjectTypes")
+						|| parent.getBrowseName().getName().equals("Types")) {
+					System.out.println("here2 " + recursive);
+				}
 
 				try {
 					// cache node
@@ -310,11 +354,15 @@ public class StandaloneNodeExplorerClient {
 					cn.setParent(parent);
 
 					// references
+
 					// if in type folder, retrieve all references recursively
 					// and add them as children
 					if (NodeNavigator.getInstance().isInTypesFolder(cn)) {
-						browseReferencesRecursive(cn, client)
-								.forEach(ref -> addChildToNode(cn, retrieveNodes(ref, client, true)));
+						browseReferencesRecursive(cn, client, recursive).forEach(ref -> addChildToNode(cn,
+								/*
+								 * recursive ? retrieveNodes(ref, client,
+								 * recursive) :
+								 */ ref, recursive));
 					}
 					cn.setReferences(browseAllReferences(cn, client));
 
@@ -324,7 +372,7 @@ public class StandaloneNodeExplorerClient {
 					}
 
 					// add child to parent
-					addChildToNode(parent, cn);
+					addChildToNode(parent, cn, recursive);
 				} catch (InterruptedException | ExecutionException e) {
 					e.printStackTrace();
 				}
