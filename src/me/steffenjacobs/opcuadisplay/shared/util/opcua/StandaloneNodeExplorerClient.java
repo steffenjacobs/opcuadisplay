@@ -118,8 +118,13 @@ public class StandaloneNodeExplorerClient {
 
 						// retrieve each sub type of DataTypes async
 						toList(root_types_xxx.getChildren()).forEach(root_types_datatypes_xxx -> {
-							exec.submit(
-									() -> retrieveNodesMonitored(root_types_datatypes_xxx, client, true, monitor, 26));
+							exec.submit(() -> {
+								// clear children, because they were not
+								// recursive and will now be overwritten anyway
+								root_types_datatypes_xxx.setChildren(new ArrayList<>());
+
+								retrieveNodesMonitored(root_types_datatypes_xxx, client, true, monitor, 26);
+							});
 						});
 
 					}
@@ -235,12 +240,13 @@ public class StandaloneNodeExplorerClient {
 
 				if (cbn != null) {
 					if (recursive) {
-						browseReferencesRecursive(cbn, client, recursive)
-								.forEach(nd -> addChildToNode(cbn, nd, recursive));
+						browseReferencesRecursive(cbn, client, recursive).forEach(nd -> addChildToNode(cbn, nd));
 					}
 					ref.add(cbn);
 				} else {
-					ref.add(new CachedBaseNode(rd));
+					CachedBaseNode nn = new CachedBaseNode(rd);
+					ref.add(nn);
+					retrieveNodes(nn, client, recursive);
 				}
 
 				refs.add(new CachedReference(getNameOfNode(rd.getReferenceTypeId(), client), rd.getBrowseName(),
