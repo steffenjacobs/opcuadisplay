@@ -16,6 +16,8 @@ import org.eclipse.milo.opcua.stack.core.types.structured.ReferenceDescription;
 
 import com.google.common.collect.Lists;
 
+import me.steffenjacobs.opcuadisplay.shared.util.opcua.NodeNavigator;
+
 public class CachedBaseNode {
 	private final NodeId nodeId;
 	private NodeClass nodeClass;
@@ -130,18 +132,46 @@ public class CachedBaseNode {
 		references = new ArrayList<>();
 	}
 
-	protected CachedBaseNode(CachedBaseNode cbn, NodeId nodeId) {
+	protected CachedBaseNode(CachedBaseNode cbn) {
 		super();
 		this.browseName = new QualifiedName(cbn.browseName.getNamespaceIndex(), cbn.browseName.getName());
-		this.children = cbn.children;
-		this.description = new LocalizedText(cbn.description.getLocale(), cbn.description.getText());
-		this.displayName = new LocalizedText(cbn.displayName.getLocale(), cbn.displayName.getText());
+		this.children = new ArrayList<>();
+		for (CachedBaseNode child : cbn.children) {
+			CachedBaseNode dup = child.duplicate();
+			dup.setParent(this);
+			this.children.add(dup);
+		}
+		if (cbn.description != null) {
+			this.description = new LocalizedText(cbn.description.getLocale(), cbn.description.getText());
+		}
+		if (cbn.displayName != null) {
+			this.displayName = new LocalizedText(cbn.displayName.getLocale(), cbn.displayName.getText());
+		}
 		this.nodeClass = cbn.nodeClass;
-		this.nodeId = nodeId;
+		this.nodeId = new NodeId(cbn.nodeId.getNamespaceIndex().intValue(),
+				NodeNavigator.getInstance().generateNewNodeId());
 		this.references = new ArrayList<CachedReference>();
-		this.references.addAll(cbn.references);
-		this.userWriteMask = UInteger.valueOf(cbn.getUserWriteMask().longValue());
-		this.writeMask = UInteger.valueOf(cbn.getWriteMask().longValue());
+
+		for (CachedReference ref : cbn.references) {
+			for (CachedBaseNode child : this.children) {
+				if (child.getBrowseName().equals(ref.getBrowseName())) {
+					CachedReference cbnNew = new CachedReference(ref.getReferenceType(), ref.getBrowseName(),
+							ref.getTypeDefinition(), child.getNodeId());
+					this.references.add(cbnNew);
+					break;
+				}
+			}
+		}
+		if (cbn.userWriteMask != null) {
+			this.userWriteMask = UInteger.valueOf(cbn.userWriteMask.longValue());
+		}
+		if (cbn.writeMask != null) {
+			this.writeMask = UInteger.valueOf(cbn.writeMask.longValue());
+		}
+	}
+
+	public CachedBaseNode duplicate() {
+		return new CachedBaseNode(this);
 	}
 
 	public void setParent(CachedBaseNode parent) {
