@@ -300,4 +300,20 @@ public class CachedBaseNode {
 		}
 		return builder.toString();
 	}
+
+	/** @return true, if class, browsename and nodeclass are equal */
+	public boolean isSimilar(CachedBaseNode cbn) {
+		if (cbn.getClass() != this.getClass()) {
+			return false;
+		}
+		if (!this.browseName.equals(cbn.browseName)) {
+			return false;
+		}
+
+		if (this.nodeClass != cbn.nodeClass) {
+			return false;
+		}
+
+		return true;
+	}
 }
