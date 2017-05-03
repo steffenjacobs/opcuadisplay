@@ -38,6 +38,10 @@ import org.eclipse.milo.opcua.stack.core.types.enumerated.NodeClass;
 import org.eclipse.milo.opcua.stack.core.types.structured.BrowseDescription;
 import org.eclipse.milo.opcua.stack.core.types.structured.BrowseResult;
 import org.eclipse.milo.opcua.stack.core.types.structured.EndpointDescription;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.MessageBox;
+import org.eclipse.swt.widgets.Shell;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,6 +72,10 @@ public class StandaloneNodeExplorerClient {
 		monitor.beginTask("Establishing connection with " + url + "...", 2);
 
 		OpcUaClient client = createClient(url);
+
+		if (client == null) {
+			return CachedBaseNode.getDummyNoData();
+		}
 
 		monitor.worked(1);
 		// synchronous connect
@@ -342,12 +350,32 @@ public class StandaloneNodeExplorerClient {
 		return parent;
 	}
 
-	private static OpcUaClient createClient(String url) throws Exception {
+	private static void openMessageBox(final String title, final String message) {
+		Display.getDefault().syncExec(new Runnable() {
+			public void run() {
+				MessageBox box = new MessageBox(new Shell(), SWT.ICON_ERROR);
+				box.setText(title);
+				box.setMessage(message);
+				box.open();
+			}
+		});
+	}
 
+	private static OpcUaClient createClient(String url) throws Exception {
 		SecurityPolicy securityPolicy = SecurityPolicy.None;
 
 		// initialize endpoint
-		EndpointDescription[] endpoints = UaTcpStackClient.getEndpoints(url).get();
+		EndpointDescription[] endpoints;
+		try {
+			endpoints = UaTcpStackClient.getEndpoints(url).get();
+		} catch (Exception excep) {
+			if (excep.getMessage().startsWith("UaException: status=Bad_TcpEndpointUrlInvalid")) {
+				openMessageBox("OPC UA Display", "Invalid hostname: " + url);
+			} else {
+				openMessageBox("OPC UA Display", excep.getLocalizedMessage());
+			}
+			return null;
+		}
 
 		EndpointDescription endpoint = Arrays.stream(endpoints)
 				.filter(e -> e.getSecurityPolicyUri().equals(securityPolicy.getSecurityPolicyUri())).findFirst()
