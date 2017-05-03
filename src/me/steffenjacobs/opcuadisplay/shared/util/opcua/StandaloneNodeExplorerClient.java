@@ -118,11 +118,11 @@ public class StandaloneNodeExplorerClient {
 
 						// retrieve each sub type of DataTypes async
 						toList(root_types_xxx.getChildren()).forEach(root_types_datatypes_xxx -> {
-							exec.submit(() -> {
-								// clear children, because they were not
-								// recursive and will now be overwritten anyway
-								root_types_datatypes_xxx.setChildren(new ArrayList<>());
+							// clear children, because they were not
+							// recursive and will now be overwritten anyway
+							root_types_datatypes_xxx.setChildren(new ArrayList<>());
 
+							exec.submit(() -> {
 								retrieveNodesMonitored(root_types_datatypes_xxx, client, true, monitor, 26);
 							});
 						});
@@ -329,12 +329,23 @@ public class StandaloneNodeExplorerClient {
 
 			if (NodeNavigator.getInstance().isInTypesFolder(parent)) {
 				List<CachedBaseNode> lstRef = browseReferencesRecursive(parent, client, recursive);
-				lstRef.forEach(n -> addChildToNode(parent, n));
+				lstRef.forEach(n -> {
+					// TODO fix references of XML Schema and Binary Schema nodes
+					// when deduplicating
+					addChildToNode(parent, n);
+				});
 
 				List<QualifiedName> names = lstRef.stream().map(CachedBaseNode::getBrowseName)
 						.collect(Collectors.toList());
 
-				lst.stream().filter(n -> names.contains(n.getBrowseName()));
+				lst = lst.stream().filter(n -> {
+					try {
+						return !names.contains(n.getBrowseName().get());
+					} catch (InterruptedException | ExecutionException e1) {
+						e1.printStackTrace();
+					}
+					return true;
+				}).collect(Collectors.toList());
 			}
 
 			lst.forEach(node -> {
@@ -350,7 +361,7 @@ public class StandaloneNodeExplorerClient {
 
 					// if in type folder, retrieve all references recursively
 					// and add them as children
-					if (NodeNavigator.getInstance().isInTypesFolder(cn)) {
+					if (NodeNavigator.getInstance().isInTypesFolder(cn) && recursive) {
 						browseReferencesRecursive(cn, client, recursive).forEach(ref -> addChildToNode(cn, ref));
 					}
 					cn.setReferences(browseAllReferences(cn, client));
