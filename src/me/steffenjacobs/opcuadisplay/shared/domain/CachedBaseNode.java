@@ -1,6 +1,7 @@
 package me.steffenjacobs.opcuadisplay.shared.domain;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
@@ -140,6 +141,14 @@ public class CachedBaseNode {
 		this.browseName = new QualifiedName(cbn.browseName.getNamespaceIndex(), cbn.browseName.getName());
 		this.children = new ArrayList<>();
 		for (CachedBaseNode child : cbn.children) {
+
+			// don't clone subtypes
+			if (!NodeNavigator.getInstance().isInTypesFolder(child)
+					&& (child instanceof CachedDataTypeNode || child instanceof CachedObjectTypeNode
+							|| child instanceof CachedVariableTypeNode || child instanceof CachedReferenceTypeNode)) {
+				continue;
+			}
+
 			CachedBaseNode dup = child.duplicate();
 			dup.setParent(this);
 			this.children.add(dup);
@@ -155,14 +164,26 @@ public class CachedBaseNode {
 				NodeNavigator.getInstance().generateNewNodeId());
 		this.references = new ArrayList<CachedReference>();
 
+		// rewire references to associated children of the parent, if possible
 		for (CachedReference ref : cbn.references) {
-			for (CachedBaseNode child : this.children) {
+			Iterator<CachedBaseNode> it = this.children.iterator();
+			boolean found = false;
+			while (it.hasNext() && !found) {
+				CachedBaseNode child = it.next();
 				if (child.getBrowseName().equals(ref.getBrowseName())) {
 					CachedReference cbnNew = new CachedReference(ref.getReferenceType(), ref.getBrowseName(),
 							ref.getTypeDefinition(), child.getNodeId());
 					this.references.add(cbnNew);
-					break;
+					found = true;
 				}
+			}
+
+			// add reference manually (e.g. type declarations do not have an
+			// associated node as a child of the parent), if the ReferenceType
+			// is not HasSubType, or the node is in the types folder
+			if (!found && (!"HasSubtype".equals(ref.getReferenceType())
+					|| NodeNavigator.getInstance().isInTypesFolder(cbn))) {
+				this.references.add(ref);
 			}
 		}
 		if (cbn.userWriteMask != null) {
