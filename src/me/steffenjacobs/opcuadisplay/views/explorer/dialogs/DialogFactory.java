@@ -91,7 +91,22 @@ public class DialogFactory {
 				}
 			});
 		case METHOD: {
-			
+			return new MethodAddDialog(new Shell(), type.getName(), new DialogListener() {
+
+				@Override
+				public void onOkMethod(int namespace, String name, int nodeId,
+						MethodArgument[] inputArgs, MethodArgument[] outputArgs) {
+					System.out.println("done.");
+					for(MethodArgument arg : inputArgs){
+						System.out.println(arg);
+					}
+					for(MethodArgument arg : outputArgs){
+						System.out.println(arg);
+					}
+					System.out.println(namespace + " - " + name + " - " + nodeId );
+
+				}
+			});
 		}
 		default:
 			return null;
