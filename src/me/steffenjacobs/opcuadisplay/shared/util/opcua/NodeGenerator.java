@@ -48,7 +48,7 @@ public class NodeGenerator {
 		}
 	}
 
-	public static void createMethod(int nameSpaceIndex, String text, int nodeId, CachedBaseNode parent,
+	public static CachedMethodNode createMethod(int nameSpaceIndex, String text, int nodeId, CachedBaseNode parent,
 			MethodArgument[] inputArgs, MethodArgument[] outputArgs) {
 		CachedMethodNode cmn = CachedMethodNode.create(nameSpaceIndex, text, nodeId, inputArgs, outputArgs);
 		parent.addChild(cmn);
@@ -57,9 +57,11 @@ public class NodeGenerator {
 
 		// rerender tree viewer
 		EventBus.getInstance().fireEvent(new AttributeModifiedEvent(parent));
+
+		return cmn;
 	}
 
-	private static void createObject(int nameSpaceIndex, String text, int nodeId, CachedObjectTypeNode type,
+	private static CachedObjectNode createObject(int nameSpaceIndex, String text, int nodeId, CachedObjectTypeNode type,
 			CachedBaseNode parent) {
 		CachedObjectNode con = CachedObjectNode.create(nameSpaceIndex, text, nodeId, type);
 		parent.addChild(con);
@@ -74,10 +76,12 @@ public class NodeGenerator {
 
 		// rerender tree viewer
 		EventBus.getInstance().fireEvent(new AttributeModifiedEvent(parent));
+
+		return con;
 	}
 
-	private static void createVariable(int namespaceIndex, String name, int nodeId, CachedDataTypeNode type,
-			CachedBaseNode parent) {
+	private static CachedVariableNode createVariable(int namespaceIndex, String name, int nodeId,
+			CachedDataTypeNode type, CachedBaseNode parent) {
 		CachedVariableNode cvn = CachedVariableNode.create(namespaceIndex, name, nodeId, type);
 
 		List<CachedReference> refs = new ArrayList<>();
@@ -95,10 +99,12 @@ public class NodeGenerator {
 
 		// rerender tree viewer
 		EventBus.getInstance().fireEvent(new AttributeModifiedEvent(parent));
+
+		return cvn;
 	}
 
-	public static void createProperty(int namespaceIndex, String name, int nodeId, CachedDataTypeNode type,
-			CachedBaseNode parent) {
+	public static CachedVariableNode createProperty(int namespaceIndex, String name, int nodeId,
+			CachedDataTypeNode type, CachedBaseNode parent) {
 		CachedVariableNode cvn = CachedVariableNode.create(namespaceIndex, name, nodeId, type);
 
 		List<CachedReference> refs = new ArrayList<>();
@@ -116,6 +122,8 @@ public class NodeGenerator {
 
 		// rerender tree viewer
 		EventBus.getInstance().fireEvent(new AttributeModifiedEvent(parent));
+
+		return cvn;
 	}
 
 }
