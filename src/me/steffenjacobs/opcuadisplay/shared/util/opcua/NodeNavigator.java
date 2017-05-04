@@ -4,12 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import org.eclipse.milo.opcua.stack.core.Identifiers;
 import org.eclipse.milo.opcua.stack.core.types.builtin.LocalizedText;
 import org.eclipse.milo.opcua.stack.core.types.builtin.QualifiedName;
 import org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.UInteger;
 import org.eclipse.milo.opcua.stack.core.types.enumerated.IdType;
+
+import com.google.common.collect.Lists;
 
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedBaseNode;
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedReference;
@@ -170,8 +173,40 @@ public class NodeNavigator {
 		return cn.getReferences().stream().filter(ref -> ref.getReferenceType().equals("HasTypeDefinition")
 				&& ref.getBrowseName().getName().equals("FolderType")).count() > 0;
 	}
-	
-	public boolean isProperty(CachedBaseNode cn){
+
+	public boolean isProperty(CachedBaseNode cn) {
 		return cn.getReferences().contains(CachedReference.PROPERTY_TYPE);
+	}
+
+	public boolean isType(CachedBaseNode cbn) {
+		switch (cbn.getNodeClass()) {
+		case DataType:
+		case ObjectType:
+		case ReferenceType:
+		case VariableType:
+			return true;
+		case Unspecified:
+		case Method:
+		case Object:
+		case Variable:
+		case View:
+		default:
+			return false;
+		}
+	}
+
+	/**
+	 * @return a list of all children (objects, methods, variables), that are
+	 *         inherited to the subtype <i>typeNode</i>
+	 */
+	public List<CachedBaseNode> aggregateInheritedChildren(CachedBaseNode typeNode) {
+		List<CachedBaseNode> result = new ArrayList<>();
+
+		do {
+			result.addAll(Lists.newArrayList(typeNode.getChildren()).stream().filter(c -> !isType(c))
+					.collect(Collectors.toList()));
+		} while (isType(typeNode = typeNode.getParent()));
+
+		return result;
 	}
 }
