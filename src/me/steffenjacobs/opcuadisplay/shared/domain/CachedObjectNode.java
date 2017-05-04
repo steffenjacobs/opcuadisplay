@@ -1,7 +1,5 @@
 package me.steffenjacobs.opcuadisplay.shared.domain;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import org.eclipse.milo.opcua.sdk.client.nodes.UaObjectNode;
@@ -12,6 +10,7 @@ import org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.UByte;
 import org.eclipse.milo.opcua.stack.core.types.enumerated.NodeClass;
 
 import me.steffenjacobs.opcuadisplay.shared.util.FutureResolver;
+import me.steffenjacobs.opcuadisplay.shared.util.opcua.NodeGenerator;
 import me.steffenjacobs.opcuadisplay.shared.util.opcua.NodeNavigator;
 
 public class CachedObjectNode extends CachedBaseNode {
@@ -51,20 +50,16 @@ public class CachedObjectNode extends CachedBaseNode {
 		CachedObjectNode cbn = new CachedObjectNode(id);
 		cbn.setDisplayName(new LocalizedText("en", name));
 		cbn.setBrowseName(new QualifiedName(namespaceIndex, name));
-		List<CachedReference> refs = new ArrayList<>();
-		CachedReference ref = new CachedReference("HasTypeDefinition", type.getBrowseName(), "null", type.getNodeId());
-		refs.add(ref);
-		refs.addAll(type.getReferences());
-		cbn.setReferences(refs);
+		cbn.getReferences()
+				.add(new CachedReference("HasTypeDefinition", type.getBrowseName(), "null", type.getNodeId()));
 
 		NodeNavigator.getInstance().increaseHighestNodeIdIfNecessarySafe(cbn);
 
-		for (CachedBaseNode child : type.getChildren()) {
-			cbn.addChild(child);
-			child.setParent(cbn);
+		for (CachedBaseNode child : NodeNavigator.getInstance().aggregateInheritedChildren(type)) {
+			NodeGenerator.insertNode(child, cbn);
 		}
-		
-		//rewire references & duplicate children recursive
+
+		// rewire references & duplicate children recursive
 		return cbn.duplicate();
 	}
 }
