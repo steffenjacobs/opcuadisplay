@@ -138,8 +138,8 @@ public class NodeGenerator {
 	private static CachedReference getAssociatedReference(CachedBaseNode child, CachedBaseNode parent) {
 		if (NodeNavigator.getInstance().isFolder(parent)) {
 			CachedReference typeDefinition = getTypeDefinition(child);
-			return new CachedReference("Organizes", child.getBrowseName(), typeDefinition.getReferenceType(),
-					child.getNodeId());
+			return new CachedReference("Organizes", child.getBrowseName(),
+					typeDefinition != null ? typeDefinition.getBrowseName().getName() : null, child.getNodeId());
 		}
 
 		if (NodeNavigator.getInstance().isType(parent) && NodeNavigator.getInstance().isType(child)) {
@@ -161,13 +161,13 @@ public class NodeGenerator {
 
 			CachedReference typeDefinition = getTypeDefinition(child);
 			return new CachedReference("HasComponent", child.getBrowseName(),
-					typeDefinition != null ? typeDefinition.getReferenceType() : null, child.getNodeId());
+					typeDefinition != null ? typeDefinition.getBrowseName().getName() : null, child.getNodeId());
 		}
 
 		if (child.getNodeClass() == NodeClass.Object) {
 			CachedReference typeDefinition = getTypeDefinition(child);
 			return new CachedReference("HasComponent", child.getBrowseName(),
-					typeDefinition != null ? typeDefinition.getReferenceType() : null, child.getNodeId());
+					typeDefinition != null ? typeDefinition.getBrowseName().getName() : null, child.getNodeId());
 		}
 		return null;
 	}
