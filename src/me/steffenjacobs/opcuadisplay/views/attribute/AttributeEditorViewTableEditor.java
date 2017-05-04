@@ -140,7 +140,7 @@ public class AttributeEditorViewTableEditor {
 								@Override
 								public void accept(String t) {
 									entry.getCachedNode().setDisplayName(AttributeValueParser.parseLocalizedText(t));
-									EventBus.getInstance().fireEvent(new AttributeModifiedEvent());
+									EventBus.getInstance().fireEvent(new AttributeModifiedEvent(entry.getCachedNode()));
 								}
 							};
 
@@ -376,7 +376,7 @@ public class AttributeEditorViewTableEditor {
 				editor.getItem().setText(editableColumn, newEditor.getSelected().toString());
 				entry.setValue(newEditor.getSelected());
 				entry.getCachedNode().setNodeClass(newEditor.getSelected());
-				EventBus.getInstance().fireEvent(new AttributeModifiedEvent());
+				EventBus.getInstance().fireEvent(new AttributeModifiedEvent(entry.getCachedNode()));
 				editor.getEditor().dispose();
 			}
 
@@ -407,7 +407,7 @@ public class AttributeEditorViewTableEditor {
 				editor.getItem().setText(editableColumn, newEditor.getSelected().toString());
 				entry.setValue(newEditor.getSelected());
 				setter.accept(newEditor.getSelected());
-				EventBus.getInstance().fireEvent(new AttributeModifiedEvent());
+				EventBus.getInstance().fireEvent(new AttributeModifiedEvent(entry.getCachedNode()));
 				editor.getEditor().dispose();
 			}
 

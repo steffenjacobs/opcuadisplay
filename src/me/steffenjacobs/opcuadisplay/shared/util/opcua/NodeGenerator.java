@@ -56,7 +56,7 @@ public class NodeGenerator {
 		parent.getReferences().add(new CachedReference("HasComponent", cmn.getBrowseName(), null, cmn.getNodeId()));
 
 		// rerender tree viewer
-		EventBus.getInstance().fireEvent(new AttributeModifiedEvent());
+		EventBus.getInstance().fireEvent(new AttributeModifiedEvent(parent));
 	}
 
 	private static void createObject(int nameSpaceIndex, String text, int nodeId, CachedObjectTypeNode type,
@@ -73,7 +73,7 @@ public class NodeGenerator {
 		}
 
 		// rerender tree viewer
-		EventBus.getInstance().fireEvent(new AttributeModifiedEvent());
+		EventBus.getInstance().fireEvent(new AttributeModifiedEvent(parent));
 	}
 
 	private static void createVariable(int namespaceIndex, String name, int nodeId, CachedDataTypeNode type,
@@ -94,7 +94,7 @@ public class NodeGenerator {
 				type.getBrowseName().getName(), type.getNodeId()));
 
 		// rerender tree viewer
-		EventBus.getInstance().fireEvent(new AttributeModifiedEvent());
+		EventBus.getInstance().fireEvent(new AttributeModifiedEvent(parent));
 	}
 
 	public static void createProperty(int namespaceIndex, String name, int nodeId, CachedDataTypeNode type,
@@ -115,7 +115,7 @@ public class NodeGenerator {
 				type.getBrowseName().getName(), type.getNodeId()));
 
 		// rerender tree viewer
-		EventBus.getInstance().fireEvent(new AttributeModifiedEvent());
+		EventBus.getInstance().fireEvent(new AttributeModifiedEvent(parent));
 	}
 
 }
