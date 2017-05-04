@@ -34,6 +34,12 @@ public class DialogFactory {
 		}
 	}
 
+	public static interface DialogListener {
+
+		void onOk(int namespace, String name, int nodeId, CachedBaseNode type);
+
+	}
+
 	private static DialogFactory instance;
 
 	private DialogFactory() {

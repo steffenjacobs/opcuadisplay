@@ -21,6 +21,7 @@ import me.steffenjacobs.opcuadisplay.shared.domain.CachedBaseNode;
 import me.steffenjacobs.opcuadisplay.shared.util.opcua.NodeNavigator;
 import me.steffenjacobs.opcuadisplay.views.explorer.NodeClassLabelProvider;
 import me.steffenjacobs.opcuadisplay.views.explorer.SimpleOpcUaTreeProvider;
+import me.steffenjacobs.opcuadisplay.views.explorer.dialogs.DialogFactory.DialogListener;
 
 public class SimpleAddDialog extends TitleAreaDialog {
 
