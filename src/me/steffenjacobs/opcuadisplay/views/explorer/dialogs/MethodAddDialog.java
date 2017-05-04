@@ -79,29 +79,36 @@ public class MethodAddDialog extends SimpleAddDialog {
 
 	private void createArgumentsPanel(Composite parent, String caption, final HashMap<String, MethodArgument> map) {
 		Composite comp = new Composite(parent, SWT.NONE);
+
+		// label with "Input Arguments" or "Output Arguments"
 		final Label lbl = new Label(comp, SWT.NONE | SWT.CENTER);
 		lbl.setText(caption);
 		lbl.setBounds(0, 0, 220, 19);
 
+		// bold font for label
 		FontData fontData = lbl.getFont().getFontData()[0];
 		Font font = new Font(Activator.getDefault().getWorkbench().getDisplay(),
 				new FontData(fontData.getName(), fontData.getHeight(), SWT.BOLD));
 		lbl.setFont(font);
 
+		// text field with the name of the new argument
+		final Text textArgumentName = new Text(comp, SWT.BORDER);
+		textArgumentName.setBounds(0, 130, 160, 25);
+
+		// list with added arguments
 		final List list = new List(comp, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL);
 		list.setBounds(0, 20, 220, 100);
 
-		final TreeViewer viewer = createTreeViewer(comp);
-
-		final Text text = new Text(comp, SWT.BORDER);
-		text.setBounds(0, 130, 160, 25);
-
 		list.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
-				text.setText(list.getItem(list.getSelectionIndex()));
+				textArgumentName.setText(list.getItem(list.getSelectionIndex()));
 			}
 		});
 
+		// tree viewer to select type for a new argument
+		final TreeViewer viewer = createTreeViewer(comp);
+
+		// button to add an argument to the list
 		final Button btnAdd = new Button(comp, SWT.PUSH);
 		btnAdd.setText("+");
 		btnAdd.setBounds(165, 130, 25, 25);
@@ -109,7 +116,7 @@ public class MethodAddDialog extends SimpleAddDialog {
 			@Override
 			public void widgetSelected(SelectionEvent arg0) {
 
-				if ("".equals(text.getText())) {
+				if ("".equals(textArgumentName.getText())) {
 					MethodAddDialog.this.setMessage("The name of an argument can not be empty.",
 							IMessageProvider.ERROR);
 					return;
@@ -129,20 +136,21 @@ public class MethodAddDialog extends SimpleAddDialog {
 					return;
 				}
 
-				MethodArgument arg = new MethodArgument(text.getText(), node);
+				MethodArgument arg = new MethodArgument(textArgumentName.getText(), node);
 
 				if (map.containsKey(arg.toString())) {
-					MethodAddDialog.this.setMessage("The name '" + text.getText() + "' already exists.",
+					MethodAddDialog.this.setMessage("The name '" + textArgumentName.getText() + "' already exists.",
 							IMessageProvider.ERROR);
 					return;
 				}
 
 				map.put(arg.toString(), arg);
 				list.add(arg.toString());
-				text.setText("");
+				textArgumentName.setText("");
 			}
 		});
 
+		// button to remove an argument from the list
 		final Button btnRemove = new Button(comp, SWT.PUSH);
 		btnRemove.setText("-");
 		btnRemove.setBounds(195, 130, 25, 25);
@@ -151,7 +159,7 @@ public class MethodAddDialog extends SimpleAddDialog {
 			public void widgetSelected(SelectionEvent arg0) {
 
 				int index = list.getSelectionIndex();
-				MethodArgument arg = map.get(text.getText());
+				MethodArgument arg = map.get(textArgumentName.getText());
 				if (arg == null) {
 					return;
 				}
@@ -161,16 +169,15 @@ public class MethodAddDialog extends SimpleAddDialog {
 				// update selection
 				if (list.getItemCount() > 0) {
 					list.setSelection(index >= list.getItemCount() ? list.getItemCount() - 1 : index);
-					text.setText(list.getItem(list.getSelectionIndex()));
-				}
-				else{
-					text.setText("");
+					textArgumentName.setText(list.getItem(list.getSelectionIndex()));
+				} else {
+					textArgumentName.setText("");
 				}
 			}
 		});
-
 	}
 
+	/**@return a TreeViewer with /Types/DataTypes/BaseDataType as a root*/
 	private TreeViewer createTreeViewer(Composite container) {
 
 		TreeViewer viewer = new TreeViewer(container, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
