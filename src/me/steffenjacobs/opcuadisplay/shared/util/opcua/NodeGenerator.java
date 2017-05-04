@@ -63,18 +63,7 @@ public class NodeGenerator {
 	private static CachedObjectNode createAndInsertObject(int nameSpaceIndex, String text, int nodeId,
 			CachedObjectTypeNode type, CachedBaseNode parent) {
 		CachedObjectNode con = CachedObjectNode.create(nameSpaceIndex, text, nodeId, type);
-		parent.addChild(con);
-		con.setParent(parent);
-		if (NodeNavigator.getInstance().isFolder(parent)) {
-			parent.getReferences().add(new CachedReference("Organizes", con.getBrowseName(),
-					type.getBrowseName().getName(), type.getNodeId()));
-		} else {
-			parent.getReferences().add(new CachedReference("HasComponent", con.getBrowseName(),
-					con.getBrowseName().getName(), con.getNodeId()));
-		}
-
-		// rerender tree viewer
-		EventBus.getInstance().fireEvent(new AttributeModifiedEvent(parent));
+		insertNode(con, parent);
 
 		return con;
 	}
