@@ -39,9 +39,14 @@ public class DialogFactory {
 	 * Dialog listener for SimpleAddDialog. Is called, when the OK-button is
 	 * pressed and the validation had been successful.
 	 */
-	public static interface DialogListener {
+	public static abstract class DialogListener {
 
-		void onOk(int namespace, String name, int nodeId, CachedBaseNode type);
+		public void onOkSimple(int namespace, String name, int nodeId, CachedBaseNode type) {
+		};
+
+		public void onOkMethod(int namespace, String name, int nodeId, MethodArgument[] inputArgs,
+				MethodArgument[] outputArgs) {
+		};
 
 	}
 
@@ -67,24 +72,27 @@ public class DialogFactory {
 		case OBJECT:
 			return new SimpleAddDialog(new Shell(), type.getName(), type.getPathToBaseTypeNode(), new DialogListener() {
 				@Override
-				public void onOk(int namespace, String name, int nodeId, CachedBaseNode typeN) {
+				public void onOkSimple(int namespace, String name, int nodeId, CachedBaseNode typeN) {
 					NodeGenerator.createAndInsert(type, namespace, name, nodeId, typeN, selectedParent);
 				}
 			});
 		case VARIABLE:
 			return new SimpleAddDialog(new Shell(), type.getName(), type.getPathToBaseTypeNode(), new DialogListener() {
 				@Override
-				public void onOk(int namespace, String name, int nodeId, CachedBaseNode typeN) {
+				public void onOkSimple(int namespace, String name, int nodeId, CachedBaseNode typeN) {
 					NodeGenerator.createAndInsert(type, namespace, name, nodeId, typeN, selectedParent);
 				}
 			});
 		case PROPERTY:
 			return new SimpleAddDialog(new Shell(), type.getName(), type.getPathToBaseTypeNode(), new DialogListener() {
 				@Override
-				public void onOk(int namespace, String name, int nodeId, CachedBaseNode typeN) {
+				public void onOkSimple(int namespace, String name, int nodeId, CachedBaseNode typeN) {
 					NodeGenerator.createAndInsert(type, namespace, name, nodeId, typeN, selectedParent);
 				}
 			});
+		case METHOD: {
+			
+		}
 		default:
 			return null;
 		}

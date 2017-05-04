@@ -38,7 +38,7 @@ public class SimpleAddDialog extends TitleAreaDialog {
 	private TreeViewer viewer;
 
 	private final String title, pathToTypeNode;
-	private final DialogListener listener;
+	private DialogListener listener;
 
 	public SimpleAddDialog(Shell parentShell, String title, String pathToTypeNode, DialogListener listener) {
 		super(parentShell);
@@ -49,7 +49,7 @@ public class SimpleAddDialog extends TitleAreaDialog {
 
 	@Override
 	protected void createButtonsForButtonBar(Composite parent) {
-		createButton(parent, IDialogConstants.OK_ID, "Create Object", true);
+		createButton(parent, IDialogConstants.OK_ID, "Create " + this.title, true);
 		createButton(parent, IDialogConstants.CANCEL_ID, IDialogConstants.CANCEL_LABEL, false);
 	}
 
@@ -198,13 +198,13 @@ public class SimpleAddDialog extends TitleAreaDialog {
 		try {
 			nameSpaceIndex = Integer.parseInt(txtNameSpace.getText());
 		} catch (NumberFormatException e) {
-			this.setMessage("Invalid namespace index!", IMessageProvider.ERROR);
+			this.setMessage("'" + txtNameSpace.getText() + "' is not a valid namespace index.", IMessageProvider.ERROR);
 			return;
 		}
 		try {
 			nextNodeId = Integer.parseInt(txtNodeId.getText());
 		} catch (NumberFormatException e) {
-			this.setMessage("Invalid NodeId!", IMessageProvider.ERROR);
+			this.setMessage("'" + txtNodeId.getText() + "' is not a valid NodeId.", IMessageProvider.ERROR);
 			return;
 		}
 
@@ -217,12 +217,19 @@ public class SimpleAddDialog extends TitleAreaDialog {
 			}
 
 			if (node == null) {
-				this.setMessage("Please select a type below!", IMessageProvider.ERROR);
+				this.setMessage("The type for the " + this.title.toLowerCase() + " to create is not specified.",
+						IMessageProvider.ERROR);
 				return;
 			}
 		}
 
-		listener.onOk(nameSpaceIndex, name, nextNodeId, node);
+		if (listener != null) {
+			listener.onOkSimple(nameSpaceIndex, name, nextNodeId, node);
+		}
 		super.okPressed();
+	}
+
+	protected void setDialogListener(DialogListener listener) {
+		this.listener = listener;
 	}
 }
