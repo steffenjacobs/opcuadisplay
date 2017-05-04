@@ -12,6 +12,7 @@ import org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.UInteger;
 import org.eclipse.milo.opcua.stack.core.types.enumerated.IdType;
 
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedBaseNode;
+import me.steffenjacobs.opcuadisplay.shared.domain.CachedReference;
 
 public class NodeNavigator {
 
@@ -168,5 +169,9 @@ public class NodeNavigator {
 	public boolean isFolder(CachedBaseNode cn) {
 		return cn.getReferences().stream().filter(ref -> ref.getReferenceType().equals("HasTypeDefinition")
 				&& ref.getBrowseName().getName().equals("FolderType")).count() > 0;
+	}
+	
+	public boolean isProperty(CachedBaseNode cn){
+		return cn.getReferences().contains(CachedReference.PROPERTY_TYPE);
 	}
 }

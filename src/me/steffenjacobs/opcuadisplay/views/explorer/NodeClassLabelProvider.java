@@ -6,7 +6,6 @@ import org.eclipse.swt.graphics.Image;
 
 import me.steffenjacobs.opcuadisplay.Activator;
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedBaseNode;
-import me.steffenjacobs.opcuadisplay.shared.domain.CachedReference;
 import me.steffenjacobs.opcuadisplay.shared.util.Images;
 import me.steffenjacobs.opcuadisplay.shared.util.opcua.NodeNavigator;
 
@@ -52,7 +51,7 @@ public class NodeClassLabelProvider extends LabelProvider {
 		}
 
 		else if (cn.getNodeClass() == NodeClass.Variable) {
-			if (cn.getReferences().contains(CachedReference.PROPERTY_TYPE)) {
+			if (NodeNavigator.getInstance().isProperty(cn)) {
 				return Activator.getImage(Images.ExplorerView.PROPERTY.getIdentifier());
 			}
 			return Activator.getImage(Images.ExplorerView.VARIABLE.getIdentifier());
