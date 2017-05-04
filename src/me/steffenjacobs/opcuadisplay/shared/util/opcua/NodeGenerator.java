@@ -40,20 +40,20 @@ public class NodeGenerator {
 
 		switch (addType) {
 		case OBJECT:
-			createObject(namespaceIndex, name, nodeId, (CachedObjectTypeNode) type, parent);
+			createAndInsertObject(namespaceIndex, name, nodeId, (CachedObjectTypeNode) type, parent);
 			break;
 		case VARIABLE:
-			createVariable(namespaceIndex, name, nodeId, (CachedDataTypeNode) type, parent);
+			createAndInsertVariable(namespaceIndex, name, nodeId, (CachedDataTypeNode) type, parent);
 			break;
 		case PROPERTY:
-			createProperty(namespaceIndex, name, nodeId, (CachedDataTypeNode) type, parent);
+			createAndInsertProperty(namespaceIndex, name, nodeId, (CachedDataTypeNode) type, parent);
 			break;
 		default:
 		}
 	}
 
-	public static CachedMethodNode createMethod(int nameSpaceIndex, String text, int nodeId, CachedBaseNode parent,
-			MethodArgument[] inputArgs, MethodArgument[] outputArgs) {
+	public static CachedMethodNode createAndInsertMethod(int nameSpaceIndex, String text, int nodeId,
+			CachedBaseNode parent, MethodArgument[] inputArgs, MethodArgument[] outputArgs) {
 		CachedMethodNode cmn = CachedMethodNode.create(nameSpaceIndex, text, nodeId, inputArgs, outputArgs);
 		parent.addChild(cmn);
 		cmn.setParent(parent);
@@ -65,8 +65,8 @@ public class NodeGenerator {
 		return cmn;
 	}
 
-	private static CachedObjectNode createObject(int nameSpaceIndex, String text, int nodeId, CachedObjectTypeNode type,
-			CachedBaseNode parent) {
+	private static CachedObjectNode createAndInsertObject(int nameSpaceIndex, String text, int nodeId,
+			CachedObjectTypeNode type, CachedBaseNode parent) {
 		CachedObjectNode con = CachedObjectNode.create(nameSpaceIndex, text, nodeId, type);
 		parent.addChild(con);
 		con.setParent(parent);
@@ -84,7 +84,7 @@ public class NodeGenerator {
 		return con;
 	}
 
-	private static CachedVariableNode createVariable(int namespaceIndex, String name, int nodeId,
+	private static CachedVariableNode createAndInsertVariable(int namespaceIndex, String name, int nodeId,
 			CachedDataTypeNode type, CachedBaseNode parent) {
 		CachedVariableNode cvn = CachedVariableNode.create(namespaceIndex, name, nodeId, type);
 
@@ -107,7 +107,7 @@ public class NodeGenerator {
 		return cvn;
 	}
 
-	public static CachedVariableNode createProperty(int namespaceIndex, String name, int nodeId,
+	public static CachedVariableNode createAndInsertProperty(int namespaceIndex, String name, int nodeId,
 			CachedDataTypeNode type, CachedBaseNode parent) {
 		CachedVariableNode cvn = CachedVariableNode.create(namespaceIndex, name, nodeId, type);
 
@@ -132,7 +132,7 @@ public class NodeGenerator {
 
 	private static CachedReference getTypeDefinition(CachedBaseNode node) {
 		return Lists.newArrayList(node.getReferences()).stream()
-				.filter(r -> "HasTypeDefinition".equals(r.getTypeDefinition())).findFirst().orElse(null);
+				.filter(r -> "HasTypeDefinition".equals(r.getReferenceType())).findFirst().orElse(null);
 	}
 
 	private static CachedReference getAssociatedReference(CachedBaseNode child, CachedBaseNode parent) {

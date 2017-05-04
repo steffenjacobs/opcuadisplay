@@ -95,7 +95,7 @@ public class DialogFactory {
 				@Override
 				public void onOkMethod(int namespace, String name, int nodeId, MethodArgument[] inputArgs,
 						MethodArgument[] outputArgs) {
-					NodeGenerator.createMethod(namespace, name, nodeId, selectedParent, inputArgs, outputArgs);
+					NodeGenerator.createAndInsertMethod(namespace, name, nodeId, selectedParent, inputArgs, outputArgs);
 				}
 			});
 		}
