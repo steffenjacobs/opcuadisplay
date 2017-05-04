@@ -8,6 +8,7 @@ import me.steffenjacobs.opcuadisplay.Activator;
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedBaseNode;
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedReference;
 import me.steffenjacobs.opcuadisplay.shared.util.Images;
+import me.steffenjacobs.opcuadisplay.shared.util.opcua.NodeNavigator;
 
 public class NodeClassLabelProvider extends LabelProvider {
 
@@ -24,7 +25,7 @@ public class NodeClassLabelProvider extends LabelProvider {
 		CachedBaseNode cn = (CachedBaseNode) obj;
 
 		if (cn.getNodeClass() == NodeClass.Object) {
-			if (isFolder(cn)) {
+			if (NodeNavigator.getInstance().isFolder(cn)) {
 				return Activator.getImage(Images.ExplorerView.FOLDER.getIdentifier());
 			}
 			return Activator.getImage(Images.ExplorerView.OBJECT.getIdentifier());
@@ -61,10 +62,5 @@ public class NodeClassLabelProvider extends LabelProvider {
 			return Activator.getImage(Images.ExplorerView.TYPE.getIdentifier());
 		}
 		return Activator.getImage(Images.ExplorerView.UNKNOWN.getIdentifier());
-	}
-
-	private boolean isFolder(CachedBaseNode cn) {
-		return cn.getReferences().stream().filter(ref -> ref.getReferenceType().equals("HasTypeDefinition") && ref.getBrowseName().getName().equals("FolderType"))
-				.count() > 0;
 	}
 }

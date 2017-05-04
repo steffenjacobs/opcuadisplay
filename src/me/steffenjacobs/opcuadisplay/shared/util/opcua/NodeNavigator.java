@@ -164,4 +164,9 @@ public class NodeNavigator {
 		}
 		return path;
 	}
+
+	public boolean isFolder(CachedBaseNode cn) {
+		return cn.getReferences().stream().filter(ref -> ref.getReferenceType().equals("HasTypeDefinition")
+				&& ref.getBrowseName().getName().equals("FolderType")).count() > 0;
+	}
 }
