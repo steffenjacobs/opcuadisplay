@@ -66,9 +66,13 @@ public class CachedMethodNode extends CachedBaseNode {
 		CachedDataTypeNode argumentType = (CachedDataTypeNode) NodeNavigator.getInstance()
 				.navigateByName("Root/Types/DataTypes/BaseDataType/Structure/Argument");
 
-		NodeGenerator.createProperty(namespaceIndex, "InputArguments", nodeId, argumentType, cmn);
+		if (inputArgs != null && inputArgs.length > 0) {
+			NodeGenerator.createProperty(namespaceIndex, "InputArguments", nodeId, argumentType, cmn);
+		}
 
-		NodeGenerator.createProperty(namespaceIndex, "OutputArguments", nodeId, argumentType, cmn);
+		if (outputArgs != null && outputArgs.length > 0) {
+			NodeGenerator.createProperty(namespaceIndex, "OutputArguments", nodeId, argumentType, cmn);
+		}
 
 		// TODO: set arguments to value-property
 
