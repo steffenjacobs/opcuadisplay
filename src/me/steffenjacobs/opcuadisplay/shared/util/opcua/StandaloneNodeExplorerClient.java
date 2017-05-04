@@ -246,6 +246,7 @@ public class StandaloneNodeExplorerClient {
 				} else {
 					CachedBaseNode nn = new CachedBaseNode(rd);
 					ref.add(nn);
+					nn.setReferences(browseAllReferences(nn, client));
 					retrieveNodes(nn, client, recursive);
 				}
 
@@ -338,6 +339,7 @@ public class StandaloneNodeExplorerClient {
 				List<QualifiedName> names = lstRef.stream().map(CachedBaseNode::getBrowseName)
 						.collect(Collectors.toList());
 
+				// deduplicating
 				lst = lst.stream().filter(n -> {
 					try {
 						return !names.contains(n.getBrowseName().get());
