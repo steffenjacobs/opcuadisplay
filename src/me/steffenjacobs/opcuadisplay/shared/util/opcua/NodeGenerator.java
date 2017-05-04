@@ -55,13 +55,8 @@ public class NodeGenerator {
 	public static CachedMethodNode createAndInsertMethod(int nameSpaceIndex, String text, int nodeId,
 			CachedBaseNode parent, MethodArgument[] inputArgs, MethodArgument[] outputArgs) {
 		CachedMethodNode cmn = CachedMethodNode.create(nameSpaceIndex, text, nodeId, inputArgs, outputArgs);
-		parent.addChild(cmn);
-		cmn.setParent(parent);
-		parent.getReferences().add(new CachedReference("HasComponent", cmn.getBrowseName(), null, cmn.getNodeId()));
 
-		// rerender tree viewer
-		EventBus.getInstance().fireEvent(new AttributeModifiedEvent(parent));
-
+		insertNode(cmn, parent);
 		return cmn;
 	}
 
