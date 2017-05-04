@@ -3,6 +3,10 @@ package me.steffenjacobs.opcuadisplay.shared.util.opcua;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.milo.opcua.stack.core.types.enumerated.NodeClass;
+
+import com.google.common.collect.Lists;
+
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedBaseNode;
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedDataTypeNode;
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedMethodNode;
@@ -124,6 +128,59 @@ public class NodeGenerator {
 		EventBus.getInstance().fireEvent(new AttributeModifiedEvent(parent));
 
 		return cvn;
+	}
+
+	private static CachedReference getTypeDefinition(CachedBaseNode node) {
+		return Lists.newArrayList(node.getReferences()).stream()
+				.filter(r -> "HasTypeDefinition".equals(r.getTypeDefinition())).findFirst().orElse(null);
+	}
+
+	private static CachedReference getAssociatedReference(CachedBaseNode child, CachedBaseNode parent) {
+		if (NodeNavigator.getInstance().isFolder(parent)) {
+			CachedReference typeDefinition = getTypeDefinition(child);
+			return new CachedReference("Organizes", child.getBrowseName(), typeDefinition.getReferenceType(),
+					child.getNodeId());
+		}
+
+		if (NodeNavigator.getInstance().isType(parent) && NodeNavigator.getInstance().isType(child)) {
+			return new CachedReference("HasSubtype", child.getBrowseName(), null, child.getNodeId());
+		}
+
+		if (child.getNodeClass() == NodeClass.Method || child.getNodeClass() == NodeClass.Object
+				|| child.getNodeClass() == NodeClass.Variable) {
+
+		}
+		if (child.getNodeClass() == NodeClass.Method) {
+			return new CachedReference("HasComponent", child.getBrowseName(), null, child.getNodeId());
+		}
+
+		if (child.getNodeClass() == NodeClass.Variable) {
+			if (NodeNavigator.getInstance().isProperty(child)) {
+				return new CachedReference("HasProperty", child.getBrowseName(), "PropertyType", child.getNodeId());
+			}
+
+			CachedReference typeDefinition = getTypeDefinition(child);
+			return new CachedReference("HasComponent", child.getBrowseName(),
+					typeDefinition != null ? typeDefinition.getReferenceType() : null, child.getNodeId());
+		}
+
+		if (child.getNodeClass() == NodeClass.Object) {
+			CachedReference typeDefinition = getTypeDefinition(child);
+			return new CachedReference("HasComponent", child.getBrowseName(),
+					typeDefinition != null ? typeDefinition.getReferenceType() : null, child.getNodeId());
+		}
+		return null;
+	}
+
+	public static void insertNode(CachedBaseNode child, CachedBaseNode parent) {
+		parent.addChild(child);
+		child.setParent(parent);
+		CachedReference ref = getAssociatedReference(child, parent);
+		if (ref != null) {
+			parent.getReferences().add(ref);
+		}
+
+		EventBus.getInstance().fireEvent(new AttributeModifiedEvent(parent));
 	}
 
 }
