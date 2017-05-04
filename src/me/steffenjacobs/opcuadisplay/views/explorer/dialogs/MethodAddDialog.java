@@ -139,6 +139,7 @@ public class MethodAddDialog extends SimpleAddDialog {
 
 				map.put(arg.toString(), arg);
 				list.add(arg.toString());
+				text.setText("");
 			}
 		});
 
@@ -161,6 +162,9 @@ public class MethodAddDialog extends SimpleAddDialog {
 				if (list.getItemCount() > 0) {
 					list.setSelection(index >= list.getItemCount() ? list.getItemCount() - 1 : index);
 					text.setText(list.getItem(list.getSelectionIndex()));
+				}
+				else{
+					text.setText("");
 				}
 			}
 		});
