@@ -23,12 +23,21 @@ import me.steffenjacobs.opcuadisplay.views.explorer.NodeClassLabelProvider;
 import me.steffenjacobs.opcuadisplay.views.explorer.SimpleOpcUaTreeProvider;
 import me.steffenjacobs.opcuadisplay.views.explorer.dialogs.DialogFactory.DialogListener;
 
+/**
+ * This class represents a simple dialog to create ObjectNodes and VariableNodes
+ * (+ PropertyNodes). <br>
+ * it contains one textfield for the name, one for the namespace and one for the
+ * node id. The node id can also be automatically generated. Additionally, a
+ * type can be selected based on the <i>pathToTypeNode</i> directory given in
+ * the constructor. When the ok button is clicked, the form is validated and the
+ * DialogListener given in the constructor is called.
+ */
 public class SimpleAddDialog extends TitleAreaDialog {
 
 	private Text txtName, txtNameSpace, txtNodeId;
 	private TreeViewer viewer;
-	private final String title, pathToTypeNode;
 
+	private final String title, pathToTypeNode;
 	private final DialogListener listener;
 
 	public SimpleAddDialog(Shell parentShell, String title, String pathToTypeNode, DialogListener listener) {
@@ -69,12 +78,13 @@ public class SimpleAddDialog extends TitleAreaDialog {
 		containerBottom.setLayout(layoutBottom);
 
 		if (this.pathToTypeNode != null) {
-			createObjectTypeTree(containerBottom);
+			createTypeTreeViewer(containerBottom);
 		}
 
 		return area;
 	}
 
+	/** generate the textfield for the nodeid of the new node */
 	private void createNodeIdField(Composite container) {
 		// add checkbox that toggles NodeId field
 		final Button btn = new Button(container, SWT.CHECK);
@@ -111,6 +121,7 @@ public class SimpleAddDialog extends TitleAreaDialog {
 		txtNodeId.setEnabled(false);
 	}
 
+	/** generates the textfield for the namespace of the new node */
 	private void createNameSpaceField(Composite container) {
 		Label label = new Label(container, SWT.NONE);
 		label.setText("Namespace Index:");
@@ -127,6 +138,7 @@ public class SimpleAddDialog extends TitleAreaDialog {
 
 	}
 
+	/** generates the textfield for the name of the new node */
 	private void createNameField(Composite container) {
 		Label lblName = new Label(container, SWT.NONE);
 		lblName.setText("Name:");
@@ -144,7 +156,8 @@ public class SimpleAddDialog extends TitleAreaDialog {
 		txtName.setSelection(0, txtName.getText().length());
 	}
 
-	private void createObjectTypeTree(Composite container) {
+	/** creates the TreeViewer with the type tree in it */
+	private void createTypeTreeViewer(Composite container) {
 
 		viewer = new TreeViewer(container, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
 
