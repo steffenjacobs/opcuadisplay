@@ -213,7 +213,7 @@ public class SimpleAddDialog extends TitleAreaDialog {
 				node = ((CachedBaseNode) ((IStructuredSelection) viewer.getSelection()).getFirstElement());
 
 			} catch (ClassCastException e) {
-				// node would be null -> catched below
+				// node would be null -> caught below
 			}
 
 			if (node == null) {

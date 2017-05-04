@@ -282,7 +282,7 @@ public class OpcUaExplorerView extends ViewPart {
 		else {
 			EventBus.getInstance().fireEvent(new SelectedNodeChangedEvent(null));
 			connector.loadVariables(importUrl);
-			// this will call an event which will then be catched above
+			// this will call an event which will then be caught above
 		}
 	}
 

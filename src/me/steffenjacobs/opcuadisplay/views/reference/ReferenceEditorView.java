@@ -18,11 +18,17 @@ import org.eclipse.ui.part.ViewPart;
 
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedReference;
 import me.steffenjacobs.opcuadisplay.shared.util.EventBus;
-import me.steffenjacobs.opcuadisplay.shared.util.EventBus.Event;
 import me.steffenjacobs.opcuadisplay.shared.util.EventBus.EventListener;
 import me.steffenjacobs.opcuadisplay.views.attribute.events.AttributeModifiedEvent;
 import me.steffenjacobs.opcuadisplay.views.explorer.events.SelectedNodeChangedEvent;
 
+/**
+ * A view, which shows the references associated with the current (parent) node
+ * relative to its children. These references can be hierarchical or
+ * non-hierarchical. <br>
+ * The view is update, when a AttributeModifiedEvent is caught (a child may have
+ * been added) or the selection in the explorer view changed
+ */
 public class ReferenceEditorView extends ViewPart {
 
 	public static final String ID = "me.steffenjacobs.opcuadisplay.views.reference.ReferenceEditorView";
@@ -42,6 +48,8 @@ public class ReferenceEditorView extends ViewPart {
 	}
 
 	private void registerListeners() {
+
+		// listener for selection change in explorer view
 		EventBus.getInstance().addListener(SelectedNodeChangedEvent.IDENTIFIER,
 				new EventListener<SelectedNodeChangedEvent>() {
 
@@ -52,9 +60,11 @@ public class ReferenceEditorView extends ViewPart {
 						viewer.refresh();
 					}
 				});
-		
-		// listener for attribute modification
-				EventBus.getInstance().addListener(AttributeModifiedEvent.IDENTIFIER, new EventListener<AttributeModifiedEvent>() {
+
+		// listener for attribute modification -> utilized to update, when a
+		// subnode is added or removed
+		EventBus.getInstance().addListener(AttributeModifiedEvent.IDENTIFIER,
+				new EventListener<AttributeModifiedEvent>() {
 					@Override
 					public void onAction(AttributeModifiedEvent event) {
 						viewer.setInput(event.getChangedNode() == null ? new ArrayList<CachedReference>()
@@ -148,6 +158,7 @@ public class ReferenceEditorView extends ViewPart {
 		return viewerColumn;
 	}
 
+	@Override
 	public void setFocus() {
 		viewer.getControl().setFocus();
 	}
