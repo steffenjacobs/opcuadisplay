@@ -26,6 +26,7 @@ import me.steffenjacobs.opcuadisplay.shared.util.opcua.NodeNavigator;
 import me.steffenjacobs.opcuadisplay.views.explorer.NodeClassLabelProvider;
 import me.steffenjacobs.opcuadisplay.views.explorer.SimpleOpcUaTreeProvider;
 import me.steffenjacobs.opcuadisplay.views.explorer.dialogs.DialogFactory.DialogListener;
+import me.steffenjacobs.opcuadisplay.views.explorer.domain.MethodArgument;
 
 public class MethodAddDialog extends SimpleAddDialog {
 

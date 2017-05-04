@@ -1,4 +1,4 @@
-package me.steffenjacobs.opcuadisplay.views.explorer.dialogs;
+package me.steffenjacobs.opcuadisplay.views.explorer.domain;
 
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedBaseNode;
 

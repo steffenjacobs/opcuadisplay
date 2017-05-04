@@ -17,7 +17,7 @@ import me.steffenjacobs.opcuadisplay.shared.domain.CachedVariableNode;
 import me.steffenjacobs.opcuadisplay.shared.util.EventBus;
 import me.steffenjacobs.opcuadisplay.views.attribute.events.AttributeModifiedEvent;
 import me.steffenjacobs.opcuadisplay.views.explorer.dialogs.DialogFactory.AddDialogType;
-import me.steffenjacobs.opcuadisplay.views.explorer.dialogs.MethodArgument;
+import me.steffenjacobs.opcuadisplay.views.explorer.domain.MethodArgument;
 
 public class NodeGenerator {
 
@@ -166,5 +166,4 @@ public class NodeGenerator {
 
 		EventBus.getInstance().fireEvent(new AttributeModifiedEvent(parent));
 	}
-
 }
