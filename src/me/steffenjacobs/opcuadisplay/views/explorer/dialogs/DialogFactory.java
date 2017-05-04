@@ -8,6 +8,7 @@ import me.steffenjacobs.opcuadisplay.shared.util.opcua.NodeGenerator;
 
 public class DialogFactory {
 
+	/** Type of nodes, a specific node-creation-dialog can create */
 	public static enum AddDialogType {
 		OBJECT("Object", "Types/ObjectTypes/BaseObjectType"),
 		VARIABLE("Variable", "Types/DataTypes/BaseDataType"),
@@ -18,22 +19,26 @@ public class DialogFactory {
 		OBJECT_TYPE("ObjectType", null);
 
 		private final String name;
-		private final String pathToBaseNode;
+		private final String pathToBaseTypeNode;
 
-		private AddDialogType(String name, String pathToBaseNode) {
+		private AddDialogType(String name, String pathToBaseTypeNode) {
 			this.name = name;
-			this.pathToBaseNode = pathToBaseNode;
+			this.pathToBaseTypeNode = pathToBaseTypeNode;
 		}
 
 		public String getName() {
 			return name;
 		}
 
-		public String getPathToBaseNode() {
-			return pathToBaseNode;
+		public String getPathToBaseTypeNode() {
+			return pathToBaseTypeNode;
 		}
 	}
 
+	/**
+	 * Dialog listener for SimpleAddDialog. Is called, when the OK-button is
+	 * pressed and the validation had been successful.
+	 */
 	public static interface DialogListener {
 
 		void onOk(int namespace, String name, int nodeId, CachedBaseNode type);
@@ -53,24 +58,28 @@ public class DialogFactory {
 		return instance;
 	}
 
+	/**
+	 * @return a node creation dialog for the given AddDialogType <i>type</i>.
+	 *         The node will then added as a child to <selectedParent>
+	 */
 	public TitleAreaDialog createAddDialog(final AddDialogType type, final CachedBaseNode selectedParent) {
 		switch (type) {
 		case OBJECT:
-			return new SimpleAddDialog(new Shell(), type.getName(), type.getPathToBaseNode(), new DialogListener() {
+			return new SimpleAddDialog(new Shell(), type.getName(), type.getPathToBaseTypeNode(), new DialogListener() {
 				@Override
 				public void onOk(int namespace, String name, int nodeId, CachedBaseNode typeN) {
 					NodeGenerator.createAndInsert(type, namespace, name, nodeId, typeN, selectedParent);
 				}
 			});
 		case VARIABLE:
-			return new SimpleAddDialog(new Shell(), type.getName(), type.getPathToBaseNode(), new DialogListener() {
+			return new SimpleAddDialog(new Shell(), type.getName(), type.getPathToBaseTypeNode(), new DialogListener() {
 				@Override
 				public void onOk(int namespace, String name, int nodeId, CachedBaseNode typeN) {
 					NodeGenerator.createAndInsert(type, namespace, name, nodeId, typeN, selectedParent);
 				}
 			});
 		case PROPERTY:
-			return new SimpleAddDialog(new Shell(), type.getName(), type.getPathToBaseNode(), new DialogListener() {
+			return new SimpleAddDialog(new Shell(), type.getName(), type.getPathToBaseTypeNode(), new DialogListener() {
 				@Override
 				public void onOk(int namespace, String name, int nodeId, CachedBaseNode typeN) {
 					NodeGenerator.createAndInsert(type, namespace, name, nodeId, typeN, selectedParent);
@@ -80,5 +89,4 @@ public class DialogFactory {
 			return null;
 		}
 	}
-
 }
