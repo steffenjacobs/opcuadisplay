@@ -58,6 +58,7 @@ import me.steffenjacobs.opcuadisplay.shared.domain.CachedVariableNode;
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedVariableTypeNode;
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedViewNode;
 
+/** retrieves the nodes from the OPC UA server */
 public class StandaloneNodeExplorerClient {
 
 	private static final Logger logger = LoggerFactory.getLogger(StandaloneNodeExplorerClient.class);
@@ -179,6 +180,7 @@ public class StandaloneNodeExplorerClient {
 
 			toList(browseResult.getReferences()).forEach(rd -> {
 
+				// pack the reference inside CachedReference
 				CachedReference cr = new CachedReference(getNameOfNode(rd.getReferenceTypeId(), client),
 						rd.getBrowseName(), getNameOfNode(rd.getTypeDefinition().local().orElse(null), client),
 						rd.getNodeId().local().get());
@@ -220,6 +222,10 @@ public class StandaloneNodeExplorerClient {
 		return node.getDisplayName().getText();
 	}
 
+	/**
+	 * browses the references recursive, by taking the referenced nodeid,
+	 * retrieving the associated node and adding it to the parent recursively
+	 */
 	private List<CachedBaseNode> browseReferencesRecursive(CachedBaseNode node, OpcUaClient client, boolean recursive) {
 		List<CachedBaseNode> ref = new ArrayList<>();
 		try {
@@ -235,21 +241,25 @@ public class StandaloneNodeExplorerClient {
 
 			final List<CachedReference> refs = new ArrayList<>();
 			toList(browseResult.getReferences()).forEach(rd -> {
-
+				// retrieve the node details from the reference
 				CachedBaseNode cbn = retrieveNodeDetails(rd.getNodeId().local().orElse(null), client);
 
 				if (cbn != null) {
+					// this is probably a type
 					if (recursive) {
 						browseReferencesRecursive(cbn, client, recursive).forEach(nd -> addChildToNode(cbn, nd));
 					}
 					ref.add(cbn);
 				} else {
+					// this is probably something else in the types folder (e.g.
+					// objects, variables, etc.)
 					CachedBaseNode nn = new CachedBaseNode(rd);
 					ref.add(nn);
 					nn.setReferences(browseAllReferences(nn, client));
 					retrieveNodes(nn, client, recursive);
 				}
 
+				// add references
 				refs.add(new CachedReference(getNameOfNode(rd.getReferenceTypeId(), client), rd.getBrowseName(),
 						getNameOfNode(rd.getTypeDefinition().local().orElse(null), client),
 						rd.getNodeId().local().get()));
@@ -262,6 +272,10 @@ public class StandaloneNodeExplorerClient {
 		return ref;
 	}
 
+	/**
+	 * adds a child to the parent without auto-referencing and adjusts the
+	 * NodeId of the child, if necessary
+	 */
 	private void addChildToNode(CachedBaseNode parent, CachedBaseNode child) {
 		parent.addChild(child);
 		child.setParent(parent);
@@ -276,7 +290,7 @@ public class StandaloneNodeExplorerClient {
 
 			return parseNode(node);
 		} catch (InterruptedException | ExecutionException e) {
-			// e.printStackTrace();
+			// this is normal, if the requested NodeId had not been found
 		}
 		return null;
 	}
@@ -398,6 +412,10 @@ public class StandaloneNodeExplorerClient {
 		});
 	}
 
+	/**
+	 * @return a preconfigured OpcUaClient not yet connected to <i>url</i> <br>
+	 * 		client.connect().get() will connect the client to <i>url</i>
+	 */
 	private static OpcUaClient createClient(String url) throws Exception {
 		SecurityPolicy securityPolicy = SecurityPolicy.None;
 
