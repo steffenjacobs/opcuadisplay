@@ -1,6 +1,7 @@
 package me.steffenjacobs.opcuadisplay.views.explorer.dialogs;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -17,22 +18,23 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedBaseNode;
-import me.steffenjacobs.opcuadisplay.shared.domain.CachedObjectTypeNode;
-import me.steffenjacobs.opcuadisplay.shared.util.opcua.NodeGenerator;
 import me.steffenjacobs.opcuadisplay.shared.util.opcua.NodeNavigator;
 import me.steffenjacobs.opcuadisplay.views.explorer.NodeClassLabelProvider;
 import me.steffenjacobs.opcuadisplay.views.explorer.SimpleOpcUaTreeProvider;
 
-public class AddObjectDialog extends TitleAreaDialog {
+public class SimpleAddDialog extends TitleAreaDialog {
 
 	private Text txtName, txtNameSpace, txtNodeId;
 	private TreeViewer viewer;
+	private final String title, pathToTypeNode;
 
-	private CachedBaseNode base;
+	private final DialogListener listener;
 
-	public AddObjectDialog(Shell parentShell, CachedBaseNode base) {
+	public SimpleAddDialog(Shell parentShell, String title, String pathToTypeNode, DialogListener listener) {
 		super(parentShell);
-		this.base = base;
+		this.title = title;
+		this.pathToTypeNode = pathToTypeNode;
+		this.listener = listener;
 	}
 
 	@Override
@@ -44,7 +46,7 @@ public class AddObjectDialog extends TitleAreaDialog {
 	@Override
 	public void create() {
 		super.create();
-		setTitle("Create Object");
+		setTitle("Create " + this.title);
 		super.setDialogHelpAvailable(false);
 	}
 
@@ -65,7 +67,9 @@ public class AddObjectDialog extends TitleAreaDialog {
 		GridLayout layoutBottom = new GridLayout(1, false);
 		containerBottom.setLayout(layoutBottom);
 
-		createObjectTypeTree(containerBottom);
+		if (this.pathToTypeNode != null) {
+			createObjectTypeTree(containerBottom);
+		}
 
 		return area;
 	}
@@ -93,7 +97,7 @@ public class AddObjectDialog extends TitleAreaDialog {
 		// add NodeId field
 		Label label = new Label(container, SWT.NONE);
 		label.setText("NodeId:");
-		label.setToolTipText("NodeId of the new object. Has to be unique.");
+		label.setToolTipText("NodeId of the new " + this.title.toLowerCase() + ". Has to be unique.");
 
 		GridData gridData = new GridData();
 		gridData.grabExcessHorizontalSpace = true;
@@ -103,15 +107,13 @@ public class AddObjectDialog extends TitleAreaDialog {
 		txtNodeId.setLayoutData(gridData);
 		txtNodeId.setText("" + (NodeNavigator.getInstance().getHighestNodeId() + 1));
 
-		txtNodeId.setFocus();
-		txtNodeId.setSelection(0, txtNodeId.getText().length());
 		txtNodeId.setEnabled(false);
 	}
 
 	private void createNameSpaceField(Composite container) {
 		Label label = new Label(container, SWT.NONE);
 		label.setText("Namespace Index:");
-		label.setToolTipText("Index associated to the namespace for the new object");
+		label.setToolTipText("Index associated to the namespace for the new " + this.title.toLowerCase());
 
 		GridData gridData = new GridData();
 		gridData.grabExcessHorizontalSpace = true;
@@ -122,14 +124,12 @@ public class AddObjectDialog extends TitleAreaDialog {
 		txtNameSpace
 				.setText("" + NodeNavigator.getInstance().getRoot().getChildren()[0].getNodeId().getNamespaceIndex());
 
-		txtNameSpace.setFocus();
-		txtNameSpace.setSelection(0, txtNameSpace.getText().length());
 	}
 
 	private void createNameField(Composite container) {
 		Label lblName = new Label(container, SWT.NONE);
 		lblName.setText("Name:");
-		lblName.setToolTipText("Name of the new object");
+		lblName.setToolTipText("Name of the new " + this.title.toLowerCase());
 
 		GridData gridData = new GridData();
 		gridData.grabExcessHorizontalSpace = true;
@@ -150,7 +150,7 @@ public class AddObjectDialog extends TitleAreaDialog {
 		viewer.setContentProvider(new SimpleOpcUaTreeProvider());
 		CachedBaseNode cbn = CachedBaseNode.createEmptyDummy();
 
-		CachedBaseNode typeNode = NodeNavigator.getInstance().navigateByName("Types/ObjectTypes/BaseObjectType");
+		CachedBaseNode typeNode = NodeNavigator.getInstance().navigateByName(this.pathToTypeNode);
 		cbn.addChild(typeNode);
 		typeNode.setParent(cbn);
 
@@ -175,20 +175,40 @@ public class AddObjectDialog extends TitleAreaDialog {
 
 	@Override
 	protected void okPressed() {
-		Integer nameSpaceIndex;
 		String name = txtName.getText();
 
-		CachedObjectTypeNode node;
+		Integer nameSpaceIndex;
+		CachedBaseNode node = null;
 		int nextNodeId;
+
 		try {
 			nameSpaceIndex = Integer.parseInt(txtNameSpace.getText());
+		} catch (NumberFormatException e) {
+			this.setMessage("Invalid namespace index!", IMessageProvider.ERROR);
+			return;
+		}
+		try {
 			nextNodeId = Integer.parseInt(txtNodeId.getText());
-			node = ((CachedObjectTypeNode) ((IStructuredSelection) viewer.getSelection()).getFirstElement());
-		} catch (ClassCastException cce) {
+		} catch (NumberFormatException e) {
+			this.setMessage("Invalid NodeId!", IMessageProvider.ERROR);
 			return;
 		}
 
-		NodeGenerator.createAndInsert(nameSpaceIndex, name, nextNodeId, node, base);
+		if (this.pathToTypeNode != null) {
+			try {
+				node = ((CachedBaseNode) ((IStructuredSelection) viewer.getSelection()).getFirstElement());
+
+			} catch (ClassCastException e) {
+				// node would be null -> catched below
+			}
+
+			if (node == null) {
+				this.setMessage("Please select a type below!", IMessageProvider.ERROR);
+				return;
+			}
+		}
+
+		listener.onOk(nameSpaceIndex, name, nextNodeId, node);
 		super.okPressed();
 	}
 }

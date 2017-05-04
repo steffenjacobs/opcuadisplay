@@ -33,7 +33,8 @@ import me.steffenjacobs.opcuadisplay.shared.util.EventBus.EventListener;
 import me.steffenjacobs.opcuadisplay.shared.util.Images;
 import me.steffenjacobs.opcuadisplay.shared.util.opcua.NodeNavigator;
 import me.steffenjacobs.opcuadisplay.views.attribute.events.AttributeModifiedEvent;
-import me.steffenjacobs.opcuadisplay.views.explorer.dialogs.AddObjectDialog;
+import me.steffenjacobs.opcuadisplay.views.explorer.dialogs.DialogFactory;
+import me.steffenjacobs.opcuadisplay.views.explorer.dialogs.DialogFactory.AddDialogType;
 import me.steffenjacobs.opcuadisplay.views.explorer.events.ChangeSelectedNodeEvent;
 import me.steffenjacobs.opcuadisplay.views.explorer.events.RootUpdatedEvent;
 import me.steffenjacobs.opcuadisplay.views.explorer.events.SelectedNodeChangedEvent;
@@ -304,6 +305,11 @@ public class OpcUaExplorerView extends ViewPart {
 		}
 	}
 
+	private void openAddDialog(AddDialogType type) {
+		DialogFactory.getInstance().createAddDialog(type,
+				(CachedBaseNode) (((IStructuredSelection) viewer.getSelection()).getFirstElement())).open();
+	}
+
 	private void makeEditActions() {
 		// delete node action
 		deleteAction = new Action() {
@@ -317,6 +323,7 @@ public class OpcUaExplorerView extends ViewPart {
 		// add variable action
 		addVariable = new Action() {
 			public void run() {
+				openAddDialog(AddDialogType.VARIABLE);
 			}
 		};
 		addVariable.setText("Add Variable");
@@ -326,6 +333,7 @@ public class OpcUaExplorerView extends ViewPart {
 		// add method action
 		addMethod = new Action() {
 			public void run() {
+				openAddDialog(AddDialogType.METHOD);
 			}
 		};
 		addMethod.setText("Add Method");
@@ -335,8 +343,7 @@ public class OpcUaExplorerView extends ViewPart {
 		// add object action
 		addObject = new Action() {
 			public void run() {
-				new AddObjectDialog(new Shell(),
-						(CachedBaseNode) (((IStructuredSelection) viewer.getSelection()).getFirstElement())).open();
+				openAddDialog(AddDialogType.OBJECT);
 			}
 		};
 		addObject.setText("Add Object");
@@ -346,6 +353,7 @@ public class OpcUaExplorerView extends ViewPart {
 		// add Property action
 		addProperty = new Action() {
 			public void run() {
+				openAddDialog(AddDialogType.PROPERTY);
 			}
 		};
 		addProperty.setText("Add Property");
@@ -355,6 +363,7 @@ public class OpcUaExplorerView extends ViewPart {
 		// add ObjectType action
 		addObjectType = new Action() {
 			public void run() {
+				openAddDialog(AddDialogType.OBJECT_TYPE);
 			}
 		};
 		addObjectType.setText("Add ObjectType");
@@ -364,6 +373,7 @@ public class OpcUaExplorerView extends ViewPart {
 		// add VariableType action
 		addVariableType = new Action() {
 			public void run() {
+				openAddDialog(AddDialogType.VARIABLE_TYPE);
 			}
 		};
 		addVariableType.setText("Add VariableType");
@@ -374,6 +384,7 @@ public class OpcUaExplorerView extends ViewPart {
 		// add DataType action
 		addDataType = new Action() {
 			public void run() {
+				openAddDialog(AddDialogType.DATA_TYPE);
 			}
 		};
 		addDataType.setText("Add DataType");

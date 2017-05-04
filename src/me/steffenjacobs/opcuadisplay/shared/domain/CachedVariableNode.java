@@ -3,13 +3,17 @@ package me.steffenjacobs.opcuadisplay.shared.domain;
 import java.util.concurrent.ExecutionException;
 
 import org.eclipse.milo.opcua.sdk.client.nodes.UaVariableNode;
+import org.eclipse.milo.opcua.stack.core.types.builtin.LocalizedText;
 import org.eclipse.milo.opcua.stack.core.types.builtin.NodeId;
+import org.eclipse.milo.opcua.stack.core.types.builtin.QualifiedName;
 import org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.UByte;
 import org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.UInteger;
+import org.eclipse.milo.opcua.stack.core.types.enumerated.NodeClass;
 
 import me.steffenjacobs.opcuadisplay.shared.util.FutureResolver;
+import me.steffenjacobs.opcuadisplay.shared.util.opcua.NodeNavigator;
 
-public class CachedVariableNode extends CachedBaseNode implements HasValueRank{
+public class CachedVariableNode extends CachedBaseNode implements HasValueRank {
 
 	private Object value;
 	private NodeId dataType;
@@ -38,18 +42,40 @@ public class CachedVariableNode extends CachedBaseNode implements HasValueRank{
 		this.value = node.value;
 		this.dataType = node.dataType;
 		this.valueRank = node.valueRank;
-		this.arrayDimensions = node.arrayDimensions.clone();
-		this.accessLevel = UByte.valueOf(node.accessLevel.intValue());
-		this.userAccessLevel = UByte.valueOf(node.userAccessLevel.intValue());
+		this.arrayDimensions = node.arrayDimensions != null ? node.arrayDimensions.clone() : new UInteger[0];
+		this.accessLevel = UByte.valueOf(node.accessLevel != null ? node.accessLevel.intValue() : 0);
+		this.userAccessLevel = UByte.valueOf(node.accessLevel != null ? node.userAccessLevel.intValue() : 0);
 		this.minimumSamplingInterval = node.minimumSamplingInterval;
 		this.historizing = node.historizing;
+	}
+
+	protected CachedVariableNode(NodeId nodeId) {
+		super(nodeId, NodeClass.Variable);
+	}
+
+	public static CachedVariableNode create(int namespaceIndex, String name, int nodeId, CachedDataTypeNode type) {
+		NodeId id = new NodeId(namespaceIndex, nodeId);
+		CachedVariableNode cvn = new CachedVariableNode(id);
+		cvn.setDisplayName(new LocalizedText("en", name));
+		cvn.setBrowseName(new QualifiedName(namespaceIndex, name));
+
+		cvn.dataType = type.getNodeId();
+
+		NodeNavigator.getInstance().increaseHighestNodeIdIfNecessarySafe(cvn);
+
+		for (CachedBaseNode child : type.getChildren()) {
+			cvn.addChild(child);
+			child.setParent(cvn);
+		}
+
+		// rewire references & duplicate children recursive
+		return cvn.duplicate();
 	}
 
 	@Override
 	public CachedVariableNode duplicate() {
 		return new CachedVariableNode(this);
 	}
-
 
 	public Object getValue() {
 		return value;
