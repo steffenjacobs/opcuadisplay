@@ -48,6 +48,9 @@ public class NodeNavigator {
 
 		CachedBaseNode node = getRoot();
 		for (String p : path) {
+			if (p == path[0] && p.equals("Root")) {
+				continue;
+			}
 			final CachedBaseNode orig = node;
 			for (CachedBaseNode cbn : node.getChildren()) {
 				if (cbn.getBrowseName().getName().equals(p)) {
