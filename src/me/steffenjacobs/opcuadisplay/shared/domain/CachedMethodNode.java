@@ -1,5 +1,6 @@
 package me.steffenjacobs.opcuadisplay.shared.domain;
 
+import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
 import org.eclipse.milo.opcua.sdk.client.nodes.UaMethodNode;
@@ -67,11 +68,15 @@ public class CachedMethodNode extends CachedBaseNode {
 				.navigateByName("Root/Types/DataTypes/BaseDataType/Structure/Argument");
 
 		if (inputArgs != null && inputArgs.length > 0) {
-			NodeGenerator.createProperty(namespaceIndex, "InputArguments", nodeId, argumentType, cmn);
+			CachedVariableNode cvn = NodeGenerator.createProperty(namespaceIndex, "InputArguments", nodeId,
+					argumentType, cmn);
+			cvn.setChildren(new ArrayList<>());
 		}
 
 		if (outputArgs != null && outputArgs.length > 0) {
-			NodeGenerator.createProperty(namespaceIndex, "OutputArguments", nodeId, argumentType, cmn);
+			CachedVariableNode cvn = NodeGenerator.createProperty(namespaceIndex, "OutputArguments", nodeId,
+					argumentType, cmn);
+			cvn.setChildren(new ArrayList<>());
 		}
 
 		// TODO: set arguments to value-property
