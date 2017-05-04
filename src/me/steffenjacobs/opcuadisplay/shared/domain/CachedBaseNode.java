@@ -74,7 +74,10 @@ public class CachedBaseNode {
 	}
 
 	public List<CachedReference> getReferences() {
-		return references == null ? new ArrayList<CachedReference>() : references;
+		if (references == null) {
+			references = new ArrayList<>();
+		}
+		return references;
 	}
 
 	public void setReferences(List<CachedReference> references) {
