@@ -131,7 +131,8 @@ public class CachedBaseNode {
 		references = new ArrayList<>();
 	}
 
-	protected CachedBaseNode(NodeId nodeId, NodeClass nodeClass) {
+	//TODO: make protected
+	public CachedBaseNode(NodeId nodeId, NodeClass nodeClass) {
 		super();
 		children = new ArrayList<>();
 		this.nodeId = nodeId;
