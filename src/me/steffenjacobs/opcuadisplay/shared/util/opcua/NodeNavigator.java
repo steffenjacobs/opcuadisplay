@@ -19,6 +19,10 @@ import me.steffenjacobs.opcuadisplay.shared.domain.CachedReference;
 
 public class NodeNavigator {
 
+	public static interface NodeManipulator {
+		void manipulate(CachedBaseNode cbn);
+	}
+
 	private static NodeNavigator instance;
 
 	private CachedBaseNode root;
@@ -192,6 +196,13 @@ public class NodeNavigator {
 		case View:
 		default:
 			return false;
+		}
+	}
+
+	public void iterateNodes(CachedBaseNode parent, NodeManipulator nm) {
+		nm.manipulate(parent);
+		for (CachedBaseNode cbn : parent.getChildren()) {
+			iterateNodes(cbn, nm);
 		}
 	}
 
