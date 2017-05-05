@@ -71,27 +71,16 @@ public class DialogFactory {
 	public TitleAreaDialog createAddDialog(final AddDialogType type, final CachedBaseNode selectedParent) {
 		switch (type) {
 		case OBJECT:
-			return new SimpleAddDialog(new Shell(), type.getName(), type.getPathToBaseTypeNode(), new DialogListener() {
-				@Override
-				public void onOkSimple(int namespace, String name, int nodeId, CachedBaseNode typeN) {
-					NodeGenerator.createAndInsert(type, namespace, name, nodeId, typeN, selectedParent);
-				}
-			});
 		case VARIABLE:
-			return new SimpleAddDialog(new Shell(), type.getName(), type.getPathToBaseTypeNode(), new DialogListener() {
-				@Override
-				public void onOkSimple(int namespace, String name, int nodeId, CachedBaseNode typeN) {
-					NodeGenerator.createAndInsert(type, namespace, name, nodeId, typeN, selectedParent);
-				}
-			});
 		case PROPERTY:
+		case OBJECT_TYPE:
 			return new SimpleAddDialog(new Shell(), type.getName(), type.getPathToBaseTypeNode(), new DialogListener() {
 				@Override
 				public void onOkSimple(int namespace, String name, int nodeId, CachedBaseNode typeN) {
 					NodeGenerator.createAndInsert(type, namespace, name, nodeId, typeN, selectedParent);
 				}
 			});
-		case METHOD: {
+		case METHOD:
 			return new MethodAddDialog(new Shell(), type.getName(), new DialogListener() {
 				@Override
 				public void onOkMethod(int namespace, String name, int nodeId, MethodArgument[] inputArgs,
@@ -99,7 +88,7 @@ public class DialogFactory {
 					NodeGenerator.createAndInsertMethod(namespace, name, nodeId, selectedParent, inputArgs, outputArgs);
 				}
 			});
-		}
+
 		default:
 			return null;
 		}

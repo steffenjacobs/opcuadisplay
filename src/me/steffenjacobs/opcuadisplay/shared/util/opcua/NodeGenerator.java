@@ -48,9 +48,17 @@ public class NodeGenerator {
 		case PROPERTY:
 			createAndInsertProperty(namespaceIndex, name, nodeId, (CachedDataTypeNode) type, parent);
 			break;
+		case OBJECT_TYPE:
+			createAndInsertObjectType(namespaceIndex, name, nodeId, parent);
+			break;
 		default:
 		}
 	}
+	private static void createAndInsertObjectType(int namespaceIndex, String name, int nodeId, CachedBaseNode parent) {
+		CachedObjectTypeNode node = CachedObjectTypeNode.create(namespaceIndex, name, nodeId);
+		insertNode(node, parent);
+	}
+	
 
 	public static CachedMethodNode createAndInsertMethod(int nameSpaceIndex, String text, int nodeId,
 			CachedBaseNode parent, MethodArgument[] inputArgs, MethodArgument[] outputArgs) {
