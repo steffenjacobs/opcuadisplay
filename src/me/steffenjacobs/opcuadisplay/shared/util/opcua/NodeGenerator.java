@@ -52,14 +52,16 @@ public class NodeGenerator {
 		case OBJECT_TYPE:
 			createAndInsertObjectType(namespaceIndex, name, nodeId, parent);
 			break;
-		case DATA_TYPE: 
+		case DATA_TYPE:
 			createAndInsertDataType(namespaceIndex, name, nodeId, parent);
-		case VARIABLE_TYPE: 
+		case VARIABLE_TYPE:
 			createAndInsertVariableType(namespaceIndex, name, nodeId, (CachedVariableTypeNode) type, parent);
 		default:
 		}
 	}
-	private static void createAndInsertVariableType(int namespaceIndex, String name, int nodeId, CachedVariableTypeNode type, CachedBaseNode parent) {
+
+	private static void createAndInsertVariableType(int namespaceIndex, String name, int nodeId,
+			CachedVariableTypeNode type, CachedBaseNode parent) {
 		CachedVariableTypeNode node = CachedVariableTypeNode.create(namespaceIndex, name, nodeId, type);
 		insertNode(node, parent);
 	}
@@ -68,7 +70,7 @@ public class NodeGenerator {
 		CachedObjectTypeNode node = CachedObjectTypeNode.create(namespaceIndex, name, nodeId);
 		insertNode(node, parent);
 	}
-	
+
 	private static void createAndInsertDataType(int namespaceIndex, String name, int nodeId, CachedBaseNode parent) {
 		CachedDataTypeNode node = CachedDataTypeNode.create(namespaceIndex, name, nodeId);
 		insertNode(node, parent);
