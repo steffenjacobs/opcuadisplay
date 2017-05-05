@@ -14,11 +14,11 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.part.ViewPart;
 
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedReference;
 import me.steffenjacobs.opcuadisplay.shared.util.EventBus;
 import me.steffenjacobs.opcuadisplay.shared.util.EventBus.EventListener;
+import me.steffenjacobs.opcuadisplay.views.CloseableView;
 import me.steffenjacobs.opcuadisplay.views.attribute.events.AttributeModifiedEvent;
 import me.steffenjacobs.opcuadisplay.views.explorer.events.SelectedNodeChangedEvent;
 
@@ -29,9 +29,14 @@ import me.steffenjacobs.opcuadisplay.views.explorer.events.SelectedNodeChangedEv
  * The view is update, when a AttributeModifiedEvent is caught (a child may have
  * been added) or the selection in the explorer view changed
  */
-public class ReferenceView extends ViewPart {
+public class ReferenceView extends CloseableView {
 
 	public static final String ID = "me.steffenjacobs.opcuadisplay.views.reference.ReferenceView";
+
+	@Override
+	public String getIdentifier() {
+		return ID;
+	}
 
 	private TableViewer viewer;
 
@@ -50,7 +55,7 @@ public class ReferenceView extends ViewPart {
 	private void registerListeners() {
 
 		// listener for selection change in explorer view
-		EventBus.getInstance().addListener(SelectedNodeChangedEvent.IDENTIFIER,
+		EventBus.getInstance().addListener(this, SelectedNodeChangedEvent.IDENTIFIER,
 				new EventListener<SelectedNodeChangedEvent>() {
 
 					@Override
@@ -63,7 +68,7 @@ public class ReferenceView extends ViewPart {
 
 		// listener for attribute modification -> utilized to update, when a
 		// subnode is added or removed
-		EventBus.getInstance().addListener(AttributeModifiedEvent.IDENTIFIER,
+		EventBus.getInstance().addListener(this, AttributeModifiedEvent.IDENTIFIER,
 				new EventListener<AttributeModifiedEvent>() {
 					@Override
 					public void onAction(AttributeModifiedEvent event) {
@@ -103,8 +108,10 @@ public class ReferenceView extends ViewPart {
 
 	// create the columns for the table
 	private void createColumns(final Composite parent, final TableViewer viewer) {
-		String[] titles = { "ReferenceType", "Browse Name", "TypeDefinition", "NodeId" };
-		int[] bounds = { 150, 120, 100, 80 };
+		String[] titles =
+			{ "ReferenceType", "Browse Name", "TypeDefinition", "NodeId" };
+		int[] bounds =
+			{ 150, 120, 100, 80 };
 
 		// reference type
 		TableViewerColumn col = createTableViewerColumn(titles[0], bounds[0], 0);

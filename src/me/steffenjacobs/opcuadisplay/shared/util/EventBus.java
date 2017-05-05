@@ -4,11 +4,26 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import me.steffenjacobs.opcuadisplay.views.CloseableView;
+
 public class EventBus {
+
+	private class RegisteredEvent {
+		String eventIdentifier;
+		EventListener<Event> listener;
+
+		public RegisteredEvent(String eventIdentifier, EventListener<Event> listener) {
+			super();
+			this.eventIdentifier = eventIdentifier;
+			this.listener = listener;
+		}
+	}
 
 	private static EventBus INSTANCE;
 
 	private HashMap<String, List<EventListener<Event>>> listeners = new HashMap<>();
+
+	private MultiMap<String, RegisteredEvent> registeredEvents = new MultiMap<>();
 
 	private EventBus() {
 		// singleton
@@ -29,17 +44,26 @@ public class EventBus {
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T extends Event> void addListener(String identifier, EventListener<T> listener) {
-		List<EventListener<Event>> list = listeners.get(identifier);
+	public <T extends Event> void addListener(CloseableView registerer, String eventIdentifier,
+			EventListener<T> listener) {
+		List<EventListener<Event>> list = listeners.get(eventIdentifier);
 		if (list == null) {
 			list = new ArrayList<>();
 		}
 		list.add((EventListener<Event>) listener);
-		listeners.put(identifier, list);
+		listeners.put(eventIdentifier, list);
+
+		registeredEvents.add(registerer.getIdentifier(),
+				new RegisteredEvent(eventIdentifier, (EventListener<Event>) listener));
 	}
 
-	public void removeListener(String identifier, EventListener<Event> listener) {
-		List<EventListener<Event>> list = listeners.get(identifier);
+	public void unregisterAllListeners(final CloseableView registerer) {
+		registeredEvents.get(registerer.getIdentifier()).stream()
+				.forEach(l -> removeListener(registerer, l.eventIdentifier, l.listener));
+	}
+
+	public void removeListener(CloseableView registerer, String eventIdentifier, EventListener<Event> listener) {
+		List<EventListener<Event>> list = listeners.get(eventIdentifier);
 
 		if (list == null) {
 			return;
@@ -47,11 +71,12 @@ public class EventBus {
 
 		list.remove(listener);
 		if (list.isEmpty()) {
-			listeners.remove(identifier);
+			listeners.remove(eventIdentifier);
 			return;
 		}
 
-		listeners.put(identifier, list);
+		listeners.put(eventIdentifier, list);
+		registeredEvents.remove(registerer.getIdentifier(), new RegisteredEvent(eventIdentifier, listener));
 	}
 
 	public static abstract class EventArgs {

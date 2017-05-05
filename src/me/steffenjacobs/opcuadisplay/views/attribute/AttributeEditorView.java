@@ -12,21 +12,26 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.part.ViewPart;
 
 import me.steffenjacobs.opcuadisplay.shared.util.EventBus;
 import me.steffenjacobs.opcuadisplay.shared.util.EventBus.EventListener;
+import me.steffenjacobs.opcuadisplay.views.CloseableView;
 import me.steffenjacobs.opcuadisplay.views.attribute.domain.NodeEntryFactory;
 import me.steffenjacobs.opcuadisplay.views.attribute.domain.NodeEntryFactory.NodeEntry;
 import me.steffenjacobs.opcuadisplay.views.explorer.events.SelectedNodeChangedEvent;
 
-public class AttributeEditorView extends ViewPart {
+public class AttributeEditorView extends CloseableView {
 
 	public static final String ID = "me.steffenjacobs.opcuadisplay.views.attribute.AttributeEditorView";
 
 	private TableViewer viewer;
 
 	private AttributeEditorViewTableEditor tableEditor;
+
+	@Override
+	public String getIdentifier() {
+		return ID;
+	}
 
 	@Override
 	public void createPartControl(Composite parent) {
@@ -41,7 +46,7 @@ public class AttributeEditorView extends ViewPart {
 	}
 
 	private void registerListeners() {
-		EventBus.getInstance().addListener(SelectedNodeChangedEvent.IDENTIFIER,
+		EventBus.getInstance().addListener(this, SelectedNodeChangedEvent.IDENTIFIER,
 				new EventListener<SelectedNodeChangedEvent>() {
 
 					@Override
@@ -83,8 +88,10 @@ public class AttributeEditorView extends ViewPart {
 
 	// create the columns for the table
 	private void createColumns(final Composite parent, final TableViewer viewer) {
-		String[] titles = { "Attribute Name", "Value", "Data Type" };
-		int[] bounds = { 150, 200, 100 };
+		String[] titles =
+			{ "Attribute Name", "Value", "Data Type" };
+		int[] bounds =
+			{ 150, 200, 100 };
 
 		// attribute name
 		TableViewerColumn col = createTableViewerColumn(titles[0], bounds[0], 0);

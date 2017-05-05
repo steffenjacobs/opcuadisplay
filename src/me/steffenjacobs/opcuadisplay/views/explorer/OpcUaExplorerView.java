@@ -23,7 +23,6 @@ import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.part.ViewPart;
 
 import me.steffenjacobs.opcuadisplay.Activator;
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedBaseNode;
@@ -33,6 +32,7 @@ import me.steffenjacobs.opcuadisplay.shared.util.EventBus.EventListener;
 import me.steffenjacobs.opcuadisplay.shared.util.Images;
 import me.steffenjacobs.opcuadisplay.shared.util.opcua.NodeGenerator;
 import me.steffenjacobs.opcuadisplay.shared.util.opcua.NodeNavigator;
+import me.steffenjacobs.opcuadisplay.views.CloseableView;
 import me.steffenjacobs.opcuadisplay.views.attribute.events.AttributeModifiedEvent;
 import me.steffenjacobs.opcuadisplay.views.explorer.dialogs.DialogFactory;
 import me.steffenjacobs.opcuadisplay.views.explorer.dialogs.DialogFactory.AddDialogType;
@@ -59,7 +59,7 @@ import me.steffenjacobs.opcuadisplay.wizard.imp.OpcUaImportWizard;
  * <p>
  */
 
-public class OpcUaExplorerView extends ViewPart {
+public class OpcUaExplorerView extends CloseableView {
 
 	/**
 	 * The ID of the view as specified by the extension.
@@ -76,10 +76,9 @@ public class OpcUaExplorerView extends ViewPart {
 
 	private CachedBaseNode cachedRoot;
 
-	/**
-	 * The constructor.
-	 */
-	public OpcUaExplorerView() {
+	@Override
+	public String getIdentifier() {
+		return ID;
 	}
 
 	private void hookDoubleClickAction() {
@@ -125,15 +124,16 @@ public class OpcUaExplorerView extends ViewPart {
 	private void registerListeners() {
 
 		// listener for attribute modification
-		EventBus.getInstance().addListener(AttributeModifiedEvent.IDENTIFIER, new EventListener<EventBus.Event>() {
-			@Override
-			public void onAction(Event event) {
-				viewer.refresh();
-			}
-		});
+		EventBus.getInstance().addListener(this, AttributeModifiedEvent.IDENTIFIER,
+				new EventListener<EventBus.Event>() {
+					@Override
+					public void onAction(Event event) {
+						viewer.refresh();
+					}
+				});
 
 		// listener when the selection in the tree viewer should change
-		EventBus.getInstance().addListener(ChangeSelectedNodeEvent.IDENTIFIER,
+		EventBus.getInstance().addListener(this, ChangeSelectedNodeEvent.IDENTIFIER,
 				new EventListener<ChangeSelectedNodeEvent>() {
 					@Override
 					public void onAction(ChangeSelectedNodeEvent event) {
@@ -142,7 +142,7 @@ public class OpcUaExplorerView extends ViewPart {
 				});
 
 		// listener for import finished
-		EventBus.getInstance().addListener(RootUpdatedEvent.IDENTIFIER, new EventListener<RootUpdatedEvent>() {
+		EventBus.getInstance().addListener(this, RootUpdatedEvent.IDENTIFIER, new EventListener<RootUpdatedEvent>() {
 			@Override
 			public void onAction(RootUpdatedEvent event) {
 				viewer.refresh();
@@ -152,21 +152,21 @@ public class OpcUaExplorerView extends ViewPart {
 		});
 
 		// listeners for import wizard
-		EventBus.getInstance().addListener(WizardOpenEvent.IDENTIFIER, new EventListener<WizardOpenEvent>() {
+		EventBus.getInstance().addListener(this, WizardOpenEvent.IDENTIFIER, new EventListener<WizardOpenEvent>() {
 			@Override
 			public void onAction(WizardOpenEvent event) {
 				onWizardOpen();
 			}
 		});
 
-		EventBus.getInstance().addListener(WizardCancelEvent.IDENTIFIER, new EventListener<WizardCancelEvent>() {
+		EventBus.getInstance().addListener(this, WizardCancelEvent.IDENTIFIER, new EventListener<WizardCancelEvent>() {
 			@Override
 			public void onAction(WizardCancelEvent event) {
 				onWizardCancel();
 			}
 		});
 
-		EventBus.getInstance().addListener(WizardFinishEvent.IDENTIFIER, new EventListener<WizardFinishEvent>() {
+		EventBus.getInstance().addListener(this, WizardFinishEvent.IDENTIFIER, new EventListener<WizardFinishEvent>() {
 			@Override
 			public void onAction(WizardFinishEvent event) {
 				onWizardFinish(event.getUrl(), event.isServer());
@@ -316,7 +316,8 @@ public class OpcUaExplorerView extends ViewPart {
 		// remove node action
 		removeAction = new Action() {
 			public void run() {
-				NodeGenerator.removeNode( (CachedBaseNode)((IStructuredSelection) viewer.getSelection()).getFirstElement());
+				NodeGenerator
+						.removeNode((CachedBaseNode) ((IStructuredSelection) viewer.getSelection()).getFirstElement());
 			}
 		};
 		removeAction.setText("Delete Node");
