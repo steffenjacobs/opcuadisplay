@@ -29,9 +29,9 @@ import me.steffenjacobs.opcuadisplay.views.explorer.events.SelectedNodeChangedEv
  * The view is update, when a AttributeModifiedEvent is caught (a child may have
  * been added) or the selection in the explorer view changed
  */
-public class ReferenceEditorView extends ViewPart {
+public class ReferenceView extends ViewPart {
 
-	public static final String ID = "me.steffenjacobs.opcuadisplay.views.reference.ReferenceEditorView";
+	public static final String ID = "me.steffenjacobs.opcuadisplay.views.reference.ReferenceView";
 
 	private TableViewer viewer;
 
