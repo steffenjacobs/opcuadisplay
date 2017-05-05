@@ -51,6 +51,21 @@
             
       </wizard>      
    </extension>
+   
+   <extension point="org.eclipse.ui.exportWizards">
+      <category
+            name="OPC UA"
+            id="me.steffenjacobs.opcuadisplay">
+      </category>
+      
+      <wizard
+            name="Export OPC UA Model"
+            class="me.steffenjacobs.opcuadisplay.wizard.exp.OpcUaExportWizard"
+            category="me.steffenjacobs.opcuadisplay"
+            id="me.steffenjacobs.opcuadisplay.wizard.exp.OpcUaExportWizard">
+            
+      </wizard>      
+   </extension>
    <extension
          point="org.eclipse.ui.perspectives">
       <perspective
