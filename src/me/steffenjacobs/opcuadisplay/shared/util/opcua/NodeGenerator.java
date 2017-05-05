@@ -2,7 +2,10 @@ package me.steffenjacobs.opcuadisplay.shared.util.opcua;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import org.eclipse.milo.opcua.stack.core.types.builtin.NodeId;
+import org.eclipse.milo.opcua.stack.core.types.builtin.QualifiedName;
 import org.eclipse.milo.opcua.stack.core.types.enumerated.NodeClass;
 
 import com.google.common.collect.Lists;
@@ -16,9 +19,11 @@ import me.steffenjacobs.opcuadisplay.shared.domain.CachedReference;
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedVariableNode;
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedVariableTypeNode;
 import me.steffenjacobs.opcuadisplay.shared.util.EventBus;
+import me.steffenjacobs.opcuadisplay.shared.util.opcua.NodeNavigator.NodeManipulator;
 import me.steffenjacobs.opcuadisplay.views.attribute.events.AttributeModifiedEvent;
 import me.steffenjacobs.opcuadisplay.views.explorer.dialogs.DialogFactory.AddDialogType;
 import me.steffenjacobs.opcuadisplay.views.explorer.domain.MethodArgument;
+import me.steffenjacobs.opcuadisplay.views.explorer.events.ChangeSelectedNodeEvent;
 
 public class NodeGenerator {
 
@@ -189,5 +194,59 @@ public class NodeGenerator {
 		}
 
 		EventBus.getInstance().fireEvent(new AttributeModifiedEvent(parent));
+	}
+
+	public static void delete(final CachedBaseNode node) {
+		switch (node.getNodeClass()) {
+		case Object:
+		case Method:
+		case Variable:
+		case View:
+			node.getParent().removeChild(node);
+			node.getParent().setReferences(node.getParent().getReferences().stream()
+					.filter(ref -> !ref.getRefNodeId().equals(node.getNodeId())).collect(Collectors.toList()));
+			break;
+		case VariableType:
+		case ObjectType:
+		case DataType:
+			node.getParent().removeChild(node);
+			node.getParent().setReferences(node.getParent().getReferences().stream()
+					.filter(ref -> !ref.getRefNodeId().equals(node.getNodeId())).collect(Collectors.toList()));
+
+			//get NodeIds of type and subtypes
+			final List<NodeId> nodes = NodeNavigator.getInstance().aggregateSubTypes(node).stream()
+					.map(CachedBaseNode::getNodeId).collect(Collectors.toList());
+			NodeNavigator.getInstance().iterateNodes(NodeNavigator.getInstance().getRoot(), new NodeManipulator() {
+
+				@Override
+				public void manipulate(CachedBaseNode cbn) {
+					cbn.setReferences(cbn.getReferences().stream()
+							.filter(ref -> !("HasTypeDefinition".equals(ref.getReferenceType())
+									&& nodes.contains(ref.getRefNodeId())))
+							.collect(Collectors.toList()));
+				}
+			});
+			break;
+		case ReferenceType:
+			node.getParent().removeChild(node);
+			node.getParent().setReferences(node.getParent().getReferences().stream()
+					.filter(ref -> !ref.getRefNodeId().equals(node.getNodeId())).collect(Collectors.toList()));
+
+			//get names of type and subtypes
+			final List<String> nodes2 = NodeNavigator.getInstance().aggregateSubTypes(node).stream()
+					.map(CachedBaseNode::getBrowseName).map(QualifiedName::getName).collect(Collectors.toList());
+
+			NodeNavigator.getInstance().iterateNodes(NodeNavigator.getInstance().getRoot(), new NodeManipulator() {
+				@Override
+				public void manipulate(CachedBaseNode cbn) {
+					cbn.setReferences(cbn.getReferences().stream()
+							.filter(ref -> !nodes2.contains(ref.getReferenceType())).collect(Collectors.toList()));
+				}
+			});
+			break;
+		default:
+		}
+
+		EventBus.getInstance().fireEvent(new ChangeSelectedNodeEvent(node.getParent(), true));
 	}
 }

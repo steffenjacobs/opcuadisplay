@@ -245,6 +245,10 @@ public class CachedBaseNode {
 		return !children.isEmpty();
 	}
 
+	public boolean removeChild(CachedBaseNode cbn) {
+		return this.children.remove(cbn);
+	}
+
 	/** @return a passive copy of the datastructure containing the children */
 	public CachedBaseNode[] getChildren() {
 		// clean up if necessary

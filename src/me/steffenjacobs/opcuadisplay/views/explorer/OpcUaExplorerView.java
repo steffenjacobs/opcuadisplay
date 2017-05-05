@@ -31,6 +31,7 @@ import me.steffenjacobs.opcuadisplay.shared.util.EventBus;
 import me.steffenjacobs.opcuadisplay.shared.util.EventBus.Event;
 import me.steffenjacobs.opcuadisplay.shared.util.EventBus.EventListener;
 import me.steffenjacobs.opcuadisplay.shared.util.Images;
+import me.steffenjacobs.opcuadisplay.shared.util.opcua.NodeGenerator;
 import me.steffenjacobs.opcuadisplay.shared.util.opcua.NodeNavigator;
 import me.steffenjacobs.opcuadisplay.views.attribute.events.AttributeModifiedEvent;
 import me.steffenjacobs.opcuadisplay.views.explorer.dialogs.DialogFactory;
@@ -315,6 +316,7 @@ public class OpcUaExplorerView extends ViewPart {
 		// delete node action
 		deleteAction = new Action() {
 			public void run() {
+				NodeGenerator.delete( (CachedBaseNode)((IStructuredSelection) viewer.getSelection()).getFirstElement());
 			}
 		};
 		deleteAction.setText("Delete Node");
