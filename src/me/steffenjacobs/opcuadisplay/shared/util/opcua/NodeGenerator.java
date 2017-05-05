@@ -196,7 +196,7 @@ public class NodeGenerator {
 		EventBus.getInstance().fireEvent(new AttributeModifiedEvent(parent));
 	}
 
-	public static void delete(final CachedBaseNode node) {
+	public static void removeNode(final CachedBaseNode node) {
 		switch (node.getNodeClass()) {
 		case Object:
 		case Method:

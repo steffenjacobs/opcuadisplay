@@ -37,7 +37,7 @@ public enum Images {
 		REFERENCE("icons/view/reference.png", "reference"),
 		DATA_TYPE("icons/view/dataType.png", "dataType"),
 		VARIABLE_TYPE("icons/view/variableType.png", "variableType"),
-		DELETE("icons/view/delete.png", "delete"),
+		REMOVE("icons/view/delete.png", "remove"),
 		UNKNOWN("icons/view/unknown.png", "unknown");
 
 		private final String path, identifier;

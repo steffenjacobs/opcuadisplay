@@ -71,7 +71,7 @@ public class OpcUaExplorerView extends ViewPart {
 	private Action openImportWizard;
 	private Action collapseAllAction, expandAllAction;
 	private Action addVariable, addMethod, addObject, addProperty, addObjectType, addVariableType, addDataType;
-	private Action deleteAction;
+	private Action removeAction;
 	private OpcUaConnector connector;
 
 	private CachedBaseNode cachedRoot;
@@ -210,8 +210,8 @@ public class OpcUaExplorerView extends ViewPart {
 	/** adds the available edit options */
 	private void addAvailableEditOptions(IMenuManager manager, CachedBaseNode selectedNode) {
 		// TODO: maybe copy & paste
-		if (ConstraintChecker.getIntsance().isDeleteAllowed(selectedNode)) {
-			manager.add(deleteAction);
+		if (ConstraintChecker.getIntsance().isRemovalAllowed(selectedNode)) {
+			manager.add(removeAction);
 		}
 		if (ConstraintChecker.getIntsance().isAddObjectAllowed(selectedNode)) {
 			manager.add(addObject);
@@ -313,15 +313,15 @@ public class OpcUaExplorerView extends ViewPart {
 	}
 
 	private void makeEditActions() {
-		// delete node action
-		deleteAction = new Action() {
+		// remove node action
+		removeAction = new Action() {
 			public void run() {
-				NodeGenerator.delete( (CachedBaseNode)((IStructuredSelection) viewer.getSelection()).getFirstElement());
+				NodeGenerator.removeNode( (CachedBaseNode)((IStructuredSelection) viewer.getSelection()).getFirstElement());
 			}
 		};
-		deleteAction.setText("Delete Node");
-		deleteAction.setToolTipText("Deletes a Node.");
-		deleteAction.setImageDescriptor(Activator.getImageDescriptor(Images.ExplorerView.DELETE.getIdentifier()));
+		removeAction.setText("Delete Node");
+		removeAction.setToolTipText("Deletes a Node.");
+		removeAction.setImageDescriptor(Activator.getImageDescriptor(Images.ExplorerView.REMOVE.getIdentifier()));
 
 		// add variable action
 		addVariable = new Action() {

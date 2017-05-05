@@ -22,7 +22,7 @@ public class ConstraintChecker {
 
 	// node cannot be root folder, a folder directly under the root or a folder
 	// directly under the Types folder
-	public boolean isDeleteAllowed(CachedBaseNode node) {
+	public boolean isRemovalAllowed(CachedBaseNode node) {
 		return !CachedBaseNode.getRoot().equals(node) && !CachedBaseNode.getRoot().equals(node.getParent())
 				&& node.getParent() != null && !Identifiers.TypesFolder.equals(node.getParent().getNodeId());
 	}
