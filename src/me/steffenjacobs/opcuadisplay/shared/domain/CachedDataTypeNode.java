@@ -3,8 +3,13 @@ package me.steffenjacobs.opcuadisplay.shared.domain;
 import java.util.concurrent.ExecutionException;
 
 import org.eclipse.milo.opcua.sdk.client.nodes.UaDataTypeNode;
+import org.eclipse.milo.opcua.stack.core.types.builtin.LocalizedText;
+import org.eclipse.milo.opcua.stack.core.types.builtin.NodeId;
+import org.eclipse.milo.opcua.stack.core.types.builtin.QualifiedName;
+import org.eclipse.milo.opcua.stack.core.types.enumerated.NodeClass;
 
 import me.steffenjacobs.opcuadisplay.shared.util.FutureResolver;
+import me.steffenjacobs.opcuadisplay.shared.util.opcua.NodeNavigator;
 
 public class CachedDataTypeNode extends CachedBaseNode implements HasOnlyAbstract {
 
@@ -21,6 +26,10 @@ public class CachedDataTypeNode extends CachedBaseNode implements HasOnlyAbstrac
 		this.isAbstract = node.isAbstract;
 	}
 
+	protected CachedDataTypeNode(NodeId nodeId) {
+		super(nodeId, NodeClass.DataType);
+	}
+
 	@Override
 	public CachedDataTypeNode duplicate() {
 		return new CachedDataTypeNode(this);
@@ -32,5 +41,17 @@ public class CachedDataTypeNode extends CachedBaseNode implements HasOnlyAbstrac
 
 	public void setAbstract(boolean isAbstract) {
 		this.isAbstract = isAbstract;
+	}
+
+	public static CachedDataTypeNode create(int namespaceIndex, String name, int nodeId) {
+		NodeId id = new NodeId(namespaceIndex, nodeId);
+		CachedDataTypeNode cbn = new CachedDataTypeNode(id);
+		cbn.setDisplayName(new LocalizedText("en", name));
+		cbn.setBrowseName(new QualifiedName(namespaceIndex, name));
+		NodeNavigator.getInstance().increaseHighestNodeIdIfNecessarySafe(cbn);
+
+		// set abstract to true per default
+		cbn.setAbstract(true);
+		return cbn;
 	}
 }

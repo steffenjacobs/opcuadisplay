@@ -73,6 +73,7 @@ public class DialogFactory {
 		case OBJECT:
 		case VARIABLE:
 		case PROPERTY:
+		case DATA_TYPE:
 		case OBJECT_TYPE:
 			return new SimpleAddDialog(new Shell(), type.getName(), type.getPathToBaseTypeNode(), new DialogListener() {
 				@Override
