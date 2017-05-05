@@ -39,10 +39,10 @@ import me.steffenjacobs.opcuadisplay.views.explorer.dialogs.DialogFactory.AddDia
 import me.steffenjacobs.opcuadisplay.views.explorer.events.ChangeSelectedNodeEvent;
 import me.steffenjacobs.opcuadisplay.views.explorer.events.RootUpdatedEvent;
 import me.steffenjacobs.opcuadisplay.views.explorer.events.SelectedNodeChangedEvent;
-import me.steffenjacobs.opcuadisplay.wizard.events.WizardCancelEvent;
-import me.steffenjacobs.opcuadisplay.wizard.events.WizardFinishEvent;
-import me.steffenjacobs.opcuadisplay.wizard.events.WizardOpenEvent;
 import me.steffenjacobs.opcuadisplay.wizard.imp.OpcUaImportWizard;
+import me.steffenjacobs.opcuadisplay.wizard.imp.events.ImportWizardCancelEvent;
+import me.steffenjacobs.opcuadisplay.wizard.imp.events.ImportWizardFinishEvent;
+import me.steffenjacobs.opcuadisplay.wizard.imp.events.ImportWizardOpenEvent;
 
 /**
  * This sample class demonstrates how to plug-in a new workbench view. The view
@@ -152,23 +152,23 @@ public class OpcUaExplorerView extends CloseableView {
 		});
 
 		// listeners for import wizard
-		EventBus.getInstance().addListener(this, WizardOpenEvent.IDENTIFIER, new EventListener<WizardOpenEvent>() {
+		EventBus.getInstance().addListener(this, ImportWizardOpenEvent.IDENTIFIER, new EventListener<ImportWizardOpenEvent>() {
 			@Override
-			public void onAction(WizardOpenEvent event) {
+			public void onAction(ImportWizardOpenEvent event) {
 				onWizardOpen();
 			}
 		});
 
-		EventBus.getInstance().addListener(this, WizardCancelEvent.IDENTIFIER, new EventListener<WizardCancelEvent>() {
+		EventBus.getInstance().addListener(this, ImportWizardCancelEvent.IDENTIFIER, new EventListener<ImportWizardCancelEvent>() {
 			@Override
-			public void onAction(WizardCancelEvent event) {
+			public void onAction(ImportWizardCancelEvent event) {
 				onWizardCancel();
 			}
 		});
 
-		EventBus.getInstance().addListener(this, WizardFinishEvent.IDENTIFIER, new EventListener<WizardFinishEvent>() {
+		EventBus.getInstance().addListener(this, ImportWizardFinishEvent.IDENTIFIER, new EventListener<ImportWizardFinishEvent>() {
 			@Override
-			public void onAction(WizardFinishEvent event) {
+			public void onAction(ImportWizardFinishEvent event) {
 				onWizardFinish(event.getUrl(), event.isServer());
 			}
 		});

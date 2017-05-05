@@ -6,9 +6,9 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchWizard;
 
 import me.steffenjacobs.opcuadisplay.shared.util.EventBus;
-import me.steffenjacobs.opcuadisplay.wizard.events.WizardCancelEvent;
-import me.steffenjacobs.opcuadisplay.wizard.events.WizardFinishEvent;
-import me.steffenjacobs.opcuadisplay.wizard.events.WizardOpenEvent;
+import me.steffenjacobs.opcuadisplay.wizard.imp.events.ImportWizardCancelEvent;
+import me.steffenjacobs.opcuadisplay.wizard.imp.events.ImportWizardFinishEvent;
+import me.steffenjacobs.opcuadisplay.wizard.imp.events.ImportWizardOpenEvent;
 
 public class OpcUaImportWizard extends Wizard implements IWorkbenchWizard {
 
@@ -22,7 +22,7 @@ public class OpcUaImportWizard extends Wizard implements IWorkbenchWizard {
 	public OpcUaImportWizard() {
 		super();
 		setNeedsProgressMonitor(true);
-		EventBus.getInstance().fireEvent(new WizardOpenEvent());
+		EventBus.getInstance().fireEvent(new ImportWizardOpenEvent());
 	}
 
 	@Override
@@ -42,13 +42,13 @@ public class OpcUaImportWizard extends Wizard implements IWorkbenchWizard {
 
 	@Override
 	public boolean performFinish() {
-		EventBus.getInstance().fireEvent(new WizardFinishEvent(this.getImportUrl(), this.isType()));
+		EventBus.getInstance().fireEvent(new ImportWizardFinishEvent(this.getImportUrl(), this.isType()));
 		return true;
 	}
 
 	@Override
 	public boolean performCancel() {
-		EventBus.getInstance().fireEvent(new WizardCancelEvent());
+		EventBus.getInstance().fireEvent(new ImportWizardCancelEvent());
 		return super.performCancel();
 	}
 
