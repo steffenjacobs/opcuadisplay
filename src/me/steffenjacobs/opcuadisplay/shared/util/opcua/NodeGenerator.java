@@ -14,6 +14,7 @@ import me.steffenjacobs.opcuadisplay.shared.domain.CachedObjectNode;
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedObjectTypeNode;
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedReference;
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedVariableNode;
+import me.steffenjacobs.opcuadisplay.shared.domain.CachedVariableTypeNode;
 import me.steffenjacobs.opcuadisplay.shared.util.EventBus;
 import me.steffenjacobs.opcuadisplay.views.attribute.events.AttributeModifiedEvent;
 import me.steffenjacobs.opcuadisplay.views.explorer.dialogs.DialogFactory.AddDialogType;
@@ -53,9 +54,16 @@ public class NodeGenerator {
 			break;
 		case DATA_TYPE: 
 			createAndInsertDataType(namespaceIndex, name, nodeId, parent);
+		case VARIABLE_TYPE: 
+			createAndInsertVariableType(namespaceIndex, name, nodeId, (CachedVariableTypeNode) type, parent);
 		default:
 		}
 	}
+	private static void createAndInsertVariableType(int namespaceIndex, String name, int nodeId, CachedVariableTypeNode type, CachedBaseNode parent) {
+		CachedVariableTypeNode node = CachedVariableTypeNode.create(namespaceIndex, name, nodeId, type);
+		insertNode(node, parent);
+	}
+
 	private static void createAndInsertObjectType(int namespaceIndex, String name, int nodeId, CachedBaseNode parent) {
 		CachedObjectTypeNode node = CachedObjectTypeNode.create(namespaceIndex, name, nodeId);
 		insertNode(node, parent);

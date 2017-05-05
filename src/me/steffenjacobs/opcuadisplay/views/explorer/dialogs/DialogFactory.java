@@ -72,6 +72,7 @@ public class DialogFactory {
 		switch (type) {
 		case OBJECT:
 		case VARIABLE:
+		case VARIABLE_TYPE:
 		case PROPERTY:
 		case DATA_TYPE:
 		case OBJECT_TYPE:

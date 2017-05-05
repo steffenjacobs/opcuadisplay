@@ -3,10 +3,15 @@ package me.steffenjacobs.opcuadisplay.shared.domain;
 import java.util.concurrent.ExecutionException;
 
 import org.eclipse.milo.opcua.sdk.client.nodes.UaVariableTypeNode;
+import org.eclipse.milo.opcua.stack.core.types.builtin.LocalizedText;
 import org.eclipse.milo.opcua.stack.core.types.builtin.NodeId;
+import org.eclipse.milo.opcua.stack.core.types.builtin.QualifiedName;
 import org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.UInteger;
+import org.eclipse.milo.opcua.stack.core.types.enumerated.NodeClass;
 
 import me.steffenjacobs.opcuadisplay.shared.util.FutureResolver;
+import me.steffenjacobs.opcuadisplay.shared.util.opcua.NodeGenerator;
+import me.steffenjacobs.opcuadisplay.shared.util.opcua.NodeNavigator;
 
 public class CachedVariableTypeNode extends CachedBaseNode implements HasOnlyAbstract, HasValueRank {
 
@@ -15,7 +20,7 @@ public class CachedVariableTypeNode extends CachedBaseNode implements HasOnlyAbs
 	private int valueRank;
 	private UInteger[] arrayDimensions;
 	private boolean isAbstract;
-
+	
 	public CachedVariableTypeNode(UaVariableTypeNode node) throws InterruptedException, ExecutionException {
 		super(node);
 
@@ -31,8 +36,12 @@ public class CachedVariableTypeNode extends CachedBaseNode implements HasOnlyAbs
 		this.value = node.value;
 		this.dataType = node.dataType;
 		this.valueRank = node.valueRank;
-		this.arrayDimensions = node.arrayDimensions.clone();
+		this.arrayDimensions = node.arrayDimensions!=null?node.arrayDimensions.clone():new UInteger[0];
 		this.isAbstract = node.isAbstract;
+	}
+
+	protected CachedVariableTypeNode(NodeId nodeId) {
+		super(nodeId, NodeClass.VariableType);
 	}
 
 	@Override
@@ -78,5 +87,26 @@ public class CachedVariableTypeNode extends CachedBaseNode implements HasOnlyAbs
 
 	public void setAbstract(boolean isAbstract) {
 		this.isAbstract = isAbstract;
+	}
+
+	public static CachedVariableTypeNode create(int namespaceIndex, String name, int nodeId, CachedVariableTypeNode type) {
+		NodeId id = new NodeId(namespaceIndex, nodeId);
+		CachedVariableTypeNode cbn = new CachedVariableTypeNode(id);
+		cbn.setDisplayName(new LocalizedText("en", name));
+		cbn.setBrowseName(new QualifiedName(namespaceIndex, name));
+
+		// set abstract to true per default
+		cbn.setAbstract(true);
+
+		cbn.getReferences()
+				.add(new CachedReference("HasTypeDefinition", type.getBrowseName(), "null", type.getNodeId()));
+
+		NodeNavigator.getInstance().increaseHighestNodeIdIfNecessarySafe(cbn);
+
+		for (CachedBaseNode child : NodeNavigator.getInstance().aggregateInheritedChildren(type)) {
+			NodeGenerator.insertNode(child, cbn);
+		}
+		
+		return  cbn.duplicate();
 	}
 }
