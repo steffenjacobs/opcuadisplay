@@ -220,4 +220,16 @@ public class NodeNavigator {
 
 		return result;
 	}
+
+	public List<CachedBaseNode> aggregateSubTypes(CachedBaseNode node) {
+		List<CachedBaseNode> result = new ArrayList<>();
+		result.add(node);
+
+		for (CachedBaseNode c : node.getChildren()) {
+			if (isType(c)) {
+				result.addAll(aggregateSubTypes(c));
+			}
+		}
+		return result;
+	}
 }
