@@ -6,6 +6,7 @@
          point="org.eclipse.ui.views">
       <category
             name="OPC UA"
+            icon="icons/opcua.png"
             id="me.steffenjacobs.opcuadisplay">
       </category>
       <view
@@ -47,6 +48,7 @@
             name="Import OPC UA Model"
             class="me.steffenjacobs.opcuadisplay.wizard.imp.OpcUaImportWizard"
             category="me.steffenjacobs.opcuadisplay"
+            icon="icons/opcua.png"
             id="me.steffenjacobs.opcuadisplay.wizard.imp.OpcUaImportWizard">
             
       </wizard>      
@@ -62,6 +64,7 @@
             name="Export OPC UA Model"
             class="me.steffenjacobs.opcuadisplay.wizard.exp.OpcUaExportWizard"
             category="me.steffenjacobs.opcuadisplay"
+            icon="icons/opcua.png"
             id="me.steffenjacobs.opcuadisplay.wizard.exp.OpcUaExportWizard">
             
       </wizard>      
@@ -70,7 +73,7 @@
          point="org.eclipse.ui.perspectives">
       <perspective
             class="me.steffenjacobs.opcuadisplay.perspectives.OpcUaPerspective"
-            icon="icons/releng_gears.gif"
+            icon="icons/opcua.png"
             id="me.steffenjacobs.opcuadisplay.perspectives.OpcUaPerspective"
             name="OPC UA Perspective">
       </perspective>

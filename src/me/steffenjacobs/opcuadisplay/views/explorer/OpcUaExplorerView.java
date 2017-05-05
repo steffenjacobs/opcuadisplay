@@ -20,7 +20,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IActionBars;
-import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.PlatformUI;
 
@@ -39,6 +38,7 @@ import me.steffenjacobs.opcuadisplay.views.explorer.dialogs.DialogFactory.AddDia
 import me.steffenjacobs.opcuadisplay.views.explorer.events.ChangeSelectedNodeEvent;
 import me.steffenjacobs.opcuadisplay.views.explorer.events.RootUpdatedEvent;
 import me.steffenjacobs.opcuadisplay.views.explorer.events.SelectedNodeChangedEvent;
+import me.steffenjacobs.opcuadisplay.wizard.exp.OpcUaExportWizard;
 import me.steffenjacobs.opcuadisplay.wizard.imp.OpcUaImportWizard;
 import me.steffenjacobs.opcuadisplay.wizard.imp.events.ImportWizardCancelEvent;
 import me.steffenjacobs.opcuadisplay.wizard.imp.events.ImportWizardFinishEvent;
@@ -68,7 +68,7 @@ public class OpcUaExplorerView extends CloseableView {
 
 	private TreeViewer viewer;
 	private Action doubleClickAction, selectionChangedAction;
-	private Action openImportWizard;
+	private Action openImportWizard, openExportWizard;
 	private Action collapseAllAction, expandAllAction;
 	private Action addVariable, addMethod, addObject, addProperty, addObjectType, addVariableType, addDataType;
 	private Action removeAction;
@@ -152,26 +152,29 @@ public class OpcUaExplorerView extends CloseableView {
 		});
 
 		// listeners for import wizard
-		EventBus.getInstance().addListener(this, ImportWizardOpenEvent.IDENTIFIER, new EventListener<ImportWizardOpenEvent>() {
-			@Override
-			public void onAction(ImportWizardOpenEvent event) {
-				onWizardOpen();
-			}
-		});
+		EventBus.getInstance().addListener(this, ImportWizardOpenEvent.IDENTIFIER,
+				new EventListener<ImportWizardOpenEvent>() {
+					@Override
+					public void onAction(ImportWizardOpenEvent event) {
+						onWizardOpen();
+					}
+				});
 
-		EventBus.getInstance().addListener(this, ImportWizardCancelEvent.IDENTIFIER, new EventListener<ImportWizardCancelEvent>() {
-			@Override
-			public void onAction(ImportWizardCancelEvent event) {
-				onWizardCancel();
-			}
-		});
+		EventBus.getInstance().addListener(this, ImportWizardCancelEvent.IDENTIFIER,
+				new EventListener<ImportWizardCancelEvent>() {
+					@Override
+					public void onAction(ImportWizardCancelEvent event) {
+						onWizardCancel();
+					}
+				});
 
-		EventBus.getInstance().addListener(this, ImportWizardFinishEvent.IDENTIFIER, new EventListener<ImportWizardFinishEvent>() {
-			@Override
-			public void onAction(ImportWizardFinishEvent event) {
-				onWizardFinish(event.getUrl(), event.isServer());
-			}
-		});
+		EventBus.getInstance().addListener(this, ImportWizardFinishEvent.IDENTIFIER,
+				new EventListener<ImportWizardFinishEvent>() {
+					@Override
+					public void onAction(ImportWizardFinishEvent event) {
+						onWizardFinish(event.getUrl(), event.isServer());
+					}
+				});
 	}
 
 	public void onChangeSelectedNode(ChangeSelectedNodeEvent event) {
@@ -238,6 +241,7 @@ public class OpcUaExplorerView extends CloseableView {
 
 	private void fillContextMenu(IMenuManager manager) {
 		manager.add(openImportWizard);
+		manager.add(openExportWizard);
 		manager.add(new Separator());
 		manager.add(collapseAllAction);
 		manager.add(expandAllAction);
@@ -255,6 +259,7 @@ public class OpcUaExplorerView extends CloseableView {
 
 	private void fillLocalToolBar(IToolBarManager manager) {
 		manager.add(openImportWizard);
+		manager.add(openExportWizard);
 		manager.add(new Separator());
 		manager.add(collapseAllAction);
 		manager.add(expandAllAction);
@@ -407,8 +412,17 @@ public class OpcUaExplorerView extends CloseableView {
 		};
 		openImportWizard.setText("Import OPC UA Model...");
 		openImportWizard.setToolTipText("Import OPC UA Model...");
-		openImportWizard.setImageDescriptor(
-				PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_ELEMENT));
+		openImportWizard.setImageDescriptor(Activator.getImageDescriptor(Images.IMG_IMPORT.getIdentifier()));
+
+		// open export wizard
+		openExportWizard = new Action() {
+			public void run() {
+				new WizardDialog(new Shell(), new OpcUaExportWizard()).open();
+			}
+		};
+		openExportWizard.setText("Export OPC UA Model...");
+		openExportWizard.setToolTipText("Export OPC UA Model...");
+		openExportWizard.setImageDescriptor(Activator.getImageDescriptor(Images.IMG_EXPORT.getIdentifier()));
 
 		// double click action
 		doubleClickAction = new Action() {

@@ -3,7 +3,11 @@ package me.steffenjacobs.opcuadisplay.shared.util;
 import me.steffenjacobs.opcuadisplay.Activator;
 
 public enum Images {
-	IMG_COLLAPSE_ALL("icons/collapseall.png", "collapseall"), IMG_EXPAND_ALL("icons/expandall.png", "expandall");
+	IMG_COLLAPSE_ALL("icons/collapseall.png", "collapseall"),
+	IMG_EXPAND_ALL("icons/expandall.png", "expandall"),
+	IMG_IMPORT("icons/import.png", "import"),
+	IMG_EXPORT("icons/export.png", "export"),
+	OPCUA("icons/opcua.png", "opocua");
 
 	private final String path, identifier;
 
