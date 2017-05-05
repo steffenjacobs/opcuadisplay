@@ -9,10 +9,12 @@ import me.steffenjacobs.opcuadisplay.shared.util.EventBus;
 import me.steffenjacobs.opcuadisplay.wizard.exp.events.ExportWizardCancelEvent;
 import me.steffenjacobs.opcuadisplay.wizard.exp.events.ExportWizardFinishEvent;
 import me.steffenjacobs.opcuadisplay.wizard.exp.events.ExportWizardOpenEvent;
+import me.steffenjacobs.opcuadisplay.wizard.shared.WizardWithUrl;
+import me.steffenjacobs.opcuadisplay.wizard.shared.XmlPage;
 
-public class OpcUaExportWizard extends Wizard implements IWorkbenchWizard {
+public class OpcUaExportWizard extends Wizard implements IWorkbenchWizard, WizardWithUrl {
 
-	public ExportToXmlPage xmlPage;
+	public XmlPage xmlPage;
 
 	public String exportUrl;
 
@@ -29,13 +31,13 @@ public class OpcUaExportWizard extends Wizard implements IWorkbenchWizard {
 
 	@Override
 	public void addPages() {
-		xmlPage = new ExportToXmlPage();
+		xmlPage = new XmlPage("Export model to XML file", "Please enter URI to an XML file to export the model to.");
 		super.addPage(xmlPage);
 	}
 
 	@Override
 	public boolean performFinish() {
-		EventBus.getInstance().fireEvent(new ExportWizardFinishEvent(this.getExportUrl()));
+		EventBus.getInstance().fireEvent(new ExportWizardFinishEvent(this.getUrl()));
 		return true;
 	}
 
@@ -45,11 +47,17 @@ public class OpcUaExportWizard extends Wizard implements IWorkbenchWizard {
 		return super.performCancel();
 	}
 
-	public String getExportUrl() {
-		return exportUrl;
+	@Override
+	public void init(IWorkbench arg0, IStructuredSelection arg1) {
 	}
 
 	@Override
-	public void init(IWorkbench arg0, IStructuredSelection arg1) {
+	public String getUrl() {
+		return this.exportUrl;
+	}
+
+	@Override
+	public void setUrl(String url) {
+		this.exportUrl = url;
 	}
 }

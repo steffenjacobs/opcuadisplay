@@ -9,11 +9,13 @@ import me.steffenjacobs.opcuadisplay.shared.util.EventBus;
 import me.steffenjacobs.opcuadisplay.wizard.imp.events.ImportWizardCancelEvent;
 import me.steffenjacobs.opcuadisplay.wizard.imp.events.ImportWizardFinishEvent;
 import me.steffenjacobs.opcuadisplay.wizard.imp.events.ImportWizardOpenEvent;
+import me.steffenjacobs.opcuadisplay.wizard.shared.WizardWithUrl;
+import me.steffenjacobs.opcuadisplay.wizard.shared.XmlPage;
 
-public class OpcUaImportWizard extends Wizard implements IWorkbenchWizard {
+public class OpcUaImportWizard extends Wizard implements IWorkbenchWizard, WizardWithUrl {
 
 	public ImportTypeSelectionPage selectionPage;
-	public ImportFromXmlPage xmlPage;
+	public XmlPage xmlPage;
 	public ImportFromServerPage serverPage;
 
 	public boolean importType;
@@ -33,7 +35,8 @@ public class OpcUaImportWizard extends Wizard implements IWorkbenchWizard {
 	@Override
 	public void addPages() {
 		selectionPage = new ImportTypeSelectionPage();
-		xmlPage = new ImportFromXmlPage();
+		xmlPage = new XmlPage("Import model from XML file",
+				"Please enter URI to an XML file to import the model from.");
 		serverPage = new ImportFromServerPage();
 		super.addPage(selectionPage);
 		super.addPage(xmlPage);
@@ -42,7 +45,7 @@ public class OpcUaImportWizard extends Wizard implements IWorkbenchWizard {
 
 	@Override
 	public boolean performFinish() {
-		EventBus.getInstance().fireEvent(new ImportWizardFinishEvent(this.getImportUrl(), this.isType()));
+		EventBus.getInstance().fireEvent(new ImportWizardFinishEvent(this.getUrl(), this.isType()));
 		return true;
 	}
 
@@ -60,11 +63,18 @@ public class OpcUaImportWizard extends Wizard implements IWorkbenchWizard {
 		return importType;
 	}
 
-	public String getImportUrl() {
-		return importUrl;
+	@Override
+	public void init(IWorkbench arg0, IStructuredSelection arg1) {
 	}
 
 	@Override
-	public void init(IWorkbench arg0, IStructuredSelection arg1) {
+	public String getUrl() {
+		return importUrl;
+
+	}
+
+	@Override
+	public void setUrl(String url) {
+		this.importUrl = url;
 	}
 }

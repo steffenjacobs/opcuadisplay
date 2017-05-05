@@ -1,4 +1,4 @@
-package me.steffenjacobs.opcuadisplay.wizard.exp;
+package me.steffenjacobs.opcuadisplay.wizard.shared;
 
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
@@ -10,15 +10,15 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
-public class ExportToXmlPage extends WizardPage {
+public class XmlPage extends WizardPage {
 
 	private Text textUrl;
 	private Composite container;
 
-	public ExportToXmlPage() {
-		super("Export model to XML file");
-		setTitle("Exprot model to XML file");
-		setDescription("Please enter URI to an XML file to export the model to.");
+	public XmlPage(String caption, String description) {
+		super(caption);
+		setTitle(caption);
+		setDescription(description);
 	}
 
 	@Override
@@ -29,7 +29,7 @@ public class ExportToXmlPage extends WizardPage {
 		layout.numColumns = 2;
 		Label lblUrl = new Label(container, SWT.NONE);
 		lblUrl.setText("XML file location:");
-		lblUrl.setToolTipText("Location to export model to");
+		lblUrl.setToolTipText("Location of the XML file");
 
 		textUrl = new Text(container, SWT.BORDER | SWT.SINGLE);
 		textUrl.addKeyListener(new KeyListener() {
@@ -42,7 +42,7 @@ public class ExportToXmlPage extends WizardPage {
 			public void keyReleased(KeyEvent e) {
 				if (!textUrl.getText().isEmpty()) {
 					setPageComplete(true);
-					((OpcUaExportWizard) getWizard()).exportUrl = getUrl();
+					((WizardWithUrl) getWizard()).setUrl(getUrl());
 				} else {
 					setPageComplete(false);
 				}
@@ -53,7 +53,7 @@ public class ExportToXmlPage extends WizardPage {
 		textUrl.setLayoutData(gd);
 
 		textUrl.setText(System.getProperty("user.dir"));
-		textUrl.setToolTipText("Location to export the model to");
+		textUrl.setToolTipText("Location of the XML file");
 
 		textUrl.setFocus();
 		textUrl.setSelection(0, textUrl.getText().length());
@@ -62,7 +62,7 @@ public class ExportToXmlPage extends WizardPage {
 		setControl(container);
 		setPageComplete(true);
 
-		((OpcUaExportWizard) getWizard()).exportUrl = getUrl();
+		((WizardWithUrl) getWizard()).setUrl(getUrl());
 	}
 
 	public String getUrl() {
