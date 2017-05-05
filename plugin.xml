@@ -51,5 +51,14 @@
             
       </wizard>      
    </extension>
+   <extension
+         point="org.eclipse.ui.perspectives">
+      <perspective
+            class="me.steffenjacobs.opcuadisplay.perspectives.OpcUaPerspective"
+            icon="icons/releng_gears.gif"
+            id="me.steffenjacobs.opcuadisplay.perspectives.OpcUaPerspective"
+            name="OPC UA Perspective">
+      </perspective>
+   </extension>
 
 </plugin>

@@ -6,7 +6,9 @@ Bundle-Version: 0.1
 Bundle-Activator: me.steffenjacobs.opcuadisplay.Activator
 Require-Bundle: org.eclipse.core.runtime,
  org.slf4j.api,
- org.eclipse.ui;bundle-version="3.108.1"
+ org.eclipse.ui;bundle-version="3.108.1",
+ org.eclipse.ui.console,
+ org.eclipse.jdt.ui
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .,
