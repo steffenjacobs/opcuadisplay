@@ -177,6 +177,7 @@ public class OpcUaExplorerView extends ViewPart {
 		viewer.setSelection(new StructuredSelection(event.getNode()), event.isRevealInTree());
 		// not necessary to fire SelectedNodeChangedEvent, because it will be
 		// fired by SelectionListener of Treeviewer
+		viewer.refresh();
 	}
 
 	private void hookContextMenu() {
