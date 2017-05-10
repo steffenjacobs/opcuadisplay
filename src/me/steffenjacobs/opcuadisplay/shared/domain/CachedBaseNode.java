@@ -11,6 +11,7 @@ import org.eclipse.milo.opcua.stack.core.Identifiers;
 import org.eclipse.milo.opcua.stack.core.types.builtin.LocalizedText;
 import org.eclipse.milo.opcua.stack.core.types.builtin.NodeId;
 import org.eclipse.milo.opcua.stack.core.types.builtin.QualifiedName;
+import org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.UByte;
 import org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.UInteger;
 import org.eclipse.milo.opcua.stack.core.types.enumerated.NodeClass;
 import org.eclipse.milo.opcua.stack.core.types.structured.ReferenceDescription;
@@ -32,7 +33,9 @@ public class CachedBaseNode {
 
 	private List<CachedReference> references;
 
-	private static CachedBaseNode noDataDummy, loadingDummy, root;
+	private static CachedBaseNode noDataDummy, loadingDummy;
+
+	private static CachedObjectNode root;
 
 	public static CachedBaseNode getDummyNoData() {
 		if (noDataDummy == null) {
@@ -42,11 +45,24 @@ public class CachedBaseNode {
 	}
 
 	public static CachedBaseNode createNewRoot() {
-		root = new CachedBaseNode("Root");
-		CachedReference f = new CachedReference("HasTypeDefinition", new QualifiedName(0, "FolderType"), null, null);
-		CachedReference oo = new CachedReference("Organizes", new QualifiedName(0, "Objects"), "FolderType", null);
-		CachedReference ot = new CachedReference("Organizes", new QualifiedName(0, "Types"), "FolderType", null);
-		CachedReference ov = new CachedReference("Organizes", new QualifiedName(0, "Views"), "FolderType", null);
+		root = new CachedObjectNode(Identifiers.RootFolder);
+
+		root.setBrowseName(new QualifiedName(0, "Root"));
+		root.setDescription(new LocalizedText("en", "The root of the server address space."));
+		root.setDisplayName(new LocalizedText("en", "Root"));
+		root.setWriteMask(UInteger.valueOf(0));
+		root.setUserWriteMask(UInteger.valueOf(0));
+		root.setChildren(new ArrayList<>());
+		root.setEventNotifier(UByte.valueOf(0));
+
+		CachedReference f = new CachedReference("HasTypeDefinition", new QualifiedName(0, "FolderType"), "null",
+				Identifiers.FolderType);
+		CachedReference oo = new CachedReference("Organizes", new QualifiedName(0, "Objects"), "FolderType",
+				Identifiers.ObjectsFolder);
+		CachedReference ot = new CachedReference("Organizes", new QualifiedName(0, "Types"), "FolderType",
+				Identifiers.TypesFolder);
+		CachedReference ov = new CachedReference("Organizes", new QualifiedName(0, "Views"), "FolderType",
+				Identifiers.ViewsFolder);
 		root.setReferences(Lists.newArrayList(f, oo, ot, ov));
 		return root;
 	}
@@ -85,17 +101,11 @@ public class CachedBaseNode {
 	}
 
 	private CachedBaseNode(String text) {
-		if ("Root".equals(text)) {
-			nodeId = Identifiers.RootFolder;
-			nodeClass = NodeClass.Object;
-			browseName = new QualifiedName(0, text);
-			description = new LocalizedText("null", "The root of the server address space.");
-		} else {
-			nodeId = new NodeId(0, 0);
-			nodeClass = NodeClass.Unspecified;
-			browseName = new QualifiedName(0, "Dummy");
-			description = new LocalizedText("null", "This is a dummy node.");
-		}
+		nodeId = new NodeId(0, 0);
+		nodeClass = NodeClass.Unspecified;
+		browseName = new QualifiedName(0, "Dummy");
+		description = new LocalizedText("null", "This is a dummy node.");
+
 		displayName = new LocalizedText("null", text);
 		writeMask = UInteger.valueOf(0);
 		userWriteMask = UInteger.valueOf(0);
@@ -131,12 +141,16 @@ public class CachedBaseNode {
 		references = new ArrayList<>();
 	}
 
-	//TODO: make protected
 	public CachedBaseNode(NodeId nodeId, NodeClass nodeClass) {
 		super();
 		children = new ArrayList<>();
 		this.nodeId = nodeId;
 		this.nodeClass = nodeClass;
+		this.browseName = new QualifiedName(0, "null");
+		this.displayName = new LocalizedText("en", "null");
+		this.description = new LocalizedText("en", "null");
+		this.writeMask = UInteger.valueOf(0);
+		this.userWriteMask = UInteger.valueOf(0);
 		references = new ArrayList<>();
 	}
 
