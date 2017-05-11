@@ -4,6 +4,8 @@ import java.util.concurrent.ExecutionException;
 
 import org.eclipse.milo.opcua.sdk.client.nodes.UaReferenceTypeNode;
 import org.eclipse.milo.opcua.stack.core.types.builtin.LocalizedText;
+import org.eclipse.milo.opcua.stack.core.types.builtin.NodeId;
+import org.eclipse.milo.opcua.stack.core.types.enumerated.NodeClass;
 
 import me.steffenjacobs.opcuadisplay.shared.util.FutureResolver;
 
@@ -26,6 +28,11 @@ public class CachedReferenceTypeNode extends CachedBaseNode {
 		this.isAbstract = node.isAbstract;
 		this.symmetric = node.symmetric;
 		this.inverseName = new LocalizedText(node.inverseName.getLocale(), node.inverseName.getText());
+	}
+
+	public CachedReferenceTypeNode(NodeId nodeId) {
+		super(nodeId, NodeClass.ReferenceType);
+		this.inverseName = new LocalizedText("", "");
 	}
 
 	@Override

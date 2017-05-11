@@ -49,8 +49,12 @@ public class CachedVariableNode extends CachedBaseNode implements HasValueRank {
 		this.historizing = node.historizing;
 	}
 
-	protected CachedVariableNode(NodeId nodeId) {
+	public CachedVariableNode(NodeId nodeId) {
 		super(nodeId, NodeClass.Variable);
+		this.dataType = new NodeId(0, 0);
+		this.arrayDimensions = new UInteger[0];
+		this.accessLevel = UByte.valueOf(0);
+		this.userAccessLevel = UByte.valueOf(0);
 	}
 
 	public static CachedVariableNode create(int namespaceIndex, String name, int nodeId, CachedDataTypeNode type) {

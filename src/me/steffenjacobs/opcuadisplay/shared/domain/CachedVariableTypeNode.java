@@ -40,8 +40,10 @@ public class CachedVariableTypeNode extends CachedBaseNode implements HasOnlyAbs
 		this.isAbstract = node.isAbstract;
 	}
 
-	protected CachedVariableTypeNode(NodeId nodeId) {
+	public CachedVariableTypeNode(NodeId nodeId) {
 		super(nodeId, NodeClass.VariableType);
+		this.dataType = new NodeId(0, 0);
+		this.arrayDimensions = new UInteger[0];
 	}
 
 	@Override

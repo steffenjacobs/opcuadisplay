@@ -26,7 +26,7 @@ public class CachedDataTypeNode extends CachedBaseNode implements HasOnlyAbstrac
 		this.isAbstract = node.isAbstract;
 	}
 
-	protected CachedDataTypeNode(NodeId nodeId) {
+	public CachedDataTypeNode(NodeId nodeId) {
 		super(nodeId, NodeClass.DataType);
 	}
 

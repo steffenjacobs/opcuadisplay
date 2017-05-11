@@ -32,7 +32,7 @@ public class CachedMethodNode extends CachedBaseNode {
 		this.userExecutable = node.userExecutable;
 	}
 
-	protected CachedMethodNode(NodeId nodeId) {
+	public CachedMethodNode(NodeId nodeId) {
 		super(nodeId, NodeClass.Method);
 	}
 

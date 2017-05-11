@@ -22,8 +22,9 @@ public class CachedObjectNode extends CachedBaseNode {
 		this.eventNotifier = FutureResolver.resolveFutureSafe(node.getEventNotifier());
 	}
 
-	protected CachedObjectNode(NodeId nodeId) {
+	public CachedObjectNode(NodeId nodeId) {
 		super(nodeId, NodeClass.Object);
+		this.eventNotifier = UByte.valueOf(0);
 	}
 
 	public UByte getEventNotifier() {

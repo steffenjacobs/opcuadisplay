@@ -3,7 +3,9 @@ package me.steffenjacobs.opcuadisplay.shared.domain;
 import java.util.concurrent.ExecutionException;
 
 import org.eclipse.milo.opcua.sdk.client.nodes.UaViewNode;
+import org.eclipse.milo.opcua.stack.core.types.builtin.NodeId;
 import org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.UByte;
+import org.eclipse.milo.opcua.stack.core.types.enumerated.NodeClass;
 
 import me.steffenjacobs.opcuadisplay.shared.util.FutureResolver;
 
@@ -23,6 +25,11 @@ public class CachedViewNode extends CachedBaseNode {
 		super(node);
 		this.containsNoLoop = node.containsNoLoop;
 		this.eventNotifier = UByte.valueOf(node.eventNotifier.intValue());
+	}
+
+	public CachedViewNode(NodeId nodeId) {
+		super(nodeId, NodeClass.View);
+		eventNotifier = UByte.valueOf(0);
 	}
 
 	@Override
