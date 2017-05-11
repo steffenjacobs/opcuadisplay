@@ -242,7 +242,9 @@ public class StandaloneNodeExplorerClient {
 			final List<CachedReference> refs = new ArrayList<>();
 			toList(browseResult.getReferences()).forEach(rd -> {
 				// retrieve the node details from the reference
-				CachedBaseNode cbn = retrieveNodeDetails(rd.getNodeId().local().orElse(null), client);
+				NodeId nodeId = rd.getNodeId().local().orElse(null);
+
+				CachedBaseNode cbn = retrieveNodeDetails(nodeId, client);
 
 				if (cbn != null) {
 					// this is probably a type
@@ -253,7 +255,22 @@ public class StandaloneNodeExplorerClient {
 				} else {
 					// this is probably something else in the types folder (e.g.
 					// objects, variables, etc.)
-					CachedBaseNode nn = new CachedBaseNode(rd);
+
+					CachedBaseNode nn;
+					if (rd.getNodeClass() == NodeClass.Object) {
+						nn = new CachedObjectNode(nodeId);
+					} else if (rd.getNodeClass() == NodeClass.Variable) {
+
+						nn = new CachedVariableNode(nodeId);
+					} else if (rd.getNodeClass() == NodeClass.DataType) {
+						nn = new CachedDataTypeNode(nodeId);
+					} else {
+						nn = new CachedBaseNode(nodeId, rd.getNodeClass());
+					}
+
+					nn.setBrowseName(rd.getBrowseName());
+					nn.setDisplayName(rd.getDisplayName());
+
 					ref.add(nn);
 					nn.setReferences(browseAllReferences(nn, client));
 					retrieveNodes(nn, client, recursive);
@@ -295,12 +312,33 @@ public class StandaloneNodeExplorerClient {
 		return null;
 	}
 
+	private CachedBaseNode retrieveNodeDetailsNonInstance(NodeId parentId, NodeId nodeId, OpcUaClient client) {
+		try {
+			List<Node> lst = client.getAddressSpace().browse(parentId).get();
+			return parseNode(lst.stream().filter(x -> {
+				try {
+					return x.getNodeId().get().equals(nodeId);
+				} catch (InterruptedException | ExecutionException e) {
+					e.printStackTrace();
+				}
+				return false;
+			}).findAny().orElse(null));
+		} catch (InterruptedException | ExecutionException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
 	/**
 	 * @param node
 	 *            the node to parse
 	 * @return the cached node of the correct class of <i>node</i>
 	 */
 	private CachedBaseNode parseNode(Node node) throws InterruptedException, ExecutionException {
+		if (node == null) {
+			return null;
+		}
+
 		if (node instanceof UaDataTypeNode) {
 			return new CachedDataTypeNode((UaDataTypeNode) node);
 		} else if (node instanceof UaMethodNode) {
@@ -414,7 +452,7 @@ public class StandaloneNodeExplorerClient {
 
 	/**
 	 * @return a preconfigured OpcUaClient not yet connected to <i>url</i> <br>
-	 * 		client.connect().get() will connect the client to <i>url</i>
+	 *         client.connect().get() will connect the client to <i>url</i>
 	 */
 	private static OpcUaClient createClient(String url) throws Exception {
 		SecurityPolicy securityPolicy = SecurityPolicy.None;

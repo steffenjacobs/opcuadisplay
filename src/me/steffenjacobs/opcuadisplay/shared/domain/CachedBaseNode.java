@@ -14,7 +14,6 @@ import org.eclipse.milo.opcua.stack.core.types.builtin.QualifiedName;
 import org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.UByte;
 import org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.UInteger;
 import org.eclipse.milo.opcua.stack.core.types.enumerated.NodeClass;
-import org.eclipse.milo.opcua.stack.core.types.structured.ReferenceDescription;
 
 import com.google.common.collect.Lists;
 
@@ -115,17 +114,17 @@ public class CachedBaseNode {
 
 	}
 
-	public CachedBaseNode(ReferenceDescription descr) {
-		children = new ArrayList<>();
-		this.nodeId = descr.getNodeId().local().orElse(null);
-		this.nodeClass = descr.getNodeClass();
-		this.browseName = descr.getBrowseName();
-		this.displayName = descr.getDisplayName();
-		this.description = null;
-		this.writeMask = null;
-		this.userWriteMask = null;
-		references = new ArrayList<>();
-	}
+	// public CachedBaseNode(ReferenceDescription descr) {
+	// children = new ArrayList<>();
+	// this.nodeId = descr.getNodeId().local().orElse(null);
+	// this.nodeClass = descr.getNodeClass();
+	// this.browseName = descr.getBrowseName();
+	// this.displayName = descr.getDisplayName();
+	// this.description = null;
+	// this.writeMask = null;
+	// this.userWriteMask = null;
+	// references = new ArrayList<>();
+	// }
 
 	public CachedBaseNode(Node node) throws InterruptedException, ExecutionException {
 		super();
