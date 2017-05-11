@@ -2,6 +2,7 @@ package me.steffenjacobs.opcuadisplay.shared.util.opcua;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Stack;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -248,5 +249,9 @@ public class NodeNavigator {
 			}
 		}
 		return result;
+	}
+
+	public Optional<CachedReference> getTypeDefinition(CachedBaseNode refNode) {
+		return refNode.getReferences().stream().filter(ref -> ref.getReferenceType().equals("HasTypeDefinition")).findAny();
 	}
 }
