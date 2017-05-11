@@ -75,9 +75,6 @@ public class XmlExport {
 			m = context.createMarshaller();
 			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 
-			// Write to System.out
-			// m.marshal(nodeSet, System.out);
-
 			// Write to File
 			m.marshal(nodeSet, new File(xmlFile));
 		} catch (JAXBException e) {

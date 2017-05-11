@@ -200,7 +200,6 @@ public class OpcUaExplorerView extends CloseableView {
 				new EventListener<NewProjectWizardFinishEvent>() {
 					@Override
 					public void onAction(NewProjectWizardFinishEvent event) {
-						System.out.println(event.isGenerateFolders() + " - " + event.isGenerateBaseTypes());
 						onNewProjectWizardFinish(event.isGenerateFolders(), event.isGenerateBaseTypes());
 					}
 				});

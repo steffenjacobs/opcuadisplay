@@ -10,7 +10,6 @@ public abstract class CloseableView extends ViewPart {
 	@Override
 	public void dispose() {
 		EventBus.getInstance().unregisterAllListeners(this);
-		System.out.println("unregistered listeners for " + this.getIdentifier());
 		super.dispose();
 	}
 
