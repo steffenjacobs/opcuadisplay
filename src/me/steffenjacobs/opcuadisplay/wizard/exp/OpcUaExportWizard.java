@@ -9,10 +9,10 @@ import me.steffenjacobs.opcuadisplay.shared.util.EventBus;
 import me.steffenjacobs.opcuadisplay.wizard.exp.events.ExportWizardCancelEvent;
 import me.steffenjacobs.opcuadisplay.wizard.exp.events.ExportWizardFinishEvent;
 import me.steffenjacobs.opcuadisplay.wizard.exp.events.ExportWizardOpenEvent;
-import me.steffenjacobs.opcuadisplay.wizard.shared.WizardWithUrl;
+import me.steffenjacobs.opcuadisplay.wizard.shared.WizardWithUrlAndType;
 import me.steffenjacobs.opcuadisplay.wizard.shared.XmlPage;
 
-public class OpcUaExportWizard extends Wizard implements IWorkbenchWizard, WizardWithUrl {
+public class OpcUaExportWizard extends Wizard implements IWorkbenchWizard, WizardWithUrlAndType {
 
 	public XmlPage xmlPage;
 
@@ -31,7 +31,8 @@ public class OpcUaExportWizard extends Wizard implements IWorkbenchWizard, Wizar
 
 	@Override
 	public void addPages() {
-		xmlPage = new XmlPage("Export model to XML file", "Please enter URI to an XML file to export the model to.");
+		xmlPage = new XmlPage("Export model to XML file", "Please enter URI to an XML file to export the model to.",
+				false);
 		super.addPage(xmlPage);
 	}
 
@@ -59,5 +60,11 @@ public class OpcUaExportWizard extends Wizard implements IWorkbenchWizard, Wizar
 	@Override
 	public void setUrl(String url) {
 		this.exportUrl = url;
+	}
+
+	@Override
+	public boolean isType() {
+		// type = XML -> false
+		return false;
 	}
 }

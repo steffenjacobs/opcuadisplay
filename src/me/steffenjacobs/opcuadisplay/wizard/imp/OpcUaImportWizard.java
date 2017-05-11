@@ -9,10 +9,10 @@ import me.steffenjacobs.opcuadisplay.shared.util.EventBus;
 import me.steffenjacobs.opcuadisplay.wizard.imp.events.ImportWizardCancelEvent;
 import me.steffenjacobs.opcuadisplay.wizard.imp.events.ImportWizardFinishEvent;
 import me.steffenjacobs.opcuadisplay.wizard.imp.events.ImportWizardOpenEvent;
-import me.steffenjacobs.opcuadisplay.wizard.shared.WizardWithUrl;
+import me.steffenjacobs.opcuadisplay.wizard.shared.WizardWithUrlAndType;
 import me.steffenjacobs.opcuadisplay.wizard.shared.XmlPage;
 
-public class OpcUaImportWizard extends Wizard implements IWorkbenchWizard, WizardWithUrl {
+public class OpcUaImportWizard extends Wizard implements IWorkbenchWizard, WizardWithUrlAndType {
 
 	public ImportTypeSelectionPage selectionPage;
 	public XmlPage xmlPage;
@@ -36,7 +36,7 @@ public class OpcUaImportWizard extends Wizard implements IWorkbenchWizard, Wizar
 	public void addPages() {
 		selectionPage = new ImportTypeSelectionPage();
 		xmlPage = new XmlPage("Import model from XML file",
-				"Please enter URI to an XML file to import the model from.");
+				"Please enter URI to an XML file to import the model from.",true);
 		serverPage = new ImportFromServerPage();
 		super.addPage(selectionPage);
 		super.addPage(xmlPage);

@@ -1,24 +1,43 @@
 package me.steffenjacobs.opcuadisplay.wizard.shared;
 
+import java.io.File;
+
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 public class XmlPage extends WizardPage {
 
 	private Text textUrl;
 	private Composite container;
+	private boolean isImport;
 
-	public XmlPage(String caption, String description) {
+	/** type: true = import, false = export */
+	public XmlPage(String caption, String description, boolean type) {
 		super(caption);
 		setTitle(caption);
 		setDescription(description);
+		this.isImport = type;
+	}
+
+	@Override
+	public boolean isPageComplete() {
+		return ((WizardWithUrlAndType) getWizard()).isType() || isValid();
+	}
+
+	@Override
+	public boolean canFlipToNextPage() {
+		return false;
 	}
 
 	@Override
@@ -40,29 +59,68 @@ public class XmlPage extends WizardPage {
 
 			@Override
 			public void keyReleased(KeyEvent e) {
-				if (!textUrl.getText().isEmpty()) {
-					setPageComplete(true);
-					((WizardWithUrl) getWizard()).setUrl(getUrl());
-				} else {
-					setPageComplete(false);
-				}
+				revalidate();
 			}
+		});
 
+		textUrl.addMouseListener(new MouseAdapter() {
+
+			@Override
+			public void mouseDoubleClick(MouseEvent arg0) {
+				FileDialog dialog;
+				if (isImport) {
+					dialog = new FileDialog(new Shell(), SWT.OPEN);
+				} else {
+					dialog = new FileDialog(new Shell(), SWT.SAVE);
+				}
+				dialog.setFilterNames(new String[]
+					{ "XML Files", "Any Files" });
+				dialog.setFilterExtensions(new String[]
+					{ "*.xml", "*.*" });
+				dialog.setFilterPath(System.getProperty("user.dir"));
+				dialog.setText("Select an XML file...");
+				textUrl.setText(dialog.open());
+				revalidate();
+			}
 		});
 		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
 		textUrl.setLayoutData(gd);
 
-		textUrl.setText(System.getProperty("user.dir"));
-		textUrl.setToolTipText("Location of the XML file");
+		textUrl.setText(System.getProperty("user.home"));
+		textUrl.setToolTipText("Location of the XML file - Double click to open file browser.");
 
 		textUrl.setFocus();
 		textUrl.setSelection(0, textUrl.getText().length());
 
 		// required to avoid an error in the system
 		setControl(container);
-		setPageComplete(true);
+		revalidate();
 
-		((WizardWithUrl) getWizard()).setUrl(getUrl());
+		((WizardWithUrlAndType) getWizard()).setUrl(getUrl());
+	}
+
+	/** checks & updates page completeness */
+	private void revalidate() {
+		this.setPageComplete(this.isPageComplete());
+	}
+
+	/**
+	 * @return if the file specified in TextField textUrl exists. Also updates
+	 *         the url in the parent wizard.
+	 */
+	private boolean isValid() {
+		if (!isImport) {
+			// export -> create file if necessary
+			((WizardWithUrlAndType) getWizard()).setUrl(getUrl());
+			return true;
+		}
+
+		File f = new File(textUrl.getText());
+		if (f.exists() && !f.isDirectory()) {
+			((WizardWithUrlAndType) getWizard()).setUrl(getUrl());
+			return true;
+		}
+		return false;
 	}
 
 	public String getUrl() {
