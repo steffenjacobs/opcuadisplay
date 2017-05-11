@@ -19,6 +19,7 @@ import org.eclipse.milo.opcua.stack.core.types.builtin.QualifiedName;
 import org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.UByte;
 import org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.UInteger;
 
+import me.steffenjacobs.opcuadisplay.Activator;
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedBaseNode;
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedDataTypeNode;
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedMethodNode;
@@ -84,6 +85,7 @@ public class XmlImport {
 
 			return rootFolder;
 		} catch (JAXBException | FileNotFoundException e) {
+			Activator.openMessageBox("Error importing XML", e.getLocalizedMessage());
 			e.printStackTrace();
 		}
 

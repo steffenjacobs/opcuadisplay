@@ -16,6 +16,7 @@ import org.eclipse.milo.opcua.stack.core.types.builtin.NodeId;
 
 import com.google.common.collect.Lists;
 
+import me.steffenjacobs.opcuadisplay.Activator;
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedBaseNode;
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedDataTypeNode;
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedMethodNode;
@@ -80,6 +81,7 @@ public class XmlExport {
 			// Write to File
 			m.marshal(nodeSet, new File(xmlFile));
 		} catch (JAXBException e) {
+			Activator.openMessageBox("Error exporting XML", "" + e.getLinkedException().getMessage());
 			e.printStackTrace();
 		}
 	}
