@@ -23,6 +23,10 @@ public class OpcUaConnector implements ITreeContentProvider {
 		this.parentShell = parentShell;
 	}
 
+	/**
+	 * loads the variables found on the URL <i>url</i> and makes the loaded tree
+	 * available at NodeNavigator.root
+	 */
 	public void loadVariables(final String url) {
 		Job job = new Job("Downloading OPC UA nodes...") {
 			@Override
@@ -53,7 +57,6 @@ public class OpcUaConnector implements ITreeContentProvider {
 
 		job.setUser(true);
 		job.schedule();
-
 	}
 
 	@Override
@@ -66,7 +69,8 @@ public class OpcUaConnector implements ITreeContentProvider {
 
 	@Override
 	public Object[] getElements(Object arg0) {
-		return new CachedBaseNode[] { NodeNavigator.getInstance().getRoot() };
+		return new CachedBaseNode[]
+			{ NodeNavigator.getInstance().getRoot() };
 	}
 
 	@Override
