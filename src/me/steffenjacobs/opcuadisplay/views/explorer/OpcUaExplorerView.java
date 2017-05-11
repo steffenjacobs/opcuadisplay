@@ -1,11 +1,16 @@
 package me.steffenjacobs.opcuadisplay.views.explorer;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
@@ -17,6 +22,7 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IActionBars;
@@ -31,6 +37,8 @@ import me.steffenjacobs.opcuadisplay.shared.util.EventBus.EventListener;
 import me.steffenjacobs.opcuadisplay.shared.util.Images;
 import me.steffenjacobs.opcuadisplay.shared.util.opcua.NodeGenerator;
 import me.steffenjacobs.opcuadisplay.shared.util.opcua.NodeNavigator;
+import me.steffenjacobs.opcuadisplay.shared.util.opcua.xml.XmlExport;
+import me.steffenjacobs.opcuadisplay.shared.util.opcua.xml.XmlImport;
 import me.steffenjacobs.opcuadisplay.views.CloseableView;
 import me.steffenjacobs.opcuadisplay.views.attribute.events.AttributeModifiedEvent;
 import me.steffenjacobs.opcuadisplay.views.explorer.dialogs.DialogFactory;
@@ -39,6 +47,7 @@ import me.steffenjacobs.opcuadisplay.views.explorer.events.ChangeSelectedNodeEve
 import me.steffenjacobs.opcuadisplay.views.explorer.events.RootUpdatedEvent;
 import me.steffenjacobs.opcuadisplay.views.explorer.events.SelectedNodeChangedEvent;
 import me.steffenjacobs.opcuadisplay.wizard.exp.OpcUaExportWizard;
+import me.steffenjacobs.opcuadisplay.wizard.exp.events.ExportWizardFinishEvent;
 import me.steffenjacobs.opcuadisplay.wizard.imp.OpcUaImportWizard;
 import me.steffenjacobs.opcuadisplay.wizard.imp.events.ImportWizardCancelEvent;
 import me.steffenjacobs.opcuadisplay.wizard.imp.events.ImportWizardFinishEvent;
@@ -175,6 +184,16 @@ public class OpcUaExplorerView extends CloseableView {
 						onWizardFinish(event.getUrl(), event.isServer());
 					}
 				});
+
+		// listener for export wizard
+
+		EventBus.getInstance().addListener(this, ExportWizardFinishEvent.IDENTIFIER,
+				new EventListener<ExportWizardFinishEvent>() {
+					@Override
+					public void onAction(ExportWizardFinishEvent event) {
+						onExportWizardFinish(event.getUrl());
+					}
+				});
 	}
 
 	public void onChangeSelectedNode(ChangeSelectedNodeEvent event) {
@@ -281,9 +300,62 @@ public class OpcUaExplorerView extends CloseableView {
 	}
 
 	/** can be called, after the import wizard has finished */
+	public void onExportWizardFinish(String exportUrl) {
+		Job job = new Job("Exporting OPC UA nodes...") {
+			@Override
+			protected IStatus run(IProgressMonitor monitor) {
+				try {
+					XmlExport.getInstance().writeToFile(exportUrl, NodeNavigator.getInstance().getRoot());
+					return Status.OK_STATUS;
+				} catch (Exception e) {
+					e.printStackTrace();
+					Display.getDefault().syncExec(new Runnable() {
+						@Override
+						public void run() {
+							MessageDialog.openError(new Shell(), "OPC UA Display", e.getLocalizedMessage());
+						}
+					});
+					return Status.CANCEL_STATUS;
+				}
+			}
+		};
+
+		job.setUser(true);
+		job.schedule();
+	}
+
+	/** can be called, after the import wizard has finished */
 	public void onWizardFinish(String importUrl, boolean server) {
 		if (!server) {
-			throw new IllegalArgumentException("XML import not supported");
+			Job job = new Job("Importing OPC UA nodes...") {
+				@Override
+				protected IStatus run(IProgressMonitor monitor) {
+					try {
+						NodeNavigator.getInstance().setRoot(XmlImport.getInstance().parseFile(importUrl));
+
+						Display.getDefault().syncExec(new Runnable() {
+							@Override
+							public void run() {
+								EventBus.getInstance()
+										.fireEvent(new RootUpdatedEvent(NodeNavigator.getInstance().getRoot()));
+							}
+						});
+						return Status.OK_STATUS;
+					} catch (Exception e) {
+						e.printStackTrace();
+						Display.getDefault().syncExec(new Runnable() {
+							@Override
+							public void run() {
+								MessageDialog.openError(new Shell(), "OPC UA Display", e.getLocalizedMessage());
+							}
+						});
+						return Status.CANCEL_STATUS;
+					}
+				}
+			};
+
+			job.setUser(true);
+			job.schedule();
 		}
 
 		else {
