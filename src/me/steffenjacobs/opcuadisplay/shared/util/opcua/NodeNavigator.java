@@ -52,9 +52,12 @@ public class NodeNavigator {
 	 * @return the node navigated to or null, if the node does not exist
 	 */
 	public CachedBaseNode navigateByName(String url) {
+		return navigateByName(url, getRoot());
+	}
+
+	public CachedBaseNode navigateByName(String url, CachedBaseNode node) {
 		String[] path = url.split("/");
 
-		CachedBaseNode node = getRoot();
 		for (String p : path) {
 			if (p == path[0] && p.equals("Root")) {
 				continue;
