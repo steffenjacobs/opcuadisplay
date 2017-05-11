@@ -3,7 +3,7 @@ package me.steffenjacobs.opcuadisplay.shared.util.opcua.xml;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -34,23 +34,28 @@ import me.steffenjacobs.opcuadisplay.shared.domain.generated.ListOfReferences;
 import me.steffenjacobs.opcuadisplay.shared.domain.generated.NodeIdAlias;
 import me.steffenjacobs.opcuadisplay.shared.domain.generated.Reference;
 import me.steffenjacobs.opcuadisplay.shared.domain.generated.UADataType;
-import me.steffenjacobs.opcuadisplay.shared.domain.generated.UAInstance;
 import me.steffenjacobs.opcuadisplay.shared.domain.generated.UAMethod;
 import me.steffenjacobs.opcuadisplay.shared.domain.generated.UANode;
 import me.steffenjacobs.opcuadisplay.shared.domain.generated.UANodeSet;
 import me.steffenjacobs.opcuadisplay.shared.domain.generated.UAObject;
 import me.steffenjacobs.opcuadisplay.shared.domain.generated.UAObjectType;
 import me.steffenjacobs.opcuadisplay.shared.domain.generated.UAReferenceType;
-import me.steffenjacobs.opcuadisplay.shared.domain.generated.UAType;
 import me.steffenjacobs.opcuadisplay.shared.domain.generated.UAVariable;
 import me.steffenjacobs.opcuadisplay.shared.domain.generated.UAVariableType;
 import me.steffenjacobs.opcuadisplay.shared.domain.generated.UAView;
+import me.steffenjacobs.opcuadisplay.shared.util.Tuple2;
+import me.steffenjacobs.opcuadisplay.shared.util.opcua.NodeNavigator;
 
 public class XmlImport {
 
-	private AliasTable aliases;
-	
 	private static XmlImport instance;
+
+	private AliasTable aliases;
+	private final ArrayList<Tuple2<Reference, CachedReference>> referencesForStep2 = new ArrayList<>();
+
+	private final List<Tuple2<CachedReference, CachedReference>> referencesForStep3 = new ArrayList<>();
+
+	private final HashMap<NodeId, CachedBaseNode> loadedNodes = new HashMap<>();
 
 	private XmlImport() {
 		// singleton
@@ -62,7 +67,7 @@ public class XmlImport {
 		}
 		return instance;
 	}
-	
+
 	public CachedBaseNode parseFile(String xmlFile) {
 		try {
 			// create JAXB context and instantiate marshaller
@@ -72,21 +77,32 @@ public class XmlImport {
 			UANodeSet nodeSet = (UANodeSet) um.unmarshal(new FileReader(xmlFile));
 
 			this.aliases = nodeSet.getAliases();
-			List<UANode> nodes = nodeSet.getUAObjectOrUAVariableOrUAMethod();
+			CopyOnWriteArrayList<UANode> nodes = new CopyOnWriteArrayList<>();
+			nodes.addAll(nodeSet.getUAObjectOrUAVariableOrUAMethod());
 
-			CachedBaseNode objectFolder = buildObjectTree(nodes);
+			CachedBaseNode rootFolder = buildFullTree(nodes);
 
-			return objectFolder;
+			return rootFolder;
 		} catch (JAXBException | FileNotFoundException e) {
 			e.printStackTrace();
 		}
 
 		return null;
 	}
-	
-	private CachedBaseNode buildObjectTree(List<UANode> nodes) {
 
-		List<CachedBaseNode> linkedNodes = new CopyOnWriteArrayList<>();
+	private CachedBaseNode buildFullTree(List<UANode> nodes) {
+		CachedObjectNode root = CachedBaseNode.createNewRoot();
+		loadedNodes.put(root.getNodeId(), root);
+
+		buildReferenceBased(root, nodes);
+		parseReferencesStep2();
+		parseReferencesStep3();
+
+		return root;
+	}
+
+	private CachedBaseNode buildObjectTree(List<UANode> nodes) {
+		// create object node
 		CachedObjectNode objectBase = new CachedObjectNode(Identifiers.ObjectsFolder);
 		objectBase.setBrowseName(new QualifiedName(0, "Objects"));
 		objectBase.setDescription(new LocalizedText("en",
@@ -96,51 +112,52 @@ public class XmlImport {
 		objectBase.setUserWriteMask(UInteger.valueOf(0));
 		objectBase.setWriteMask(UInteger.valueOf(0));
 
-		linkedNodes.add(objectBase);
+		return buildReferenceBased(objectBase, nodes);
+	}
 
-		boolean changed = true;
-		while (changed) {
-			changed = false;
-			Iterator<UANode> it = nodes.iterator();
-			while (it.hasNext()) {
-				UANode node = it.next();
-
-				NodeId parent;
-				if (node instanceof UAInstance) {
-					try{
-					parent = NodeId.parse(((UAInstance) node).getParentNodeId());
-					}
-					catch(NullPointerException ne){
-						//no parent
-						continue;
-					}
-				} else if (node instanceof UAType) {
-					// TODO
+	/**
+	 * build the tree based on the references of the root node. Nodes are
+	 * resolved via the refNode of the references recursively.<br/>
+	 * CachedReferences are added, but not BrowseName and TypeDefinition of
+	 * CachedReferences can only be set, after this process has finished.
+	 * 
+	 * @param root
+	 *            the start node
+	 * @param nodes
+	 *            a list of the loaded nodes that should be mapped to a tree
+	 *            structure
+	 * @return <i>root</i>
+	 */
+	private CachedBaseNode buildReferenceBased(CachedBaseNode root, List<UANode> nodes) {
+		for (CachedReference cr : root.getReferences()) {
+			if (NodeNavigator.getInstance().isHierarchicalReference(cr.getReferenceType())) {
+				UANode child = findByNodeId(nodes, cr.getRefNodeId());
+				if (child == null) {
+					System.out.println("Error: Node not found: " + cr.getReferenceType() + " - " + cr.getRefNodeId());
 					continue;
 				}
 
-				else {
-					System.out.println(node.getClass().getName());
-					continue;
-				}
-				for (CachedBaseNode cbn : linkedNodes) {
-					// TODO: check, if this works with namespaces...
-					if (cbn.getNodeId().equals(parent)) {
-						CachedBaseNode newNode = parseNode(0, node);
-						cbn.addChild(newNode);
-						linkedNodes.add(newNode);
-						it.remove();
-						changed = true;
-						break;
-					}
-				}
+				CachedBaseNode childNode = parseNode(0, child);
+				root.addChild(childNode);
+				childNode.setParent(root);
+				loadedNodes.put(childNode.getNodeId(), childNode);
 
+				nodes.remove(child);
+
+				buildReferenceBased(childNode, nodes);
 			}
 		}
-
-		return objectBase;
+		return root;
 	}
-	
+
+	/**
+	 * @return the UANode from the <i>list</i>, associated with the given
+	 *         <i>nodeId</i>
+	 */
+	private UANode findByNodeId(List<UANode> list, NodeId nodeId) {
+		return list.stream().filter(x -> parseNodeId(0, x.getNodeId()).equals(nodeId)).findAny().orElse(null);
+	}
+
 	private CachedBaseNode parseNode(int namespaceIndex, UANode uaNode) {
 
 		CachedBaseNode cbn = null;
@@ -268,11 +285,15 @@ public class XmlImport {
 		cbn.setWriteMask(UInteger.valueOf(uaNode.getWriteMask()));
 
 		// references
-		cbn.setReferences(parseReferences(uaNode.getReferences()));
+		cbn.setReferences(parseReferencesStep1(uaNode.getReferences()));
 
 		return cbn;
 	}
 
+	/**
+	 * @return the NodeId object from the namespaceIndex and a String <i>str
+	 *         (i=[0-9]*)</i>
+	 */
 	private NodeId parseNodeId(int namespaceIndex, String str) {
 		try {
 			return NodeId.parse("ns=" + namespaceIndex + ";" + str);
@@ -283,13 +304,47 @@ public class XmlImport {
 		}
 	}
 
-	private List<CachedReference> parseReferences(ListOfReferences refs) {
+	/**
+	 * ReferenceType and ReferredNodeId are set here, while the BrowseName and
+	 * the TypeDefinition are set in steps 2 and 3.
+	 * 
+	 * @return a list of CachedReferences from <i>ref</i>. *
+	 */
+	private List<CachedReference> parseReferencesStep1(ListOfReferences refs) {
 		List<CachedReference> list = new ArrayList<>();
 		for (Reference ref : refs.getReference()) {
-			CachedReference cr = new CachedReference(ref.getReferenceType(), new QualifiedName(0,"null-name"), "null", NodeId.parse(ref.getValue()));
+			CachedReference cr = new CachedReference(ref.getReferenceType(), new QualifiedName(0, "null-name"), "null",
+					NodeId.parse(ref.getValue()));
 			list.add(cr);
+			referencesForStep2.add(new Tuple2<Reference, CachedReference>(ref, cr));
 		}
 		return list;
+	}
+
+	/** set BrowseName, which is the browse name of the associated child node */
+	private void parseReferencesStep2() {
+		referencesForStep2.forEach(t -> {
+
+			NodeId nid = parseNodeId(0, t.getX().getValue());
+			CachedBaseNode refNode = loadedNodes.get(nid);
+			if (refNode != null) {
+				t.getY().setBrowseName(refNode.getBrowseName());
+
+				NodeNavigator.getInstance().getTypeDefinition(refNode).ifPresent(
+						cr -> referencesForStep3.add(new Tuple2<CachedReference, CachedReference>(t.getY(), cr)));
+			}
+		});
+	}
+
+	/**
+	 * set TypeDefinition, which is the BrowseName of the reference
+	 * HasTypeDefinition of the associated child node
+	 */
+	private void parseReferencesStep3() {
+		referencesForStep3.forEach(t -> {
+
+			t.getX().setTypeDefinition(t.getY().getBrowseName().getName());
+		});
 	}
 
 	private LocalizedText parseLocalizedText(me.steffenjacobs.opcuadisplay.shared.domain.generated.LocalizedText lt) {
