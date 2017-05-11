@@ -52,6 +52,7 @@ import me.steffenjacobs.opcuadisplay.wizard.imp.OpcUaImportWizard;
 import me.steffenjacobs.opcuadisplay.wizard.imp.events.ImportWizardCancelEvent;
 import me.steffenjacobs.opcuadisplay.wizard.imp.events.ImportWizardFinishEvent;
 import me.steffenjacobs.opcuadisplay.wizard.imp.events.ImportWizardOpenEvent;
+import me.steffenjacobs.opcuadisplay.wizard.newProject.events.NewProjectWizardFinishEvent;
 
 /**
  * This sample class demonstrates how to plug-in a new workbench view. The view
@@ -193,6 +194,16 @@ public class OpcUaExplorerView extends CloseableView {
 						onExportWizardFinish(event.getUrl());
 					}
 				});
+
+		// listener for create-new wizard
+		EventBus.getInstance().addListener(this, NewProjectWizardFinishEvent.IDENTIFIER,
+				new EventListener<NewProjectWizardFinishEvent>() {
+					@Override
+					public void onAction(NewProjectWizardFinishEvent event) {
+						System.out.println(event.isGenerateFolders() + " - " + event.isGenerateBaseTypes());
+						onNewProjectWizardFinish(event.isGenerateFolders(), event.isGenerateBaseTypes());
+					}
+				});
 	}
 
 	public void onChangeSelectedNode(ChangeSelectedNodeEvent event) {
@@ -305,6 +316,48 @@ public class OpcUaExplorerView extends CloseableView {
 			protected IStatus run(IProgressMonitor monitor) {
 				try {
 					XmlExport.getInstance().writeToFile(exportUrl, NodeNavigator.getInstance().getRoot());
+					return Status.OK_STATUS;
+				} catch (Exception e) {
+					e.printStackTrace();
+					Display.getDefault().syncExec(new Runnable() {
+						@Override
+						public void run() {
+							MessageDialog.openError(new Shell(), "OPC UA Display", e.getLocalizedMessage());
+						}
+					});
+					return Status.CANCEL_STATUS;
+				}
+			}
+		};
+
+		job.setUser(true);
+		job.schedule();
+	}
+
+	/** can be called, after the new project wizard has finished */
+	private void onNewProjectWizardFinish(boolean generateFolders, boolean generateBaseTypes) {
+		Job job = new Job("Generating OPC UA nodes...") {
+			@Override
+			protected IStatus run(IProgressMonitor monitor) {
+				try {
+					if (!generateFolders) {
+						NodeNavigator.getInstance().setRoot(CachedBaseNode.createNewRoot());
+
+					} else {
+						if (!generateBaseTypes) {
+							NodeGenerator.getInstance().generateFolders();
+						} else {
+							NodeGenerator.getInstance().generateBaseTypes();
+						}
+					}
+
+					Display.getDefault().syncExec(new Runnable() {
+						@Override
+						public void run() {
+							EventBus.getInstance()
+									.fireEvent(new RootUpdatedEvent(NodeNavigator.getInstance().getRoot()));
+						}
+					});
 					return Status.OK_STATUS;
 				} catch (Exception e) {
 					e.printStackTrace();

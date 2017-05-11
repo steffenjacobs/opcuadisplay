@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<UANodeSet xmlns="http://opcfoundation.org/UA/2011/03/UANodeSet.xsd">
+    <UAObject EventNotifier="0" NodeId="i=84" BrowseName="Root" WriteMask="0" UserWriteMask="0">
+        <DisplayName Locale="en">Root</DisplayName>
+        <Description Locale="en">The root of the server address space.</Description>
+        <References/>
+    </UAObject>
+    <UAObject EventNotifier="0" ParentNodeId="i=84" NodeId="i=85" BrowseName="Objects" WriteMask="0" UserWriteMask="0">
+        <DisplayName Locale="">Objects</DisplayName>
+        <Description Locale="">The browse entry point when looking for objects in the server address space.</Description>
+        <References/>
+    </UAObject>
+    <UAObject EventNotifier="0" ParentNodeId="i=84" NodeId="i=86" BrowseName="Types" WriteMask="0" UserWriteMask="0">
+        <DisplayName Locale="">Types</DisplayName>
+        <Description Locale="">The browse entry point when looking for types in the server address space.</Description>
+        <References/>
+    </UAObject>
+    <UAObject EventNotifier="0" ParentNodeId="i=86" NodeId="i=88" BrowseName="ObjectTypes" WriteMask="0" UserWriteMask="0">
+        <DisplayName Locale="">ObjectTypes</DisplayName>
+        <Description Locale="">The browse entry point when looking for object types in the server address space.</Description>
+        <References/>
+    </UAObject>
+    <UAObject EventNotifier="0" ParentNodeId="i=86" NodeId="i=89" BrowseName="VariableTypes" WriteMask="0" UserWriteMask="0">
+        <DisplayName Locale="">VariableTypes</DisplayName>
+        <Description Locale="">The browse entry point when looking for variable types in the server address space.</Description>
+        <References/>
+    </UAObject>
+    <UAObject EventNotifier="0" ParentNodeId="i=86" NodeId="i=90" BrowseName="DataTypes" WriteMask="0" UserWriteMask="0">
+        <DisplayName Locale="">DataTypes</DisplayName>
+        <Description Locale="">The browse entry point when looking for data types in the server address space.</Description>
+        <References/>
+    </UAObject>
+    <UAObject EventNotifier="0" ParentNodeId="i=86" NodeId="i=91" BrowseName="ReferenceTypes" WriteMask="0" UserWriteMask="0">
+        <DisplayName Locale="">ReferenceTypes</DisplayName>
+        <Description Locale="">The browse entry point when looking for reference types in the server address space.</Description>
+        <References/>
+    </UAObject>
+    <UAObject EventNotifier="0" ParentNodeId="i=86" NodeId="i=3048" BrowseName="EventTypes" WriteMask="0" UserWriteMask="0">
+        <DisplayName Locale="">EventTypes</DisplayName>
+        <Description Locale=""></Description>
+        <References/>
+    </UAObject>
+    <UAObject EventNotifier="0" ParentNodeId="i=84" NodeId="i=87" BrowseName="Views" WriteMask="0" UserWriteMask="0">
+        <DisplayName Locale="">Views</DisplayName>
+        <Description Locale="">The browse entry point when looking for views in the server address space.</Description>
+        <References/>
+    </UAObject>
+</UANodeSet>

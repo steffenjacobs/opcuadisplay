@@ -69,6 +69,23 @@
             
       </wizard>      
    </extension>
+   
+   <extension point="org.eclipse.ui.newWizards">
+      <category
+            name="OPC UA"
+            id="me.steffenjacobs.opcuadisplay">
+      </category>
+      
+      <wizard
+            name="OPC UA Model"
+            class="me.steffenjacobs.opcuadisplay.wizard.newProject.NewProjectWizard"
+            category="me.steffenjacobs.opcuadisplay"
+            icon="icons/opcua.png"
+            id="me.steffenjacobs.opcuadisplay.wizard.newProject.NewProjectWizard">
+            
+      </wizard>      
+   </extension>
+   
    <extension
          point="org.eclipse.ui.perspectives">
       <perspective

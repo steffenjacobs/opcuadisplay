@@ -1,5 +1,6 @@
 package me.steffenjacobs.opcuadisplay.shared.util.opcua;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,6 +21,7 @@ import me.steffenjacobs.opcuadisplay.shared.domain.CachedVariableNode;
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedVariableTypeNode;
 import me.steffenjacobs.opcuadisplay.shared.util.EventBus;
 import me.steffenjacobs.opcuadisplay.shared.util.opcua.NodeNavigator.NodeManipulator;
+import me.steffenjacobs.opcuadisplay.shared.util.opcua.xml.XmlImport;
 import me.steffenjacobs.opcuadisplay.views.attribute.events.AttributeModifiedEvent;
 import me.steffenjacobs.opcuadisplay.views.explorer.dialogs.DialogFactory.AddDialogType;
 import me.steffenjacobs.opcuadisplay.views.explorer.domain.MethodArgument;
@@ -183,6 +185,16 @@ public class NodeGenerator {
 					typeDefinition != null ? typeDefinition.getBrowseName().getName() : null, child.getNodeId());
 		}
 		return null;
+	}
+
+	public void generateBaseTypes() {
+		InputStream is = this.getClass().getClassLoader().getResourceAsStream("base.xml");
+		NodeNavigator.getInstance().setRoot(XmlImport.getInstance().parseFile(is));
+	}
+
+	public void generateFolders() {
+		InputStream is = this.getClass().getClassLoader().getResourceAsStream("folders.xml");
+		NodeNavigator.getInstance().setRoot(XmlImport.getInstance().parseFile(is));
 	}
 
 	public void insertNode(CachedBaseNode child, CachedBaseNode parent) {

@@ -2,6 +2,9 @@ package me.steffenjacobs.opcuadisplay.shared.util.opcua.xml;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -69,13 +72,13 @@ public class XmlImport {
 		return instance;
 	}
 
-	public CachedBaseNode parseFile(String xmlFile) {
+	public CachedBaseNode parseFile(Reader xmlReader) {
 		try {
 			// create JAXB context and instantiate marshaller
 			JAXBContext context = JAXBContext.newInstance(UANodeSet.class);
 
 			Unmarshaller um = context.createUnmarshaller();
-			UANodeSet nodeSet = (UANodeSet) um.unmarshal(new FileReader(xmlFile));
+			UANodeSet nodeSet = (UANodeSet) um.unmarshal(xmlReader);
 
 			this.aliases = nodeSet.getAliases();
 			CopyOnWriteArrayList<UANode> nodes = new CopyOnWriteArrayList<>();
@@ -84,12 +87,26 @@ public class XmlImport {
 			CachedBaseNode rootFolder = buildFullTree(nodes);
 
 			return rootFolder;
-		} catch (JAXBException | FileNotFoundException e) {
+		} catch (JAXBException e) {
 			Activator.openMessageBox("Error importing XML", e.getLocalizedMessage());
 			e.printStackTrace();
 		}
 
 		return null;
+	}
+
+	public CachedBaseNode parseFile(String xmlFile) {
+		try {
+			return parseFile(new FileReader(xmlFile));
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	public CachedBaseNode parseFile(InputStream is) {
+		return parseFile(new InputStreamReader(is));
 	}
 
 	private CachedBaseNode buildFullTree(List<UANode> nodes) {
