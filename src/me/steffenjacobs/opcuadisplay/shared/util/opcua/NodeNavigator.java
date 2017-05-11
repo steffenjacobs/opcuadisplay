@@ -23,6 +23,10 @@ public class NodeNavigator {
 		void manipulate(CachedBaseNode cbn);
 	}
 
+	private static final String[] HIERARCHICAL_REFERENCES = new String[]
+		{ "HasChild", "Aggregates", "HasComponent", "HasOrderedComponent", "HasHistoricalConfiguration", "HasProperty",
+				"HasSubtype", "HasEventSource", "HasNotifier", "Organizes" };
+
 	private static NodeNavigator instance;
 
 	private CachedBaseNode root;
@@ -200,6 +204,16 @@ public class NodeNavigator {
 		default:
 			return false;
 		}
+	}
+
+	public boolean isHierarchicalReference(String referenceType) {
+
+		for (String s : HIERARCHICAL_REFERENCES) {
+			if (s.equals(referenceType)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public void iterateNodes(CachedBaseNode parent, NodeManipulator nm) {
