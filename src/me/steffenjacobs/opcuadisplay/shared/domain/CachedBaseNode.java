@@ -28,22 +28,22 @@ public class CachedBaseNode {
 
 	private List<CachedReference> references;
 
-	private static CachedBaseNode noDataDummy, loadingDummy;
+	private static CachedObjectNode noDataDummy, loadingDummy;
 
-	public static CachedBaseNode getDummyNoData() {
+	public static CachedObjectNode getDummyNoData() {
 		if (noDataDummy == null) {
-			noDataDummy = new CachedBaseNode("Double click here, to load variables.");
+			noDataDummy = new CachedObjectNode("Double click here, to load variables.");
 		}
 		return noDataDummy;
 	}
 
-	public static CachedBaseNode createEmptyDummy() {
-		return new CachedBaseNode("");
+	public static CachedObjectNode createEmptyDummy() {
+		return new CachedObjectNode("");
 	}
 
-	public static CachedBaseNode getDummyLoading() {
+	public static CachedObjectNode getDummyLoading() {
 		if (loadingDummy == null) {
-			loadingDummy = new CachedBaseNode("Loading variables...");
+			loadingDummy = new CachedObjectNode("Loading variables...");
 		}
 		return loadingDummy;
 	}
@@ -63,7 +63,7 @@ public class CachedBaseNode {
 		this.references = references;
 	}
 
-	private CachedBaseNode(String text) {
+	protected CachedBaseNode(String text) {
 		nodeId = new NodeId(0, 0);
 		nodeClass = NodeClass.Unspecified;
 		browseName = new QualifiedName(0, "Dummy");

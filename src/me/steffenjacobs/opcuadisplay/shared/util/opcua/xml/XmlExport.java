@@ -45,7 +45,7 @@ import me.steffenjacobs.opcuadisplay.shared.util.opcua.NodeNavigator.NodeManipul
 public class XmlExport {
 
 	public static void main(String[] args) {
-		CachedBaseNode cbn = XmlImport.getInstance().parseFile("C:/Users/sjacobs/Desktop/dump.xml");
+		CachedBaseNode cbn = XmlImport.getInstance().parseFile("C:/Users/sjacobs/Desktop/dump.xml", false);
 		XmlExport.getInstance().writeToFile("C:/Users/sjacobs/Desktop/dump.xml2", cbn);
 	}
 

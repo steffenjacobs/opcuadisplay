@@ -66,7 +66,7 @@ public class StandaloneNodeExplorerClient {
 	 * @return all nodes from an opc server specified in <i>url</i> linked to
 	 *         their parents
 	 */
-	public CachedBaseNode retrieveNodes(String url, final IProgressMonitor monitor) throws Exception {
+	public CachedObjectNode retrieveNodes(String url, final IProgressMonitor monitor) throws Exception {
 		NodeNavigator.getInstance().resetHighestNodeId();
 
 		monitor.beginTask("Establishing connection with " + url + "...", 2);
@@ -89,7 +89,7 @@ public class StandaloneNodeExplorerClient {
 
 		monitor.beginTask("Downloading Models...", 100);
 		// receive sub folders of root
-		final CachedBaseNode root = retrieveNodes(NodeGenerator.getInstance().generateRoot(), client, false);
+		final CachedObjectNode root = (CachedObjectNode) retrieveNodes(NodeGenerator.getInstance().generateRoot(), client, false);
 
 		toList(root.getChildren()).forEach(root_xxx -> {
 

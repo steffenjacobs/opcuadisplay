@@ -10,6 +10,7 @@ import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
@@ -19,6 +20,7 @@ import org.eclipse.swt.widgets.Text;
 public class XmlPage extends WizardPage {
 
 	private Text textUrl;
+	private Button checkboxBaseTypesImplicit;
 	private Composite container;
 	private boolean isImport;
 
@@ -91,6 +93,11 @@ public class XmlPage extends WizardPage {
 
 		textUrl.setFocus();
 		textUrl.setSelection(0, textUrl.getText().length());
+		
+		checkboxBaseTypesImplicit = new Button(container, SWT.CHECK);
+		
+		checkboxBaseTypesImplicit.setText("Base Types implicit");
+		checkboxBaseTypesImplicit.setSelection(true);
 
 		// required to avoid an error in the system
 		setControl(container);
@@ -125,5 +132,9 @@ public class XmlPage extends WizardPage {
 
 	public String getUrl() {
 		return textUrl.getText();
+	}
+	
+	public boolean isBaseTypesImplicit(){
+		return checkboxBaseTypesImplicit.getSelection();
 	}
 }

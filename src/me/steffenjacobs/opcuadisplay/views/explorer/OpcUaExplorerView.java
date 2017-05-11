@@ -31,6 +31,7 @@ import org.eclipse.ui.PlatformUI;
 
 import me.steffenjacobs.opcuadisplay.Activator;
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedBaseNode;
+import me.steffenjacobs.opcuadisplay.shared.domain.CachedObjectNode;
 import me.steffenjacobs.opcuadisplay.shared.util.EventBus;
 import me.steffenjacobs.opcuadisplay.shared.util.EventBus.Event;
 import me.steffenjacobs.opcuadisplay.shared.util.EventBus.EventListener;
@@ -84,7 +85,7 @@ public class OpcUaExplorerView extends CloseableView {
 	private Action removeAction;
 	private OpcUaConnector connector;
 
-	private CachedBaseNode cachedRoot;
+	private CachedObjectNode cachedRoot;
 
 	@Override
 	public String getIdentifier() {
@@ -182,7 +183,7 @@ public class OpcUaExplorerView extends CloseableView {
 				new EventListener<ImportWizardFinishEvent>() {
 					@Override
 					public void onAction(ImportWizardFinishEvent event) {
-						onWizardFinish(event.getUrl(), event.isServer());
+						onImportWizardFinish(event.getUrl(), event.isServer(), event.isBaseDataTypesImplicit());
 					}
 				});
 
@@ -376,13 +377,13 @@ public class OpcUaExplorerView extends CloseableView {
 	}
 
 	/** can be called, after the import wizard has finished */
-	public void onWizardFinish(String importUrl, boolean server) {
+	public void onImportWizardFinish(String importUrl, boolean server, final boolean baseDataTypesImplicit) {
 		if (!server) {
 			Job job = new Job("Importing OPC UA nodes...") {
 				@Override
 				protected IStatus run(IProgressMonitor monitor) {
 					try {
-						NodeNavigator.getInstance().setRoot(XmlImport.getInstance().parseFile(importUrl));
+						NodeNavigator.getInstance().setRoot(XmlImport.getInstance().parseFile(importUrl, baseDataTypesImplicit));
 
 						Display.getDefault().syncExec(new Runnable() {
 							@Override

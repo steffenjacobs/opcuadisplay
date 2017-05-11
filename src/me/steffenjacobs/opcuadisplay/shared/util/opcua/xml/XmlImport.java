@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -50,6 +51,7 @@ import me.steffenjacobs.opcuadisplay.shared.domain.generated.UAView;
 import me.steffenjacobs.opcuadisplay.shared.util.Tuple2;
 import me.steffenjacobs.opcuadisplay.shared.util.opcua.NodeGenerator;
 import me.steffenjacobs.opcuadisplay.shared.util.opcua.NodeNavigator;
+import me.steffenjacobs.opcuadisplay.shared.util.opcua.NodeNavigator.NodeManipulator;
 
 public class XmlImport {
 
@@ -73,7 +75,7 @@ public class XmlImport {
 		return instance;
 	}
 
-	public CachedBaseNode parseFile(Reader xmlReader) {
+	public CachedObjectNode parseFile(Reader xmlReader, boolean baseDataTypesImplicit) {
 		try {
 			// create JAXB context and instantiate marshaller
 			JAXBContext context = JAXBContext.newInstance(UANodeSet.class);
@@ -85,7 +87,7 @@ public class XmlImport {
 			CopyOnWriteArrayList<UANode> nodes = new CopyOnWriteArrayList<>();
 			nodes.addAll(nodeSet.getUAObjectOrUAVariableOrUAMethod());
 
-			CachedBaseNode rootFolder = buildFullTree(nodes);
+			CachedObjectNode rootFolder = buildFullTree(nodes, baseDataTypesImplicit);
 
 			return rootFolder;
 		} catch (JAXBException e) {
@@ -96,9 +98,9 @@ public class XmlImport {
 		return null;
 	}
 
-	public CachedBaseNode parseFile(String xmlFile) {
+	public CachedObjectNode parseFile(String xmlFile, boolean baseDataTypesImplicit) {
 		try {
-			return parseFile(new FileReader(xmlFile));
+			return parseFile(new FileReader(xmlFile), baseDataTypesImplicit);
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -106,13 +108,26 @@ public class XmlImport {
 		return null;
 	}
 
-	public CachedBaseNode parseFile(InputStream is) {
-		return parseFile(new InputStreamReader(is));
+	public CachedObjectNode parseFile(InputStream is, boolean baseDataTypesImplicit) {
+		return parseFile(new InputStreamReader(is), baseDataTypesImplicit);
 	}
 
-	private CachedBaseNode buildFullTree(List<UANode> nodes) {
-		CachedObjectNode root = NodeGenerator.getInstance().generateRoot();
-		loadedNodes.put(root.getNodeId(), root);
+	private CachedObjectNode buildFullTree(List<UANode> nodes, boolean baseDataTypesImplicit) {
+		CachedObjectNode root;
+		if (baseDataTypesImplicit) {
+			NodeGenerator.getInstance().generateBaseTypes();
+			root = NodeNavigator.getInstance().getRoot();
+			NodeNavigator.getInstance().iterateNodes(root, new NodeManipulator() {
+
+				@Override
+				public void manipulate(CachedBaseNode cbn) {
+					loadedNodes.put(cbn.getNodeId(), cbn);
+				}
+			});
+		} else {
+			root = NodeGenerator.getInstance().generateRoot();
+			loadedNodes.put(root.getNodeId(), root);
+		}
 
 		buildReferenceBased(root, nodes);
 		parseReferencesStep2();
@@ -149,7 +164,9 @@ public class XmlImport {
 	 * @return <i>root</i>
 	 */
 	private CachedBaseNode buildReferenceBased(CachedBaseNode root, List<UANode> nodes) {
-		for (CachedReference cr : root.getReferences()) {
+		Iterator<CachedReference> it = root.getReferences().iterator();
+		while (it.hasNext()) {
+			CachedReference cr = it.next();
 			if (NodeNavigator.getInstance().isHierarchicalReference(cr.getReferenceType())) {
 				UANode child = findByNodeId(nodes, cr.getRefNodeId());
 				if (child == null) {
@@ -158,8 +175,7 @@ public class XmlImport {
 				}
 
 				CachedBaseNode childNode = parseNode(0, child);
-				root.addChild(childNode);
-				childNode.setParent(root);
+				childNode = NodeGenerator.getInstance().mergeInsertNode(childNode, root);
 				loadedNodes.put(childNode.getNodeId(), childNode);
 
 				nodes.remove(child);
@@ -331,7 +347,7 @@ public class XmlImport {
 	 * @return a list of CachedReferences from <i>ref</i>. *
 	 */
 	private List<CachedReference> parseReferencesStep1(ListOfReferences refs) {
-		List<CachedReference> list = new ArrayList<>();
+		List<CachedReference> list = new CopyOnWriteArrayList<CachedReference>();
 		for (Reference ref : refs.getReference()) {
 			CachedReference cr = new CachedReference(ref.getReferenceType(), new QualifiedName(0, "null-name"), "null",
 					NodeId.parse(ref.getValue()));

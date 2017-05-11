@@ -16,6 +16,7 @@ import org.eclipse.milo.opcua.stack.core.types.enumerated.IdType;
 import com.google.common.collect.Lists;
 
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedBaseNode;
+import me.steffenjacobs.opcuadisplay.shared.domain.CachedObjectNode;
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedReference;
 
 public class NodeNavigator {
@@ -30,7 +31,7 @@ public class NodeNavigator {
 
 	private static NodeNavigator instance;
 
-	private CachedBaseNode root;
+	private CachedObjectNode root;
 
 	// does not work for multiple clients simultaniously!
 	private AtomicInteger highestNodeId = new AtomicInteger(-1);
@@ -47,7 +48,7 @@ public class NodeNavigator {
 	}
 
 	/** @return the root node */
-	public CachedBaseNode getRoot() {
+	public CachedObjectNode getRoot() {
 		return root;
 	}
 
@@ -81,7 +82,7 @@ public class NodeNavigator {
 		return node;
 	}
 
-	public void setRoot(CachedBaseNode newRoot) {
+	public void setRoot(CachedObjectNode newRoot) {
 		this.root = newRoot;
 	}
 

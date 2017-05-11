@@ -4,7 +4,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.eclipse.swt.widgets.Display;
+
+import me.steffenjacobs.opcuadisplay.shared.util.opcua.NodeNavigator;
 import me.steffenjacobs.opcuadisplay.views.CloseableView;
+import me.steffenjacobs.opcuadisplay.views.explorer.events.RootUpdatedEvent;
 
 public class EventBus {
 
@@ -37,10 +41,15 @@ public class EventBus {
 	}
 
 	public void fireEvent(Event event) {
-		List<EventListener<Event>> list = listeners.get(event.identifier);
-		if (list != null) {
-			list.forEach(l -> l.onAction(event));
-		}
+		Display.getDefault().syncExec(new Runnable() {
+			@Override
+			public void run() {
+				List<EventListener<Event>> list = listeners.get(event.identifier);
+				if (list != null) {
+					list.forEach(l -> l.onAction(event));
+				}
+			}
+		});
 	}
 
 	@SuppressWarnings("unchecked")

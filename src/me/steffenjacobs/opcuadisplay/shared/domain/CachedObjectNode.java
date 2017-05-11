@@ -21,6 +21,11 @@ public class CachedObjectNode extends CachedBaseNode {
 		super(node);
 		this.eventNotifier = FutureResolver.resolveFutureSafe(node.getEventNotifier());
 	}
+	
+	/**constructor for dummy nodes*/
+	protected CachedObjectNode(String name){
+		super(name);
+	}
 
 	public CachedObjectNode(NodeId nodeId) {
 		super(nodeId, NodeClass.Object);

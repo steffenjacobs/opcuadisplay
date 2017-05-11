@@ -8,12 +8,13 @@ public class ImportWizardFinishEvent extends Event {
 	public static String IDENTIFIER = "importWizardFinish";
 
 	private final String url;
-	private final boolean server;
+	private final boolean server, baseDataTypesImplicit;
 
-	public ImportWizardFinishEvent(String url, boolean server) {
+	public ImportWizardFinishEvent(String url, boolean server, boolean baseDataTypesImplicit) {
 		super(IDENTIFIER, EventArgs.NONE);
 		this.url = url;
 		this.server = server;
+		this.baseDataTypesImplicit = baseDataTypesImplicit;
 	}
 
 	public String getUrl() {
@@ -22,5 +23,9 @@ public class ImportWizardFinishEvent extends Event {
 
 	public boolean isServer() {
 		return server;
+	}
+
+	public boolean isBaseDataTypesImplicit() {
+		return baseDataTypesImplicit;
 	}
 }

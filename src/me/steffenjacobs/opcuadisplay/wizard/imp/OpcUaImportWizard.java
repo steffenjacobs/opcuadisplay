@@ -45,7 +45,7 @@ public class OpcUaImportWizard extends Wizard implements IWorkbenchWizard, Wizar
 
 	@Override
 	public boolean performFinish() {
-		EventBus.getInstance().fireEvent(new ImportWizardFinishEvent(this.getUrl(), this.isType()));
+		EventBus.getInstance().fireEvent(new ImportWizardFinishEvent(this.getUrl(), this.isType(), xmlPage.isBaseTypesImplicit()));
 		return true;
 	}
 

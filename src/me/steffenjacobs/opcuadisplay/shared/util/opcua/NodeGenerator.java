@@ -3,6 +3,7 @@ package me.steffenjacobs.opcuadisplay.shared.util.opcua;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 import org.eclipse.milo.opcua.stack.core.Identifiers;
@@ -210,26 +211,52 @@ public class NodeGenerator {
 				Identifiers.TypesFolder);
 		CachedReference ov = new CachedReference("Organizes", new QualifiedName(0, "Views"), "FolderType",
 				Identifiers.ViewsFolder);
-		root.setReferences(Lists.newArrayList(f, oo, ot, ov));
+
+		List<CachedReference> references = new CopyOnWriteArrayList<>();
+		references.add(f);
+		references.add(oo);
+		references.add(ot);
+		references.add(ov);
+		root.setReferences(references);
+
 		NodeNavigator.getInstance().setRoot(root);
 		return root;
 	}
 
 	public void generateBaseTypes() {
 		InputStream is = this.getClass().getClassLoader().getResourceAsStream("base.xml");
-		NodeNavigator.getInstance().setRoot(XmlImport.getInstance().parseFile(is));
+		NodeNavigator.getInstance().setRoot(XmlImport.getInstance().parseFile(is, false));
 	}
 
 	public void generateFolders() {
 		InputStream is = this.getClass().getClassLoader().getResourceAsStream("folders.xml");
-		NodeNavigator.getInstance().setRoot(XmlImport.getInstance().parseFile(is));
+		NodeNavigator.getInstance().setRoot(XmlImport.getInstance().parseFile(is, false));
+	}
+
+	public CachedBaseNode mergeInsertNode(CachedBaseNode child, CachedBaseNode parent) {
+		List<CachedBaseNode> children = Lists.newArrayList(parent.getChildren());
+		int index = children.indexOf(child);
+		// copy subchilds to merge existing base structure with loaded xml
+		// structure
+		if (index > -1) {
+			CachedBaseNode containedChild = children.get(index);
+			NodeMerger.getInstance().merge(containedChild, child);
+			for (CachedBaseNode childOfChild : child.getChildren()) {
+				return mergeInsertNode(childOfChild, containedChild);
+			}
+			return containedChild;
+		} else {
+			insertNode(child, parent);
+			return child;
+		}
 	}
 
 	public void insertNode(CachedBaseNode child, CachedBaseNode parent) {
+
 		parent.addChild(child);
 		child.setParent(parent);
 		CachedReference ref = getAssociatedReference(child, parent);
-		if (ref != null) {
+		if (ref != null && !parent.getReferences().contains(ref)) {
 			parent.getReferences().add(ref);
 		}
 

@@ -37,11 +37,11 @@ public class CachedReference {
 	public NodeId getRefNodeId() {
 		return refNodeId;
 	}
-	
+
 	public void setBrowseName(QualifiedName browseName) {
 		this.browseName = browseName;
 	}
-	
+
 	public void setTypeDefinition(String typeDefinition) {
 		this.typeDefinition = typeDefinition;
 	}
