@@ -4,6 +4,7 @@ import org.eclipse.milo.opcua.stack.core.Identifiers;
 import org.eclipse.milo.opcua.stack.core.types.enumerated.NodeClass;
 
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedBaseNode;
+import me.steffenjacobs.opcuadisplay.shared.util.opcua.NodeNavigator;
 
 public class ConstraintChecker {
 
@@ -23,13 +24,13 @@ public class ConstraintChecker {
 	// node cannot be root folder, a folder directly under the root or a folder
 	// directly under the Types folder
 	public boolean isRemovalAllowed(CachedBaseNode node) {
-		return !CachedBaseNode.getRoot().equals(node) && !CachedBaseNode.getRoot().equals(node.getParent())
+		return !NodeNavigator.getInstance().getRoot().equals(node) && !NodeNavigator.getInstance().getRoot().equals(node.getParent())
 				&& node.getParent() != null && !Identifiers.TypesFolder.equals(node.getParent().getNodeId());
 	}
 
 	// node cannot be root node or directly in types folder or a variable
 	public boolean isAddObjectAllowed(CachedBaseNode node) {
-		return !CachedBaseNode.getRoot().equals(node) && !Identifiers.TypesFolder.equals(node.getParent())
+		return !NodeNavigator.getInstance().getRoot().equals(node) && !Identifiers.TypesFolder.equals(node.getParent())
 				&& !NodeClass.Variable.equals(node.getNodeClass());
 	}
 
@@ -46,7 +47,7 @@ public class ConstraintChecker {
 
 	// node cannot be root node or directly in types folder or a variable
 	public boolean isAddMethodAllowed(CachedBaseNode node) {
-		return !CachedBaseNode.getRoot().equals(node) && !Identifiers.TypesFolder.equals(node.getParent())
+		return !NodeNavigator.getInstance().getRoot().equals(node) && !Identifiers.TypesFolder.equals(node.getParent())
 				&& !NodeClass.Variable.equals(node.getNodeClass());
 	}
 

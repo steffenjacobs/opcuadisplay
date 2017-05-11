@@ -89,7 +89,7 @@ public class StandaloneNodeExplorerClient {
 
 		monitor.beginTask("Downloading Models...", 100);
 		// receive sub folders of root
-		final CachedBaseNode root = retrieveNodes(CachedBaseNode.createNewRoot(), client, false);
+		final CachedBaseNode root = retrieveNodes(NodeGenerator.getInstance().generateRoot(), client, false);
 
 		toList(root.getChildren()).forEach(root_xxx -> {
 

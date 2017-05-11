@@ -48,6 +48,7 @@ import me.steffenjacobs.opcuadisplay.shared.domain.generated.UAVariable;
 import me.steffenjacobs.opcuadisplay.shared.domain.generated.UAVariableType;
 import me.steffenjacobs.opcuadisplay.shared.domain.generated.UAView;
 import me.steffenjacobs.opcuadisplay.shared.util.Tuple2;
+import me.steffenjacobs.opcuadisplay.shared.util.opcua.NodeGenerator;
 import me.steffenjacobs.opcuadisplay.shared.util.opcua.NodeNavigator;
 
 public class XmlImport {
@@ -110,7 +111,7 @@ public class XmlImport {
 	}
 
 	private CachedBaseNode buildFullTree(List<UANode> nodes) {
-		CachedObjectNode root = CachedBaseNode.createNewRoot();
+		CachedObjectNode root = NodeGenerator.getInstance().generateRoot();
 		loadedNodes.put(root.getNodeId(), root);
 
 		buildReferenceBased(root, nodes);

@@ -7,15 +7,11 @@ import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 import org.eclipse.milo.opcua.sdk.client.api.nodes.Node;
-import org.eclipse.milo.opcua.stack.core.Identifiers;
 import org.eclipse.milo.opcua.stack.core.types.builtin.LocalizedText;
 import org.eclipse.milo.opcua.stack.core.types.builtin.NodeId;
 import org.eclipse.milo.opcua.stack.core.types.builtin.QualifiedName;
-import org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.UByte;
 import org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.UInteger;
 import org.eclipse.milo.opcua.stack.core.types.enumerated.NodeClass;
-
-import com.google.common.collect.Lists;
 
 import me.steffenjacobs.opcuadisplay.shared.util.opcua.NodeNavigator;
 
@@ -34,8 +30,6 @@ public class CachedBaseNode {
 
 	private static CachedBaseNode noDataDummy, loadingDummy;
 
-	private static CachedObjectNode root;
-
 	public static CachedBaseNode getDummyNoData() {
 		if (noDataDummy == null) {
 			noDataDummy = new CachedBaseNode("Double click here, to load variables.");
@@ -43,38 +37,8 @@ public class CachedBaseNode {
 		return noDataDummy;
 	}
 
-	public static CachedObjectNode createNewRoot() {
-		root = new CachedObjectNode(Identifiers.RootFolder);
-
-		root.setBrowseName(new QualifiedName(0, "Root"));
-		root.setDescription(new LocalizedText("en", "The root of the server address space."));
-		root.setDisplayName(new LocalizedText("en", "Root"));
-		root.setWriteMask(UInteger.valueOf(0));
-		root.setUserWriteMask(UInteger.valueOf(0));
-		root.setChildren(new ArrayList<>());
-		root.setEventNotifier(UByte.valueOf(0));
-
-		CachedReference f = new CachedReference("HasTypeDefinition", new QualifiedName(0, "FolderType"), "null",
-				Identifiers.FolderType);
-		CachedReference oo = new CachedReference("Organizes", new QualifiedName(0, "Objects"), "FolderType",
-				Identifiers.ObjectsFolder);
-		CachedReference ot = new CachedReference("Organizes", new QualifiedName(0, "Types"), "FolderType",
-				Identifiers.TypesFolder);
-		CachedReference ov = new CachedReference("Organizes", new QualifiedName(0, "Views"), "FolderType",
-				Identifiers.ViewsFolder);
-		root.setReferences(Lists.newArrayList(f, oo, ot, ov));
-		return root;
-	}
-
 	public static CachedBaseNode createEmptyDummy() {
 		return new CachedBaseNode("");
-	}
-
-	public static CachedBaseNode getRoot() {
-		if (root == null) {
-			createNewRoot();
-		}
-		return root;
 	}
 
 	public static CachedBaseNode getDummyLoading() {
@@ -113,18 +77,6 @@ public class CachedBaseNode {
 		parent = null;
 
 	}
-
-	// public CachedBaseNode(ReferenceDescription descr) {
-	// children = new ArrayList<>();
-	// this.nodeId = descr.getNodeId().local().orElse(null);
-	// this.nodeClass = descr.getNodeClass();
-	// this.browseName = descr.getBrowseName();
-	// this.displayName = descr.getDisplayName();
-	// this.description = null;
-	// this.writeMask = null;
-	// this.userWriteMask = null;
-	// references = new ArrayList<>();
-	// }
 
 	public CachedBaseNode(Node node) throws InterruptedException, ExecutionException {
 		super();

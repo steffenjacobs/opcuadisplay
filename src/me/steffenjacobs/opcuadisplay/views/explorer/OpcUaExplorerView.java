@@ -340,7 +340,7 @@ public class OpcUaExplorerView extends CloseableView {
 			protected IStatus run(IProgressMonitor monitor) {
 				try {
 					if (!generateFolders) {
-						NodeNavigator.getInstance().setRoot(CachedBaseNode.createNewRoot());
+						NodeGenerator.getInstance().generateRoot();
 
 					} else {
 						if (!generateBaseTypes) {

@@ -5,8 +5,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.eclipse.milo.opcua.stack.core.Identifiers;
+import org.eclipse.milo.opcua.stack.core.types.builtin.LocalizedText;
 import org.eclipse.milo.opcua.stack.core.types.builtin.NodeId;
 import org.eclipse.milo.opcua.stack.core.types.builtin.QualifiedName;
+import org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.UByte;
+import org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.UInteger;
 import org.eclipse.milo.opcua.stack.core.types.enumerated.NodeClass;
 
 import com.google.common.collect.Lists;
@@ -185,6 +189,30 @@ public class NodeGenerator {
 					typeDefinition != null ? typeDefinition.getBrowseName().getName() : null, child.getNodeId());
 		}
 		return null;
+	}
+
+	public CachedObjectNode generateRoot() {
+		CachedObjectNode root = new CachedObjectNode(Identifiers.RootFolder);
+
+		root.setBrowseName(new QualifiedName(0, "Root"));
+		root.setDescription(new LocalizedText("en", "The root of the server address space."));
+		root.setDisplayName(new LocalizedText("en", "Root"));
+		root.setWriteMask(UInteger.valueOf(0));
+		root.setUserWriteMask(UInteger.valueOf(0));
+		root.setChildren(new ArrayList<>());
+		root.setEventNotifier(UByte.valueOf(0));
+
+		CachedReference f = new CachedReference("HasTypeDefinition", new QualifiedName(0, "FolderType"), "null",
+				Identifiers.FolderType);
+		CachedReference oo = new CachedReference("Organizes", new QualifiedName(0, "Objects"), "FolderType",
+				Identifiers.ObjectsFolder);
+		CachedReference ot = new CachedReference("Organizes", new QualifiedName(0, "Types"), "FolderType",
+				Identifiers.TypesFolder);
+		CachedReference ov = new CachedReference("Organizes", new QualifiedName(0, "Views"), "FolderType",
+				Identifiers.ViewsFolder);
+		root.setReferences(Lists.newArrayList(f, oo, ot, ov));
+		NodeNavigator.getInstance().setRoot(root);
+		return root;
 	}
 
 	public void generateBaseTypes() {
