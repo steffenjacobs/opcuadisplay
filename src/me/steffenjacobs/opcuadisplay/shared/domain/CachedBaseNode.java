@@ -43,7 +43,7 @@ public class CachedBaseNode {
 		return noDataDummy;
 	}
 
-	public static CachedBaseNode createNewRoot() {
+	public static CachedObjectNode createNewRoot() {
 		root = new CachedObjectNode(Identifiers.RootFolder);
 
 		root.setBrowseName(new QualifiedName(0, "Root"));
