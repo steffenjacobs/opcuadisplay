@@ -8,7 +8,11 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.MessageBox;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -86,6 +90,17 @@ public class Activator extends AbstractUIPlugin {
 		URL url = FileLocator.find(bundle, path, null);
 		ImageDescriptor desc = ImageDescriptor.createFromURL(url);
 		registry.put(strName, desc);
+	}
+
+	public static void openMessageBox(final String title, final String message) {
+		Display.getDefault().syncExec(new Runnable() {
+			public void run() {
+				MessageBox box = new MessageBox(new Shell(), SWT.ICON_ERROR);
+				box.setText(title);
+				box.setMessage(message);
+				box.open();
+			}
+		});
 	}
 
 	@Override

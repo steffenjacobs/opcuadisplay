@@ -40,13 +40,10 @@ import org.eclipse.milo.opcua.stack.core.types.enumerated.NodeClass;
 import org.eclipse.milo.opcua.stack.core.types.structured.BrowseDescription;
 import org.eclipse.milo.opcua.stack.core.types.structured.BrowseResult;
 import org.eclipse.milo.opcua.stack.core.types.structured.EndpointDescription;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.MessageBox;
-import org.eclipse.swt.widgets.Shell;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import me.steffenjacobs.opcuadisplay.Activator;
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedBaseNode;
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedDataTypeNode;
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedMethodNode;
@@ -439,16 +436,7 @@ public class StandaloneNodeExplorerClient {
 		return parent;
 	}
 
-	private static void openMessageBox(final String title, final String message) {
-		Display.getDefault().syncExec(new Runnable() {
-			public void run() {
-				MessageBox box = new MessageBox(new Shell(), SWT.ICON_ERROR);
-				box.setText(title);
-				box.setMessage(message);
-				box.open();
-			}
-		});
-	}
+	
 
 	/**
 	 * @return a preconfigured OpcUaClient not yet connected to <i>url</i> <br>
@@ -463,9 +451,9 @@ public class StandaloneNodeExplorerClient {
 			endpoints = UaTcpStackClient.getEndpoints(url).get();
 		} catch (Exception excep) {
 			if (excep.getMessage().startsWith("UaException: status=Bad_TcpEndpointUrlInvalid")) {
-				openMessageBox("OPC UA Display", "Invalid hostname: " + url);
+				Activator.openMessageBox("OPC UA Display", "Invalid hostname: " + url);
 			} else {
-				openMessageBox("OPC UA Display", excep.getLocalizedMessage());
+				Activator.openMessageBox("OPC UA Display", excep.getLocalizedMessage());
 			}
 			return null;
 		}
