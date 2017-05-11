@@ -79,7 +79,7 @@ public class DialogFactory {
 			return new SimpleAddDialog(new Shell(), type.getName(), type.getPathToBaseTypeNode(), new DialogListener() {
 				@Override
 				public void onOkSimple(int namespace, String name, int nodeId, CachedBaseNode typeN) {
-					NodeGenerator.createAndInsert(type, namespace, name, nodeId, typeN, selectedParent);
+					NodeGenerator.getInstance().createAndInsert(type, namespace, name, nodeId, typeN, selectedParent);
 				}
 			});
 		case METHOD:
@@ -87,7 +87,7 @@ public class DialogFactory {
 				@Override
 				public void onOkMethod(int namespace, String name, int nodeId, MethodArgument[] inputArgs,
 						MethodArgument[] outputArgs) {
-					NodeGenerator.createAndInsertMethod(namespace, name, nodeId, selectedParent, inputArgs, outputArgs);
+					NodeGenerator.getInstance().createAndInsertMethod(namespace, name, nodeId, selectedParent, inputArgs, outputArgs);
 				}
 			});
 

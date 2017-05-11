@@ -68,13 +68,13 @@ public class CachedMethodNode extends CachedBaseNode {
 				.navigateByName("Root/Types/DataTypes/BaseDataType/Structure/Argument");
 
 		if (inputArgs != null && inputArgs.length > 0) {
-			CachedVariableNode cvn = NodeGenerator.createAndInsertProperty(namespaceIndex, "InputArguments", nodeId,
+			CachedVariableNode cvn = NodeGenerator.getInstance().createAndInsertProperty(namespaceIndex, "InputArguments", nodeId,
 					argumentType, cmn);
 			cvn.setChildren(new ArrayList<>());
 		}
 
 		if (outputArgs != null && outputArgs.length > 0) {
-			CachedVariableNode cvn = NodeGenerator.createAndInsertProperty(namespaceIndex, "OutputArguments", nodeId,
+			CachedVariableNode cvn = NodeGenerator.getInstance().createAndInsertProperty(namespaceIndex, "OutputArguments", nodeId,
 					argumentType, cmn);
 			cvn.setChildren(new ArrayList<>());
 		}

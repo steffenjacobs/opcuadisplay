@@ -57,7 +57,7 @@ public class CachedObjectNode extends CachedBaseNode {
 		NodeNavigator.getInstance().increaseHighestNodeIdIfNecessarySafe(cbn);
 
 		for (CachedBaseNode child : NodeNavigator.getInstance().aggregateInheritedChildren(type)) {
-			NodeGenerator.insertNode(child, cbn);
+			NodeGenerator.getInstance().insertNode(child, cbn);
 		}
 
 		// rewire references & duplicate children recursive

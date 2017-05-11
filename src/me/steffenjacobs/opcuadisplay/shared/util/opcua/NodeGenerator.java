@@ -33,7 +33,7 @@ public class NodeGenerator {
 		// singleton
 	}
 
-	public NodeGenerator getInstance() {
+	public static NodeGenerator getInstance() {
 		if (instance == null) {
 			instance = new NodeGenerator();
 		}
@@ -41,8 +41,8 @@ public class NodeGenerator {
 	}
 
 	/** creation of objects, variables and properties */
-	public static void createAndInsert(AddDialogType addType, int namespaceIndex, String name, int nodeId,
-			CachedBaseNode type, CachedBaseNode parent) {
+	public void createAndInsert(AddDialogType addType, int namespaceIndex, String name, int nodeId, CachedBaseNode type,
+			CachedBaseNode parent) {
 
 		switch (addType) {
 		case OBJECT:
@@ -65,31 +65,31 @@ public class NodeGenerator {
 		}
 	}
 
-	private static void createAndInsertVariableType(int namespaceIndex, String name, int nodeId,
-			CachedVariableTypeNode type, CachedBaseNode parent) {
+	private void createAndInsertVariableType(int namespaceIndex, String name, int nodeId, CachedVariableTypeNode type,
+			CachedBaseNode parent) {
 		CachedVariableTypeNode node = CachedVariableTypeNode.create(namespaceIndex, name, nodeId, type);
 		insertNode(node, parent);
 	}
 
-	private static void createAndInsertObjectType(int namespaceIndex, String name, int nodeId, CachedBaseNode parent) {
+	private void createAndInsertObjectType(int namespaceIndex, String name, int nodeId, CachedBaseNode parent) {
 		CachedObjectTypeNode node = CachedObjectTypeNode.create(namespaceIndex, name, nodeId);
 		insertNode(node, parent);
 	}
 
-	private static void createAndInsertDataType(int namespaceIndex, String name, int nodeId, CachedBaseNode parent) {
+	private void createAndInsertDataType(int namespaceIndex, String name, int nodeId, CachedBaseNode parent) {
 		CachedDataTypeNode node = CachedDataTypeNode.create(namespaceIndex, name, nodeId);
 		insertNode(node, parent);
 	}
 
-	public static CachedMethodNode createAndInsertMethod(int nameSpaceIndex, String text, int nodeId,
-			CachedBaseNode parent, MethodArgument[] inputArgs, MethodArgument[] outputArgs) {
+	public CachedMethodNode createAndInsertMethod(int nameSpaceIndex, String text, int nodeId, CachedBaseNode parent,
+			MethodArgument[] inputArgs, MethodArgument[] outputArgs) {
 		CachedMethodNode cmn = CachedMethodNode.create(nameSpaceIndex, text, nodeId, inputArgs, outputArgs);
 
 		insertNode(cmn, parent);
 		return cmn;
 	}
 
-	private static CachedObjectNode createAndInsertObject(int nameSpaceIndex, String text, int nodeId,
+	private CachedObjectNode createAndInsertObject(int nameSpaceIndex, String text, int nodeId,
 			CachedObjectTypeNode type, CachedBaseNode parent) {
 		CachedObjectNode con = CachedObjectNode.create(nameSpaceIndex, text, nodeId, type);
 		insertNode(con, parent);
@@ -97,7 +97,7 @@ public class NodeGenerator {
 		return con;
 	}
 
-	private static CachedVariableNode createAndInsertVariable(int namespaceIndex, String name, int nodeId,
+	private CachedVariableNode createAndInsertVariable(int namespaceIndex, String name, int nodeId,
 			CachedDataTypeNode type, CachedBaseNode parent) {
 		CachedVariableNode cvn = CachedVariableNode.create(namespaceIndex, name, nodeId, type);
 
@@ -120,7 +120,7 @@ public class NodeGenerator {
 		return cvn;
 	}
 
-	public static CachedVariableNode createAndInsertProperty(int namespaceIndex, String name, int nodeId,
+	public CachedVariableNode createAndInsertProperty(int namespaceIndex, String name, int nodeId,
 			CachedDataTypeNode type, CachedBaseNode parent) {
 		CachedVariableNode cvn = CachedVariableNode.create(namespaceIndex, name, nodeId, type);
 
@@ -143,12 +143,12 @@ public class NodeGenerator {
 		return cvn;
 	}
 
-	private static CachedReference getTypeDefinition(CachedBaseNode node) {
+	private CachedReference getTypeDefinition(CachedBaseNode node) {
 		return Lists.newArrayList(node.getReferences()).stream()
 				.filter(r -> "HasTypeDefinition".equals(r.getReferenceType())).findFirst().orElse(null);
 	}
 
-	private static CachedReference getAssociatedReference(CachedBaseNode child, CachedBaseNode parent) {
+	private CachedReference getAssociatedReference(CachedBaseNode child, CachedBaseNode parent) {
 		if (NodeNavigator.getInstance().isFolder(parent)) {
 			CachedReference typeDefinition = getTypeDefinition(child);
 			return new CachedReference("Organizes", child.getBrowseName(),
@@ -185,7 +185,7 @@ public class NodeGenerator {
 		return null;
 	}
 
-	public static void insertNode(CachedBaseNode child, CachedBaseNode parent) {
+	public void insertNode(CachedBaseNode child, CachedBaseNode parent) {
 		parent.addChild(child);
 		child.setParent(parent);
 		CachedReference ref = getAssociatedReference(child, parent);
@@ -196,7 +196,7 @@ public class NodeGenerator {
 		EventBus.getInstance().fireEvent(new AttributeModifiedEvent(parent));
 	}
 
-	public static void removeNode(final CachedBaseNode node) {
+	public void removeNode(final CachedBaseNode node) {
 		switch (node.getNodeClass()) {
 		case Object:
 		case Method:
@@ -213,7 +213,7 @@ public class NodeGenerator {
 			node.getParent().setReferences(node.getParent().getReferences().stream()
 					.filter(ref -> !ref.getRefNodeId().equals(node.getNodeId())).collect(Collectors.toList()));
 
-			//get NodeIds of type and subtypes
+			// get NodeIds of type and subtypes
 			final List<NodeId> nodes = NodeNavigator.getInstance().aggregateSubTypes(node).stream()
 					.map(CachedBaseNode::getNodeId).collect(Collectors.toList());
 			NodeNavigator.getInstance().iterateNodes(NodeNavigator.getInstance().getRoot(), new NodeManipulator() {
@@ -232,7 +232,7 @@ public class NodeGenerator {
 			node.getParent().setReferences(node.getParent().getReferences().stream()
 					.filter(ref -> !ref.getRefNodeId().equals(node.getNodeId())).collect(Collectors.toList()));
 
-			//get names of type and subtypes
+			// get names of type and subtypes
 			final List<String> nodes2 = NodeNavigator.getInstance().aggregateSubTypes(node).stream()
 					.map(CachedBaseNode::getBrowseName).map(QualifiedName::getName).collect(Collectors.toList());
 

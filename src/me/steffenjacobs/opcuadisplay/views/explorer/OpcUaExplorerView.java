@@ -186,7 +186,6 @@ public class OpcUaExplorerView extends CloseableView {
 				});
 
 		// listener for export wizard
-
 		EventBus.getInstance().addListener(this, ExportWizardFinishEvent.IDENTIFIER,
 				new EventListener<ExportWizardFinishEvent>() {
 					@Override
@@ -299,7 +298,7 @@ public class OpcUaExplorerView extends CloseableView {
 		expandToDefaultState();
 	}
 
-	/** can be called, after the import wizard has finished */
+	/** can be called, after the export wizard has finished */
 	public void onExportWizardFinish(String exportUrl) {
 		Job job = new Job("Exporting OPC UA nodes...") {
 			@Override
@@ -393,7 +392,7 @@ public class OpcUaExplorerView extends CloseableView {
 		// remove node action
 		removeAction = new Action() {
 			public void run() {
-				NodeGenerator
+				NodeGenerator.getInstance()
 						.removeNode((CachedBaseNode) ((IStructuredSelection) viewer.getSelection()).getFirstElement());
 			}
 		};
