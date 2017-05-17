@@ -132,8 +132,6 @@ public class XmlImport {
 		parseReferencesStep2();
 		parseReferencesStep3();
 
-		loadedNodes.forEach((x, y) -> System.out.println(y.getBrowseName() + " - " + y.getNodeId()));
-
 		return root;
 	}
 
