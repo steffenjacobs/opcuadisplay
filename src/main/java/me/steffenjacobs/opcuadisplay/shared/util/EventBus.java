@@ -6,9 +6,7 @@ import java.util.List;
 
 import org.eclipse.swt.widgets.Display;
 
-import me.steffenjacobs.opcuadisplay.shared.util.opcua.NodeNavigator;
 import me.steffenjacobs.opcuadisplay.views.CloseableView;
-import me.steffenjacobs.opcuadisplay.views.explorer.events.RootUpdatedEvent;
 
 public class EventBus {
 

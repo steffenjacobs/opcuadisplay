@@ -309,23 +309,6 @@ public class StandaloneNodeExplorerClient {
 		return null;
 	}
 
-	private CachedBaseNode retrieveNodeDetailsNonInstance(NodeId parentId, NodeId nodeId, OpcUaClient client) {
-		try {
-			List<Node> lst = client.getAddressSpace().browse(parentId).get();
-			return parseNode(lst.stream().filter(x -> {
-				try {
-					return x.getNodeId().get().equals(nodeId);
-				} catch (InterruptedException | ExecutionException e) {
-					e.printStackTrace();
-				}
-				return false;
-			}).findAny().orElse(null));
-		} catch (InterruptedException | ExecutionException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-
 	/**
 	 * @param node
 	 *            the node to parse

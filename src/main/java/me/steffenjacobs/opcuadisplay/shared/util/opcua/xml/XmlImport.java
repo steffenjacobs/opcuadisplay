@@ -15,7 +15,6 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
-import org.eclipse.milo.opcua.stack.core.Identifiers;
 import org.eclipse.milo.opcua.stack.core.UaRuntimeException;
 import org.eclipse.milo.opcua.stack.core.types.builtin.LocalizedText;
 import org.eclipse.milo.opcua.stack.core.types.builtin.NodeId;
@@ -133,22 +132,26 @@ public class XmlImport {
 		parseReferencesStep2();
 		parseReferencesStep3();
 
+		loadedNodes.forEach((x, y) -> System.out.println(y.getBrowseName() + " - " + y.getNodeId()));
+
 		return root;
 	}
 
-	private CachedBaseNode buildObjectTree(List<UANode> nodes) {
-		// create object node
-		CachedObjectNode objectBase = new CachedObjectNode(Identifiers.ObjectsFolder);
-		objectBase.setBrowseName(new QualifiedName(0, "Objects"));
-		objectBase.setDescription(new LocalizedText("en",
-				"The browse entry point when looking for objects in the server address space."));
-		objectBase.setDisplayName(new LocalizedText("en", "Objects"));
-		objectBase.setEventNotifier(UByte.valueOf(0));
-		objectBase.setUserWriteMask(UInteger.valueOf(0));
-		objectBase.setWriteMask(UInteger.valueOf(0));
+//	private CachedBaseNode buildObjectTree(List<UANode> nodes) {
 
-		return buildReferenceBased(objectBase, nodes);
-	}
+		// // create object node
+		// CachedObjectNode objectBase = new
+		// CachedObjectNode(Identifiers.ObjectsFolder);
+		// objectBase.setBrowseName(new QualifiedName(0, "Objects"));
+		// objectBase.setDescription(new LocalizedText("en",
+		// "The browse entry point when looking for objects in the server
+		// address space."));
+		// objectBase.setDisplayName(new LocalizedText("en", "Objects"));
+		// objectBase.setEventNotifier(UByte.valueOf(0));
+		// objectBase.setUserWriteMask(UInteger.valueOf(0));
+		// objectBase.setWriteMask(UInteger.valueOf(0));
+//		return buildReferenceBased(NodeNavigator.getInstance().navigateByName("Root/Objects"), nodes);
+//	}
 
 	/**
 	 * build the tree based on the references of the root node. Nodes are
@@ -169,12 +172,21 @@ public class XmlImport {
 			CachedReference cr = it.next();
 			if (NodeNavigator.getInstance().isHierarchicalReference(cr.getReferenceType())) {
 				UANode child = findByNodeId(nodes, cr.getRefNodeId());
+				CachedBaseNode childNode;
 				if (child == null) {
 					System.out.println("Error: Node not found: " + cr.getReferenceType() + " - " + cr.getRefNodeId());
-					continue;
+					childNode = loadedNodes.get(cr.getRefNodeId());
+
+					if (childNode == null) {
+						System.out.println("really hard for " + cr.getReferenceType() + " - " + cr.getRefNodeId());
+						continue;
+					}
 				}
 
-				CachedBaseNode childNode = parseNode(0, child);
+				else {
+					childNode = parseNode(0, child);
+				}
+
 				childNode = NodeGenerator.getInstance().mergeInsertNode(childNode, root);
 				loadedNodes.put(childNode.getNodeId(), childNode);
 
@@ -182,8 +194,10 @@ public class XmlImport {
 
 				buildReferenceBased(childNode, nodes);
 			}
-		}
+		}		
+		
 		return root;
+
 	}
 
 	/**
