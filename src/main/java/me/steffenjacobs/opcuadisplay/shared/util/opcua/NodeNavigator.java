@@ -155,9 +155,10 @@ public class NodeNavigator {
 		StringBuilder sb = new StringBuilder();
 
 		List<CachedBaseNode> names = this.getPath(node);
+		names = Lists.reverse(names);
 		names.forEach(n -> {
 			sb.append("/");
-			sb.append(n);
+			sb.append(n.getBrowseName().getName());
 		});
 		return sb.toString();
 	}
