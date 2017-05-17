@@ -3,7 +3,7 @@ package me.steffenjacobs.opcuadisplay.shared.util;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
+/** @author Steffen Jacobs */
 public class MultiMap<K, V> {
 
 	private final HashMap<K, List<V>> innerMap = new HashMap<>();

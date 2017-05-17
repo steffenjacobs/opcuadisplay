@@ -11,7 +11,7 @@ import me.steffenjacobs.opcuadisplay.wizard.imp.events.ImportWizardFinishEvent;
 import me.steffenjacobs.opcuadisplay.wizard.imp.events.ImportWizardOpenEvent;
 import me.steffenjacobs.opcuadisplay.wizard.shared.WizardWithUrlAndType;
 import me.steffenjacobs.opcuadisplay.wizard.shared.XmlPage;
-
+/** @author Steffen Jacobs */
 public class OpcUaImportWizard extends Wizard implements IWorkbenchWizard, WizardWithUrlAndType {
 
 	public ImportTypeSelectionPage selectionPage;

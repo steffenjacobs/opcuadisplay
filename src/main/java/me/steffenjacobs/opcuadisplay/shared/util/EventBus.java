@@ -7,7 +7,7 @@ import java.util.List;
 import org.eclipse.swt.widgets.Display;
 
 import me.steffenjacobs.opcuadisplay.views.CloseableView;
-
+/** @author Steffen Jacobs */
 public class EventBus {
 
 	private class RegisteredEvent {

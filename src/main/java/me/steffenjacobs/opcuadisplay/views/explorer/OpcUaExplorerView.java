@@ -68,6 +68,8 @@ import me.steffenjacobs.opcuadisplay.wizard.newProject.events.NewProjectWizardFi
  * can be shared between views in order to ensure that objects of the same type
  * are presented in the same way everywhere.
  * <p>
+ * 
+ * @author Steffen Jacobs
  */
 
 public class OpcUaExplorerView extends CloseableView {

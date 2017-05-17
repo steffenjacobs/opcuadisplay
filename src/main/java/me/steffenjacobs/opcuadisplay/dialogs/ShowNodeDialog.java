@@ -23,7 +23,7 @@ import me.steffenjacobs.opcuadisplay.shared.widgets.DropDownCheckedListBox;
 import me.steffenjacobs.opcuadisplay.shared.widgets.GenericComboBox;
 import me.steffenjacobs.opcuadisplay.shared.widgets.GenericComboBox.Renderer;
 import me.steffenjacobs.opcuadisplay.views.attribute.BitmaskParser;
-
+/** @author Steffen Jacobs */
 public class ShowNodeDialog extends TitleAreaDialog {
 
 	private Text txtNodeId, txtBrowseName, txtDisplayName, txtDescription, txtWriteMask, txtUserWriteMask, txtParent;

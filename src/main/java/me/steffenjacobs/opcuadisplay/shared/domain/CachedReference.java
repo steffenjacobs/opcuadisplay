@@ -3,7 +3,7 @@ package me.steffenjacobs.opcuadisplay.shared.domain;
 import org.eclipse.milo.opcua.stack.core.Identifiers;
 import org.eclipse.milo.opcua.stack.core.types.builtin.NodeId;
 import org.eclipse.milo.opcua.stack.core.types.builtin.QualifiedName;
-
+/** @author Steffen Jacobs */
 public class CachedReference {
 
 	public static final CachedReference PROPERTY_TYPE = new CachedReference("HasTypeDefinition",

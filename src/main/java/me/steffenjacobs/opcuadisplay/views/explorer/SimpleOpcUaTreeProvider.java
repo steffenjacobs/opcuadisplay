@@ -4,7 +4,7 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedBaseNode;
 import me.steffenjacobs.opcuadisplay.shared.util.opcua.NodeNavigator;
-
+/** @author Steffen Jacobs */
 public class SimpleOpcUaTreeProvider implements ITreeContentProvider {
 
 	@Override

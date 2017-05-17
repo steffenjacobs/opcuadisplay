@@ -11,7 +11,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-
+/** @author Steffen Jacobs */
 public class LoadVariablesDialog extends TitleAreaDialog {
 
 	private Text txtUrl;

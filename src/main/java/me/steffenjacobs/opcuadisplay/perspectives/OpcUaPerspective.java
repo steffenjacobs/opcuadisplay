@@ -10,10 +10,7 @@ import me.steffenjacobs.opcuadisplay.views.explorer.OpcUaExplorerView;
 import me.steffenjacobs.opcuadisplay.views.reference.ReferenceView;
 
 /**
- * This class is meant to serve as an example for how various contributions are
- * made to a perspective. Note that some of the extension point id's are
- * referred to as API constants while others are hardcoded and may be subject to
- * change.
+ * @author Steffen Jacobs
  */
 public class OpcUaPerspective implements IPerspectiveFactory {
 

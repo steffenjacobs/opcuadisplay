@@ -15,6 +15,7 @@ import me.steffenjacobs.opcuadisplay.shared.util.EventBus.EventArgs;
 import me.steffenjacobs.opcuadisplay.shared.util.EventBus.EventListener;
 import me.steffenjacobs.opcuadisplay.views.CloseableView;
 
+/** @author Steffen Jacobs */
 public class TestEventBus {
 
 	/** TestEvent class with only an identifier */

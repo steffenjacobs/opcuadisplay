@@ -19,7 +19,7 @@ import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
-
+/** @author Steffen Jacobs */
 public class KeyStoreLoader {
 
     private static final String CLIENT_ALIAS = "client-ai";

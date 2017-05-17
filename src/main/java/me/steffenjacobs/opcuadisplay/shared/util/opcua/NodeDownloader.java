@@ -54,7 +54,7 @@ import me.steffenjacobs.opcuadisplay.shared.domain.CachedReferenceTypeNode;
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedVariableNode;
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedVariableTypeNode;
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedViewNode;
-
+/** @author Steffen Jacobs */
 public class NodeDownloader {
 
 	private static final Logger logger = LoggerFactory.getLogger(NodeDownloader.class);

@@ -51,7 +51,7 @@ import me.steffenjacobs.opcuadisplay.shared.util.Tuple2;
 import me.steffenjacobs.opcuadisplay.shared.util.opcua.NodeGenerator;
 import me.steffenjacobs.opcuadisplay.shared.util.opcua.NodeNavigator;
 import me.steffenjacobs.opcuadisplay.shared.util.opcua.NodeNavigator.NodeManipulator;
-
+/** @author Steffen Jacobs */
 public class XmlImport {
 
 	private static XmlImport instance;

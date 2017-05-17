@@ -16,7 +16,7 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-
+/** @author Steffen Jacobs */
 public class XmlPage extends WizardPage {
 
 	private Text textUrl;

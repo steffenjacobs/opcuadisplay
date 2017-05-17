@@ -1,5 +1,5 @@
 package me.steffenjacobs.opcuadisplay.shared.domain;
-
+/** @author Steffen Jacobs */
 public enum BetterValueRank {
 	OneDimension(1),
 	OneOrMoreDimensions(0),

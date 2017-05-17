@@ -31,6 +31,8 @@ import me.steffenjacobs.opcuadisplay.views.explorer.dialogs.DialogFactory.Dialog
  * type can be selected based on the <i>pathToTypeNode</i> directory given in
  * the constructor. When the ok button is clicked, the form is validated and the
  * DialogListener given in the constructor is called.
+ * 
+ * @author Steffen Jacobs
  */
 public class SimpleAddDialog extends TitleAreaDialog {
 

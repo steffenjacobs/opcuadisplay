@@ -27,7 +27,7 @@ import me.steffenjacobs.opcuadisplay.views.explorer.NodeClassLabelProvider;
 import me.steffenjacobs.opcuadisplay.views.explorer.SimpleOpcUaTreeProvider;
 import me.steffenjacobs.opcuadisplay.views.explorer.dialogs.DialogFactory.DialogListener;
 import me.steffenjacobs.opcuadisplay.views.explorer.domain.MethodArgument;
-
+/** @author Steffen Jacobs */
 public class MethodAddDialog extends SimpleAddDialog {
 
 	private final HashMap<String, MethodArgument> inputArgs = new HashMap<>(), outputArgs = new HashMap<>();

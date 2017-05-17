@@ -21,6 +21,8 @@ import me.steffenjacobs.opcuadisplay.shared.util.Images;
 
 /**
  * The activator class controls the plug-in life cycle
+ * 
+ * @author Steffen Jacobs
  */
 public class Activator extends AbstractUIPlugin {
 

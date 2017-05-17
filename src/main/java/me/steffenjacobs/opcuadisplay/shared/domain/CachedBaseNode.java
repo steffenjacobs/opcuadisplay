@@ -14,7 +14,7 @@ import org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.UInteger;
 import org.eclipse.milo.opcua.stack.core.types.enumerated.NodeClass;
 
 import me.steffenjacobs.opcuadisplay.shared.util.opcua.NodeNavigator;
-
+/** @author Steffen Jacobs */
 public class CachedBaseNode {
 	private final NodeId nodeId;
 	private NodeClass nodeClass;

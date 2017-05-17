@@ -1,7 +1,7 @@
 package me.steffenjacobs.opcuadisplay.views.explorer.domain;
 
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedBaseNode;
-
+/** @author Steffen Jacobs */
 public class MethodArgument {
 	private final String name;
 	private final CachedBaseNode dataTypeNode;

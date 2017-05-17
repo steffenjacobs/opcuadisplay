@@ -8,7 +8,7 @@ import org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.UByte;
 import org.eclipse.milo.opcua.stack.core.types.enumerated.NodeClass;
 
 import me.steffenjacobs.opcuadisplay.shared.util.FutureResolver;
-
+/** @author Steffen Jacobs */
 public class CachedViewNode extends CachedBaseNode {
 
 	private boolean containsNoLoop;

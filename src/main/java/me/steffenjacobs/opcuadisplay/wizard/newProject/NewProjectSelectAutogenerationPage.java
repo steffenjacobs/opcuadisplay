@@ -8,7 +8,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-
+/** @author Steffen Jacobs */
 public class NewProjectSelectAutogenerationPage extends WizardPage {
 
 	/** type: true = import, false = export */

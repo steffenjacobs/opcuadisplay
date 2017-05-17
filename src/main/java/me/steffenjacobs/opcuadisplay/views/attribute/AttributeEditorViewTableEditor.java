@@ -35,7 +35,7 @@ import me.steffenjacobs.opcuadisplay.shared.widgets.GenericComboBox;
 import me.steffenjacobs.opcuadisplay.shared.widgets.GenericComboBox.Renderer;
 import me.steffenjacobs.opcuadisplay.views.attribute.domain.NodeEntryFactory.NodeEntry;
 import me.steffenjacobs.opcuadisplay.views.attribute.events.AttributeModifiedEvent;
-
+/** @author Steffen Jacobs */
 public class AttributeEditorViewTableEditor {
 	private TableEditor editor;
 

@@ -28,6 +28,8 @@ import me.steffenjacobs.opcuadisplay.views.explorer.events.SelectedNodeChangedEv
  * non-hierarchical. <br>
  * The view is update, when a AttributeModifiedEvent is caught (a child may have
  * been added) or the selection in the explorer view changed
+ * 
+ * @author Steffen Jacobs
  */
 public class ReferenceView extends CloseableView {
 

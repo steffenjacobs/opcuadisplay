@@ -55,7 +55,11 @@ import me.steffenjacobs.opcuadisplay.shared.domain.CachedVariableNode;
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedVariableTypeNode;
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedViewNode;
 
-/** retrieves the nodes from the OPC UA server */
+/**
+ * retrieves the nodes from the OPC UA server
+ * 
+ * @author Steffen Jacobs
+ */
 public class StandaloneNodeExplorerClient {
 
 	private static final Logger logger = LoggerFactory.getLogger(StandaloneNodeExplorerClient.class);
@@ -89,7 +93,8 @@ public class StandaloneNodeExplorerClient {
 
 		monitor.beginTask("Downloading Models...", 100);
 		// receive sub folders of root
-		final CachedObjectNode root = (CachedObjectNode) retrieveNodes(NodeGenerator.getInstance().generateRoot(), client, false);
+		final CachedObjectNode root = (CachedObjectNode) retrieveNodes(NodeGenerator.getInstance().generateRoot(),
+				client, false);
 
 		toList(root.getChildren()).forEach(root_xxx -> {
 
@@ -418,8 +423,6 @@ public class StandaloneNodeExplorerClient {
 
 		return parent;
 	}
-
-	
 
 	/**
 	 * @return a preconfigured OpcUaClient not yet connected to <i>url</i> <br>

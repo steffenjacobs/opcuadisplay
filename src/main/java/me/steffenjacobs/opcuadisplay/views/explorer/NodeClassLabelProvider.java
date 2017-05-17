@@ -8,7 +8,7 @@ import me.steffenjacobs.opcuadisplay.Activator;
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedBaseNode;
 import me.steffenjacobs.opcuadisplay.shared.util.Images;
 import me.steffenjacobs.opcuadisplay.shared.util.opcua.NodeNavigator;
-
+/** @author Steffen Jacobs */
 public class NodeClassLabelProvider extends LabelProvider {
 
 	@Override

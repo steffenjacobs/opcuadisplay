@@ -10,7 +10,7 @@ import org.eclipse.milo.opcua.stack.core.types.enumerated.NodeClass;
 
 import me.steffenjacobs.opcuadisplay.shared.util.FutureResolver;
 import me.steffenjacobs.opcuadisplay.shared.util.opcua.NodeNavigator;
-
+/** @author Steffen Jacobs */
 public class CachedDataTypeNode extends CachedBaseNode implements HasOnlyAbstract {
 
 	private boolean isAbstract;

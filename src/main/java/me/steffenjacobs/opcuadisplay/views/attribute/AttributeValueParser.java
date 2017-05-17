@@ -12,7 +12,7 @@ import org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.UInteger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
-
+/** @author Steffen Jacobs */
 public class AttributeValueParser {
 
 	private static final Pattern patternLocale = Pattern.compile("loc=(.*);text=(.*)");

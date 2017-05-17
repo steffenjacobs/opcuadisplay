@@ -1,5 +1,5 @@
 package me.steffenjacobs.opcuadisplay.shared.util;
-
+/** @author Steffen Jacobs */
 public class Tuple2<X, Y> {
 
 	private final X x;

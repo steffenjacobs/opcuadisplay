@@ -8,7 +8,7 @@ import me.steffenjacobs.opcuadisplay.shared.domain.CachedObjectTypeNode;
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedVariableNode;
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedVariableTypeNode;
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedViewNode;
-
+/** @author Steffen Jacobs */
 public class NodeMerger {
 	private static NodeMerger instance;
 

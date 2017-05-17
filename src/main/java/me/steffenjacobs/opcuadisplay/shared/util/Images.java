@@ -1,7 +1,7 @@
 package me.steffenjacobs.opcuadisplay.shared.util;
 
 import me.steffenjacobs.opcuadisplay.Activator;
-
+/** @author Steffen Jacobs */
 public enum Images {
 	IMG_COLLAPSE_ALL("icons/collapseall.png", "collapseall"),
 	IMG_EXPAND_ALL("icons/expandall.png", "expandall"),

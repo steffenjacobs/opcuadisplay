@@ -9,7 +9,7 @@ import me.steffenjacobs.opcuadisplay.shared.util.EventBus;
 import me.steffenjacobs.opcuadisplay.wizard.newProject.events.NewProjectWizardCancelEvent;
 import me.steffenjacobs.opcuadisplay.wizard.newProject.events.NewProjectWizardFinishEvent;
 import me.steffenjacobs.opcuadisplay.wizard.newProject.events.NewProjectWizardOpenEvent;
-
+/** @author Steffen Jacobs */
 public class NewProjectWizard extends Wizard implements IWorkbenchWizard {
 
 	private NewProjectSelectAutogenerationPage page;

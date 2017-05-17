@@ -13,7 +13,7 @@ import me.steffenjacobs.opcuadisplay.shared.util.FutureResolver;
 import me.steffenjacobs.opcuadisplay.shared.util.opcua.NodeGenerator;
 import me.steffenjacobs.opcuadisplay.shared.util.opcua.NodeNavigator;
 import me.steffenjacobs.opcuadisplay.views.explorer.domain.MethodArgument;
-
+/** @author Steffen Jacobs */
 public class CachedMethodNode extends CachedBaseNode {
 
 	private boolean executable;

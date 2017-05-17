@@ -31,7 +31,7 @@ import me.steffenjacobs.opcuadisplay.views.attribute.events.AttributeModifiedEve
 import me.steffenjacobs.opcuadisplay.views.explorer.dialogs.DialogFactory.AddDialogType;
 import me.steffenjacobs.opcuadisplay.views.explorer.domain.MethodArgument;
 import me.steffenjacobs.opcuadisplay.views.explorer.events.ChangeSelectedNodeEvent;
-
+/** @author Steffen Jacobs */
 public class NodeGenerator {
 
 	private static NodeGenerator instance;

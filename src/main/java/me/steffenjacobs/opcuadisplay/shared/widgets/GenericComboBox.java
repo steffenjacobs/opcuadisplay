@@ -15,7 +15,7 @@ import org.eclipse.swt.widgets.Composite;
 /**
  * A generic combo box
  * 
- * @author sjacobs
+ * @author Steffen Jacobs
  */
 public class GenericComboBox<T> extends Composite {
 

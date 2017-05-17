@@ -10,7 +10,7 @@ import me.steffenjacobs.opcuadisplay.shared.widgets.GenericComboBox.Renderer;
 /**
  * Bitmask Parser: converts a bitmasked UInteger to a map and backwards
  * 
- * @author sjacobs
+ * @author Steffen Jacobs
  */
 public class BitmaskParser {
 
@@ -23,10 +23,11 @@ public class BitmaskParser {
 		// the order of these strings is important, because the index of each
 		// string in this array determines the position of the associated bit in
 		// the bitmasked UInteger
-		names = new String[] { "AccessLevel", "ArrayDimensions", "BrowseName", "ContainsNoLoops", "DataType",
-				"Description", "DisplayName", "EventNotifier", "Executable", "Historizing", "InverseName", "IsAbstract",
-				"MinimumSamplingInterval", "NodeClass", "NodeId", "Symmetric", "UserAccessLevel", "UserExecutable",
-				"UserWriteMask", "ValueRank", "WriteMask", "ValueForVariableType" };
+		names = new String[]
+			{ "AccessLevel", "ArrayDimensions", "BrowseName", "ContainsNoLoops", "DataType", "Description",
+					"DisplayName", "EventNotifier", "Executable", "Historizing", "InverseName", "IsAbstract",
+					"MinimumSamplingInterval", "NodeClass", "NodeId", "Symmetric", "UserAccessLevel", "UserExecutable",
+					"UserWriteMask", "ValueRank", "WriteMask", "ValueForVariableType" };
 	}
 
 	public static BitmaskParser getInstance() {

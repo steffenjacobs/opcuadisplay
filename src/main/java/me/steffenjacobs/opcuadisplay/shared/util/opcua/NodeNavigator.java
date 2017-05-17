@@ -18,7 +18,7 @@ import com.google.common.collect.Lists;
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedBaseNode;
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedObjectNode;
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedReference;
-
+/** @author Steffen Jacobs */
 public class NodeNavigator {
 
 	public static interface NodeManipulator {

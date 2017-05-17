@@ -18,7 +18,7 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Text;
 
 import me.steffenjacobs.opcuadisplay.shared.widgets.GenericComboBox.Renderer;
-
+/** @author Steffen Jacobs */
 public class DropDownCheckedListBox extends Composite {
 
 	private static final int LINE_WIDTH = 120;

@@ -19,7 +19,7 @@ import me.steffenjacobs.opcuadisplay.views.CloseableView;
 import me.steffenjacobs.opcuadisplay.views.attribute.domain.NodeEntryFactory;
 import me.steffenjacobs.opcuadisplay.views.attribute.domain.NodeEntryFactory.NodeEntry;
 import me.steffenjacobs.opcuadisplay.views.explorer.events.SelectedNodeChangedEvent;
-
+/** @author Steffen Jacobs */
 public class AttributeEditorView extends CloseableView {
 
 	public static final String ID = "me.steffenjacobs.opcuadisplay.views.attribute.AttributeEditorView";

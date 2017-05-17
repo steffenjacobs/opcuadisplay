@@ -41,7 +41,7 @@ import me.steffenjacobs.opcuadisplay.shared.domain.generated.UAVariableType;
 import me.steffenjacobs.opcuadisplay.shared.domain.generated.UAView;
 import me.steffenjacobs.opcuadisplay.shared.util.opcua.NodeNavigator;
 import me.steffenjacobs.opcuadisplay.shared.util.opcua.NodeNavigator.NodeManipulator;
-
+/** @author Steffen Jacobs */
 public class XmlExport {
 
 	public static void main(String[] args) {

@@ -8,7 +8,7 @@ import org.eclipse.milo.opcua.stack.core.types.builtin.NodeId;
 import org.eclipse.milo.opcua.stack.core.types.enumerated.NodeClass;
 
 import me.steffenjacobs.opcuadisplay.shared.util.FutureResolver;
-
+/** @author Steffen Jacobs */
 public class CachedReferenceTypeNode extends CachedBaseNode {
 
 	private boolean isAbstract;

@@ -2,7 +2,7 @@ package me.steffenjacobs.opcuadisplay.wizard.newProject.events;
 
 import me.steffenjacobs.opcuadisplay.shared.util.EventBus.Event;
 import me.steffenjacobs.opcuadisplay.shared.util.EventBus.EventArgs;
-
+/** @author Steffen Jacobs */
 public class NewProjectWizardCancelEvent extends Event {
 
 	public static String IDENTIFIER = "newProjectWizardCancel";

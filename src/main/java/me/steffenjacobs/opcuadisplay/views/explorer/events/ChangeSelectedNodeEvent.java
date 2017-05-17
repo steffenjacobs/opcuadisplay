@@ -4,7 +4,9 @@ import me.steffenjacobs.opcuadisplay.shared.domain.CachedBaseNode;
 import me.steffenjacobs.opcuadisplay.shared.util.EventBus.Event;
 import me.steffenjacobs.opcuadisplay.shared.util.EventBus.EventArgs;
 
-/**is called to change the selected node*/
+/**is called to change the selected node
+ * 
+ * @author Steffen Jacobs*/
 public class ChangeSelectedNodeEvent extends Event {
 
 	public static String IDENTIFIER = "changeSelectedNodeEvent";

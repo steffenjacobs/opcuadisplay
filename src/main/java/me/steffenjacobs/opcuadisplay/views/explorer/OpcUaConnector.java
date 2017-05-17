@@ -14,7 +14,7 @@ import me.steffenjacobs.opcuadisplay.shared.util.EventBus;
 import me.steffenjacobs.opcuadisplay.shared.util.opcua.NodeNavigator;
 import me.steffenjacobs.opcuadisplay.shared.util.opcua.StandaloneNodeExplorerClient;
 import me.steffenjacobs.opcuadisplay.views.explorer.events.RootUpdatedEvent;
-
+/** @author Steffen Jacobs */
 public class OpcUaConnector implements ITreeContentProvider {
 
 	private final Shell parentShell;
