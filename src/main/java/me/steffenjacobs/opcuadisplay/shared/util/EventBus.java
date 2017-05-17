@@ -66,10 +66,10 @@ public class EventBus {
 
 	public void unregisterAllListeners(final CloseableView registerer) {
 		registeredEvents.get(registerer.getIdentifier()).stream()
-				.forEach(l -> removeListener(registerer, l.eventIdentifier, l.listener));
+				.forEach(l -> unregisterListener(registerer, l.eventIdentifier, l.listener));
 	}
 
-	public void removeListener(CloseableView registerer, String eventIdentifier, EventListener<Event> listener) {
+	public void unregisterListener(CloseableView registerer, String eventIdentifier, EventListener<Event> listener) {
 		List<EventListener<Event>> list = listeners.get(eventIdentifier);
 
 		if (list == null) {
