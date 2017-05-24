@@ -17,6 +17,7 @@ import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
 import org.eclipse.swt.graphics.Color;
 
 import me.steffenjacobs.opcuadisplay.shared.util.EventBus;
+import me.steffenjacobs.opcuadisplay.shared.util.opcua.NodeNavigator;
 import me.steffenjacobs.opcuadisplay.views.explorer.events.ChangeSelectedNodeEvent;
 import me.steffenjacobs.opcuadisplay.views.starschema.ColorSet;
 import me.steffenjacobs.opcuadisplay.views.starschema.model.NodeModel;
@@ -34,7 +35,7 @@ public class NodeEditPart extends AbstractGraphicalEditPart {
 		if (m.isDummy()) {
 			// remove border
 			rectangle.setBorder(new LineBorder(ColorSet.WHITE.getColor()));
-			rectangle.setCornerDimensions(new Dimension(0,0));
+			rectangle.setCornerDimensions(new Dimension(0, 0));
 		} else {
 			rectangle.setCornerDimensions(new Dimension(20, 20));
 
@@ -51,12 +52,20 @@ public class NodeEditPart extends AbstractGraphicalEditPart {
 	private void addListeners(final NodeModel m, final IFigure rectangle) {
 		rectangle.addMouseListener(new MouseListener() {
 
+			// this is necessary, because the second mouseRelease event from a
+			// double click would also be caught here, causing the node that
+			// spawned under the parent to be clicked immediately
+			boolean pressed = false;
+
 			@Override
 			public void mouseReleased(MouseEvent arg0) {
 				Color hoverColor = new Color(null, m.getColor().getRed() - 10, m.getColor().getGreen() - 10,
 						m.getColor().getBlue() - 10);
 				rectangle.setBackgroundColor(hoverColor);
-				EventBus.getInstance().fireEvent(new ChangeSelectedNodeEvent(m.getNode(), true));
+				if (m.getNode() != NodeNavigator.getInstance().getSelectedNode() && pressed) {
+					EventBus.getInstance().fireEvent(new ChangeSelectedNodeEvent(m.getNode(), true));
+				}
+				pressed = false;
 			}
 
 			@Override
@@ -64,10 +73,14 @@ public class NodeEditPart extends AbstractGraphicalEditPart {
 				Color darker = new Color(null, m.getColor().getRed() - 30, m.getColor().getGreen() - 30,
 						m.getColor().getBlue() - 30);
 				rectangle.setBackgroundColor(darker);
+				pressed = true;
 			}
 
 			@Override
 			public void mouseDoubleClicked(MouseEvent me) {
+				if (m.getNode() == NodeNavigator.getInstance().getSelectedNode() && m.getNode().getParent() != null) {
+					EventBus.getInstance().fireEvent(new ChangeSelectedNodeEvent(m.getNode().getParent(), true));
+				}
 			}
 		});
 
