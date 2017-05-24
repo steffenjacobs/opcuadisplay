@@ -19,7 +19,6 @@ import com.google.common.collect.Lists;
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedBaseNode;
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedObjectNode;
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedObjectTypeNode;
-import me.steffenjacobs.opcuadisplay.shared.domain.CachedReference;
 import me.steffenjacobs.opcuadisplay.shared.util.opcua.NodeNavigator.NodeManipulator;
 
 public class TestNodeNavigator {
@@ -92,8 +91,8 @@ public class TestNodeNavigator {
 
 		NodeNavigator.getInstance().setRoot(root);
 
-		NodeGenerator.getInstance().insertNode(test1, root);
-		NodeGenerator.getInstance().insertNode(test2, test1);
+		NodeGenerator.getInstance().insertNode(test1, root, false);
+		NodeGenerator.getInstance().insertNode(test2, test1, false);
 
 		return new CachedBaseNode[]
 			{ root, test1, test2 };

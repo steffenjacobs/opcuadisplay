@@ -106,7 +106,7 @@ public class CachedVariableTypeNode extends CachedBaseNode implements HasOnlyAbs
 		NodeNavigator.getInstance().increaseHighestNodeIdIfNecessarySafe(cbn);
 
 		for (CachedBaseNode child : NodeNavigator.getInstance().aggregateInheritedChildren(type)) {
-			NodeGenerator.getInstance().insertNode(child, cbn);
+			NodeGenerator.getInstance().insertNode(child, cbn, false);
 		}
 		
 		return  cbn.duplicate();

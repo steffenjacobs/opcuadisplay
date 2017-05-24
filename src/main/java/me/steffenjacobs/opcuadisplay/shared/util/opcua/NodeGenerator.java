@@ -31,6 +31,7 @@ import me.steffenjacobs.opcuadisplay.views.attribute.events.AttributeModifiedEve
 import me.steffenjacobs.opcuadisplay.views.explorer.dialogs.DialogFactory.AddDialogType;
 import me.steffenjacobs.opcuadisplay.views.explorer.domain.MethodArgument;
 import me.steffenjacobs.opcuadisplay.views.explorer.events.ChangeSelectedNodeEvent;
+
 /** @author Steffen Jacobs */
 public class NodeGenerator {
 
@@ -75,31 +76,31 @@ public class NodeGenerator {
 	private void createAndInsertVariableType(int namespaceIndex, String name, int nodeId, CachedVariableTypeNode type,
 			CachedBaseNode parent) {
 		CachedVariableTypeNode node = CachedVariableTypeNode.create(namespaceIndex, name, nodeId, type);
-		insertNode(node, parent);
+		insertNode(node, parent, false);
 	}
 
 	private void createAndInsertObjectType(int namespaceIndex, String name, int nodeId, CachedBaseNode parent) {
 		CachedObjectTypeNode node = CachedObjectTypeNode.create(namespaceIndex, name, nodeId);
-		insertNode(node, parent);
+		insertNode(node, parent, false);
 	}
 
 	private void createAndInsertDataType(int namespaceIndex, String name, int nodeId, CachedBaseNode parent) {
 		CachedDataTypeNode node = CachedDataTypeNode.create(namespaceIndex, name, nodeId);
-		insertNode(node, parent);
+		insertNode(node, parent, false);
 	}
 
 	public CachedMethodNode createAndInsertMethod(int nameSpaceIndex, String text, int nodeId, CachedBaseNode parent,
 			MethodArgument[] inputArgs, MethodArgument[] outputArgs) {
 		CachedMethodNode cmn = CachedMethodNode.create(nameSpaceIndex, text, nodeId, inputArgs, outputArgs);
 
-		insertNode(cmn, parent);
+		insertNode(cmn, parent, false);
 		return cmn;
 	}
 
 	private CachedObjectNode createAndInsertObject(int nameSpaceIndex, String text, int nodeId,
 			CachedObjectTypeNode type, CachedBaseNode parent) {
 		CachedObjectNode con = CachedObjectNode.create(nameSpaceIndex, text, nodeId, type);
-		insertNode(con, parent);
+		insertNode(con, parent, false);
 
 		return con;
 	}
@@ -246,12 +247,12 @@ public class NodeGenerator {
 			}
 			return containedChild;
 		} else {
-			insertNode(child, parent);
+			insertNode(child, parent, true);
 			return child;
 		}
 	}
 
-	public void insertNode(CachedBaseNode child, CachedBaseNode parent) {
+	public void insertNode(CachedBaseNode child, CachedBaseNode parent, boolean suppressEvent) {
 
 		parent.addChild(child);
 		child.setParent(parent);
@@ -260,7 +261,9 @@ public class NodeGenerator {
 			parent.getReferences().add(ref);
 		}
 
-		EventBus.getInstance().fireEvent(new AttributeModifiedEvent(parent));
+		if (!suppressEvent) {
+			EventBus.getInstance().fireEvent(new AttributeModifiedEvent(parent));
+		}
 	}
 
 	public void removeNode(final CachedBaseNode node) {

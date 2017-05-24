@@ -127,7 +127,7 @@ public class TestNodeGenerator {
 				.navigateByName("Root/Types/ObjectTypes/BaseObjectType");
 
 		// insert node
-		NodeGenerator.getInstance().insertNode(testObjectType, baseObjectTypeNode);
+		NodeGenerator.getInstance().insertNode(testObjectType, baseObjectTypeNode, false);
 
 		// check, if node had been inserted
 		assertSame(testObjectType, NodeNavigator.getInstance()
