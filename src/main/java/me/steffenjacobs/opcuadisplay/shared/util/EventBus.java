@@ -65,6 +65,9 @@ public class EventBus {
 	}
 
 	public void unregisterAllListeners(final CloseableView registerer) {
+		if(!registeredEvents.contains(registerer.getIdentifier())){
+			return;
+		}
 		registeredEvents.get(registerer.getIdentifier()).stream()
 				.forEach(l -> unregisterListener(registerer, l.eventIdentifier, l.listener));
 	}
