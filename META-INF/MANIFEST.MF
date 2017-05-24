@@ -9,7 +9,8 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui;bundle-version="3.108.1",
  org.eclipse.ui.console,
  org.eclipse.jdt.ui,
- org.junit
+ org.junit,
+ org.eclipse.gef;bundle-version="3.11.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .,

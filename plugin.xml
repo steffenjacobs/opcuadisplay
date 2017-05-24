@@ -30,6 +30,13 @@
             class="me.steffenjacobs.opcuadisplay.views.reference.ReferenceView"
             id="me.steffenjacobs.opcuadisplay.views.reference.ReferenceView">
       </view>
+       <view
+            name="OPC UA Star Schema View"
+            icon="icons/view/starschema.png"
+            category="me.steffenjacobs.opcuadisplay"
+            class="me.steffenjacobs.opcuadisplay.views.starschema.StarSchemaView"
+            id="me.steffenjacobs.opcuadisplay.views.starschema.StarSchemaView">
+      </view>
    </extension>
    <extension
          point="org.eclipse.help.contexts">
