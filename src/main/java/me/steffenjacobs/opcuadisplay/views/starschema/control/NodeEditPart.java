@@ -9,7 +9,8 @@ import org.eclipse.draw2d.MouseEvent;
 import org.eclipse.draw2d.MouseListener;
 import org.eclipse.draw2d.MouseMotionListener;
 import org.eclipse.draw2d.PositionConstants;
-import org.eclipse.draw2d.RectangleFigure;
+import org.eclipse.draw2d.RoundedRectangle;
+import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.gef.ConnectionEditPart;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
@@ -27,16 +28,18 @@ public class NodeEditPart extends AbstractGraphicalEditPart {
 
 		final NodeModel m = ((NodeModel) getModel());
 
-		final IFigure rectangle = new RectangleFigure();
+		final RoundedRectangle rectangle = new RoundedRectangle();
 		rectangle.setBackgroundColor(m.getColor());
 
 		if (m.isDummy()) {
 			// remove border
-			rectangle.setBorder(new LineBorder(ColorSet.NO_BORDER.getColor()));
+			rectangle.setBorder(new LineBorder(ColorSet.WHITE.getColor()));
+			rectangle.setCornerDimensions(new Dimension(0,0));
 		} else {
+			rectangle.setCornerDimensions(new Dimension(20, 20));
+
 			// add listeners
 			addListeners(m, rectangle);
-
 		}
 		return rectangle;
 	}

@@ -3,9 +3,8 @@ package me.steffenjacobs.opcuadisplay.views.starschema;
 import org.eclipse.swt.graphics.Color;
 
 public enum ColorSet {
-	NO_BORDER(new Color(null, 255, 255, 255)),
-	SELECTED_NODE(new Color(null, 200, 208, 208)),
-	NODE(new Color(null, 240, 243, 243)),
+	SELECTED_NODE(new Color(null, 208, 223, 239)),
+	NODE(new Color(null, 230, 234, 248)),
 	WHITE(new Color(null, 255, 255, 255));
 
 	private final Color color;
