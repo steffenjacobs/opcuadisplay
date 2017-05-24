@@ -38,4 +38,8 @@ public class MultiMap<K, V> {
 	public void removeall(K k){
 		innerMap.remove(k);
 	}
+
+	public boolean contains(K k) {
+		return innerMap.containsKey(k);
+	}
 }
