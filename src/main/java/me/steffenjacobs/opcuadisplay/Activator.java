@@ -118,5 +118,10 @@ public class Activator extends AbstractUIPlugin {
 		for (Images.ExplorerView img : Images.ExplorerView.values()) {
 			loadImage(bundle, registry, img.getPath(), img.getIdentifier());
 		}
+
+		// load view images
+		for (Images.StarSchemaView img : Images.StarSchemaView.values()) {
+			loadImage(bundle, registry, img.getPath(), img.getIdentifier());
+		}
 	}
 }

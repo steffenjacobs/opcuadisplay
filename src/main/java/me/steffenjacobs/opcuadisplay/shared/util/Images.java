@@ -89,4 +89,28 @@ public enum Images {
 			return identifier;
 		}
 	}
+
+	public static enum StarSchemaView {
+		UP("icons/view/starschema/up.gif", "up");
+
+		private final String path, identifier;
+
+		StarSchemaView(String path, String identifier) {
+			this.path = path;
+			this.identifier = Activator.PLUGIN_ID + ".view.starschema." + identifier;
+		}
+
+		public String getIdentifier() {
+			return identifier;
+		}
+
+		public String getPath() {
+			return path;
+		}
+
+		@Override
+		public String toString() {
+			return identifier;
+		}
+	}
 }

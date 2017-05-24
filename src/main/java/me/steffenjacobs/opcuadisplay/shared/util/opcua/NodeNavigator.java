@@ -12,12 +12,17 @@ import org.eclipse.milo.opcua.stack.core.types.builtin.LocalizedText;
 import org.eclipse.milo.opcua.stack.core.types.builtin.QualifiedName;
 import org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.UInteger;
 import org.eclipse.milo.opcua.stack.core.types.enumerated.IdType;
+import org.eclipse.swt.widgets.Composite;
 
 import com.google.common.collect.Lists;
 
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedBaseNode;
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedObjectNode;
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedReference;
+import me.steffenjacobs.opcuadisplay.shared.util.EventBus;
+import me.steffenjacobs.opcuadisplay.shared.util.EventBus.EventListener;
+import me.steffenjacobs.opcuadisplay.views.CloseableView;
+import me.steffenjacobs.opcuadisplay.views.explorer.events.SelectedNodeChangedEvent;
 /** @author Steffen Jacobs */
 public class NodeNavigator {
 
@@ -30,6 +35,8 @@ public class NodeNavigator {
 				"HasSubtype", "HasEventSource", "HasNotifier", "Organizes" };
 
 	private static NodeNavigator instance;
+	
+	private CachedBaseNode selectedNode;
 
 	private CachedObjectNode root;
 
@@ -38,6 +45,31 @@ public class NodeNavigator {
 
 	private NodeNavigator() {
 		// singleton
+		EventBus.getInstance().addListener(new CloseableView() {
+			
+			@Override
+			public void setFocus() {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void createPartControl(Composite arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public String getIdentifier() {
+				return "dummy";
+			}
+		}, SelectedNodeChangedEvent.IDENTIFIER, new EventListener<SelectedNodeChangedEvent>() {
+
+			@Override
+			public void onAction(SelectedNodeChangedEvent event) {
+				selectedNode = event.getNode();
+			}
+		});
 	}
 
 	public static NodeNavigator getInstance() {
@@ -255,5 +287,9 @@ public class NodeNavigator {
 
 	public Optional<CachedReference> getTypeDefinition(CachedBaseNode refNode) {
 		return refNode.getReferences().stream().filter(ref -> ref.getReferenceType().equals("HasTypeDefinition")).findAny();
+	}
+
+	public CachedBaseNode getSelectedNode() {
+		return this.selectedNode;
 	}
 }
