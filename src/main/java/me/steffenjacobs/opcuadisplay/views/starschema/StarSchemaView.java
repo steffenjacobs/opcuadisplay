@@ -48,7 +48,7 @@ public class StarSchemaView extends CloseableView {
 	private void fillLocalToolBar(IToolBarManager manager) {
 
 		// collapse all action
-		Action goLevelUp = new Action() {
+		Action jumpToParentNode = new Action() {
 			public void run() {
 				if (NodeNavigator.getInstance().getSelectedNode() != null
 						&& NodeNavigator.getInstance().getSelectedNode().getParent() != null) {
@@ -57,11 +57,11 @@ public class StarSchemaView extends CloseableView {
 				}
 			}
 		};
-		goLevelUp.setText("Up");
-		goLevelUp.setToolTipText("Go one level up");
-		goLevelUp.setImageDescriptor(Activator.getImageDescriptor(Images.StarSchemaView.UP.getIdentifier()));
+		jumpToParentNode.setText("Jump to parent node");
+		jumpToParentNode.setToolTipText("Jump to parent node");
+		jumpToParentNode.setImageDescriptor(Activator.getImageDescriptor(Images.StarSchemaView.UP.getIdentifier()));
 
-		manager.add(goLevelUp);
+		manager.add(jumpToParentNode);
 	}
 
 	private void addListeners() {
