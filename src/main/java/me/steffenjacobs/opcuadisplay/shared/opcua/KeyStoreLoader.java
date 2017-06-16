@@ -11,7 +11,7 @@
  *   http://www.eclipse.org/org/documents/edl-v10.html.
  */
 
-package me.steffenjacobs.opcuadisplay.shared.util.opcua;
+package me.steffenjacobs.opcuadisplay.shared.opcua;
 
 import java.security.Key;
 import java.security.KeyPair;

@@ -1,4 +1,4 @@
-package me.steffenjacobs.opcuadisplay.shared.util.opcua;
+package me.steffenjacobs.opcuadisplay.shared.opcua;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,8 +18,8 @@ import com.google.common.collect.Lists;
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedBaseNode;
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedObjectNode;
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedReference;
-import me.steffenjacobs.opcuadisplay.shared.util.EventBus;
-import me.steffenjacobs.opcuadisplay.shared.util.EventBus.EventListener;
+import me.steffenjacobs.opcuadisplay.shared.eventbus.EventBus;
+import me.steffenjacobs.opcuadisplay.shared.eventbus.EventBus.EventListener;
 import me.steffenjacobs.opcuadisplay.views.explorer.events.SelectedNodeChangedEvent;
 
 /** @author Steffen Jacobs */

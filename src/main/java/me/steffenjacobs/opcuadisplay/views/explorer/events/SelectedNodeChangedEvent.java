@@ -1,8 +1,8 @@
 package me.steffenjacobs.opcuadisplay.views.explorer.events;
 
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedBaseNode;
-import me.steffenjacobs.opcuadisplay.shared.util.EventBus.Event;
-import me.steffenjacobs.opcuadisplay.shared.util.EventBus.EventArgs;
+import me.steffenjacobs.opcuadisplay.shared.eventbus.EventBus.Event;
+import me.steffenjacobs.opcuadisplay.shared.eventbus.EventBus.EventArgs;
 
 /** is called, after the selected node has changed 
  * @author Steffen Jacobs*/

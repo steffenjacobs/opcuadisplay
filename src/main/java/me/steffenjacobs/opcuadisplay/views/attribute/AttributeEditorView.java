@@ -13,8 +13,8 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
 
-import me.steffenjacobs.opcuadisplay.shared.util.EventBus;
-import me.steffenjacobs.opcuadisplay.shared.util.EventBus.EventListener;
+import me.steffenjacobs.opcuadisplay.shared.eventbus.EventBus;
+import me.steffenjacobs.opcuadisplay.shared.eventbus.EventBus.EventListener;
 import me.steffenjacobs.opcuadisplay.views.CloseableView;
 import me.steffenjacobs.opcuadisplay.views.attribute.domain.NodeEntryFactory;
 import me.steffenjacobs.opcuadisplay.views.attribute.domain.NodeEntryFactory.NodeEntry;

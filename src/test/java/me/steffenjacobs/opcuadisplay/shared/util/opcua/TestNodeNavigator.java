@@ -19,7 +19,9 @@ import com.google.common.collect.Lists;
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedBaseNode;
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedObjectNode;
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedObjectTypeNode;
-import me.steffenjacobs.opcuadisplay.shared.util.opcua.NodeNavigator.NodeManipulator;
+import me.steffenjacobs.opcuadisplay.shared.opcua.NodeGenerator;
+import me.steffenjacobs.opcuadisplay.shared.opcua.NodeNavigator;
+import me.steffenjacobs.opcuadisplay.shared.opcua.NodeNavigator.NodeManipulator;
 
 public class TestNodeNavigator {
 

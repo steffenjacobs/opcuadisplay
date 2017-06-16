@@ -8,10 +8,10 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IActionBars;
 
 import me.steffenjacobs.opcuadisplay.Activator;
-import me.steffenjacobs.opcuadisplay.shared.util.EventBus;
-import me.steffenjacobs.opcuadisplay.shared.util.EventBus.EventListener;
+import me.steffenjacobs.opcuadisplay.shared.eventbus.EventBus;
+import me.steffenjacobs.opcuadisplay.shared.eventbus.EventBus.EventListener;
+import me.steffenjacobs.opcuadisplay.shared.opcua.NodeNavigator;
 import me.steffenjacobs.opcuadisplay.shared.util.Images;
-import me.steffenjacobs.opcuadisplay.shared.util.opcua.NodeNavigator;
 import me.steffenjacobs.opcuadisplay.views.CloseableView;
 import me.steffenjacobs.opcuadisplay.views.explorer.events.ChangeSelectedNodeEvent;
 import me.steffenjacobs.opcuadisplay.views.explorer.events.SelectedNodeChangedEvent;

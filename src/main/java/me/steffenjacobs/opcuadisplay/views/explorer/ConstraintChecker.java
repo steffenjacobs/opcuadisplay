@@ -4,7 +4,7 @@ import org.eclipse.milo.opcua.stack.core.Identifiers;
 import org.eclipse.milo.opcua.stack.core.types.enumerated.NodeClass;
 
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedBaseNode;
-import me.steffenjacobs.opcuadisplay.shared.util.opcua.NodeNavigator;
+import me.steffenjacobs.opcuadisplay.shared.opcua.NodeNavigator;
 /** @author Steffen Jacobs */
 public class ConstraintChecker {
 

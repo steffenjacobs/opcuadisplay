@@ -10,8 +10,8 @@ import org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.UByte;
 import org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.UInteger;
 import org.eclipse.milo.opcua.stack.core.types.enumerated.NodeClass;
 
-import me.steffenjacobs.opcuadisplay.shared.util.FutureResolver;
-import me.steffenjacobs.opcuadisplay.shared.util.opcua.NodeNavigator;
+import me.steffenjacobs.opcuadisplay.shared.opcua.FutureResolver;
+import me.steffenjacobs.opcuadisplay.shared.opcua.NodeNavigator;
 
 /** @author Steffen Jacobs */
 public class CachedVariableNode extends CachedBaseNode implements HasValueRank {

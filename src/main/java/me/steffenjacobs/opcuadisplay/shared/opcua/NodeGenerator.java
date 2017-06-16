@@ -1,4 +1,4 @@
-package me.steffenjacobs.opcuadisplay.shared.util.opcua;
+package me.steffenjacobs.opcuadisplay.shared.opcua;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -24,9 +24,9 @@ import me.steffenjacobs.opcuadisplay.shared.domain.CachedObjectTypeNode;
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedReference;
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedVariableNode;
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedVariableTypeNode;
-import me.steffenjacobs.opcuadisplay.shared.util.EventBus;
-import me.steffenjacobs.opcuadisplay.shared.util.opcua.NodeNavigator.NodeManipulator;
-import me.steffenjacobs.opcuadisplay.shared.util.opcua.xml.XmlImport;
+import me.steffenjacobs.opcuadisplay.shared.eventbus.EventBus;
+import me.steffenjacobs.opcuadisplay.shared.opcua.NodeNavigator.NodeManipulator;
+import me.steffenjacobs.opcuadisplay.shared.xml.XmlImport;
 import me.steffenjacobs.opcuadisplay.views.attribute.events.AttributeModifiedEvent;
 import me.steffenjacobs.opcuadisplay.views.explorer.dialogs.DialogFactory.AddDialogType;
 import me.steffenjacobs.opcuadisplay.views.explorer.domain.MethodArgument;

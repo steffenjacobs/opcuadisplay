@@ -8,8 +8,8 @@ import org.eclipse.milo.opcua.stack.core.types.builtin.NodeId;
 import org.eclipse.milo.opcua.stack.core.types.builtin.QualifiedName;
 import org.eclipse.milo.opcua.stack.core.types.enumerated.NodeClass;
 
-import me.steffenjacobs.opcuadisplay.shared.util.FutureResolver;
-import me.steffenjacobs.opcuadisplay.shared.util.opcua.NodeNavigator;
+import me.steffenjacobs.opcuadisplay.shared.opcua.FutureResolver;
+import me.steffenjacobs.opcuadisplay.shared.opcua.NodeNavigator;
 /** @author Steffen Jacobs */
 public class CachedObjectTypeNode extends CachedBaseNode implements HasOnlyAbstract {
 	

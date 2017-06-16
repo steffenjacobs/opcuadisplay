@@ -1,4 +1,4 @@
-package me.steffenjacobs.opcuadisplay.shared.util;
+package me.steffenjacobs.opcuadisplay.shared.xml;
 /** @author Steffen Jacobs */
 public class Tuple2<X, Y> {
 

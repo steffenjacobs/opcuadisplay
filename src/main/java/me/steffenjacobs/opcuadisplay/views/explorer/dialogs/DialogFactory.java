@@ -4,7 +4,7 @@ import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.swt.widgets.Shell;
 
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedBaseNode;
-import me.steffenjacobs.opcuadisplay.shared.util.opcua.NodeGenerator;
+import me.steffenjacobs.opcuadisplay.shared.opcua.NodeGenerator;
 import me.steffenjacobs.opcuadisplay.views.explorer.domain.MethodArgument;
 /** @author Steffen Jacobs */
 public class DialogFactory {

@@ -1,4 +1,4 @@
-package me.steffenjacobs.opcuadisplay.shared.util.opcua.xml;
+package me.steffenjacobs.opcuadisplay.shared.xml;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -47,10 +47,9 @@ import me.steffenjacobs.opcuadisplay.shared.domain.generated.UAReferenceType;
 import me.steffenjacobs.opcuadisplay.shared.domain.generated.UAVariable;
 import me.steffenjacobs.opcuadisplay.shared.domain.generated.UAVariableType;
 import me.steffenjacobs.opcuadisplay.shared.domain.generated.UAView;
-import me.steffenjacobs.opcuadisplay.shared.util.Tuple2;
-import me.steffenjacobs.opcuadisplay.shared.util.opcua.NodeGenerator;
-import me.steffenjacobs.opcuadisplay.shared.util.opcua.NodeNavigator;
-import me.steffenjacobs.opcuadisplay.shared.util.opcua.NodeNavigator.NodeManipulator;
+import me.steffenjacobs.opcuadisplay.shared.opcua.NodeGenerator;
+import me.steffenjacobs.opcuadisplay.shared.opcua.NodeNavigator;
+import me.steffenjacobs.opcuadisplay.shared.opcua.NodeNavigator.NodeManipulator;
 /** @author Steffen Jacobs */
 public class XmlImport {
 

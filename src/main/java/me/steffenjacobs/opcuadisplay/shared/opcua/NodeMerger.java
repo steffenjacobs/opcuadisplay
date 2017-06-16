@@ -1,4 +1,4 @@
-package me.steffenjacobs.opcuadisplay.shared.util.opcua;
+package me.steffenjacobs.opcuadisplay.shared.opcua;
 
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedBaseNode;
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedDataTypeNode;

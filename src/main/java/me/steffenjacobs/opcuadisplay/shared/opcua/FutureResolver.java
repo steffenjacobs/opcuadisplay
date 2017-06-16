@@ -1,4 +1,4 @@
-package me.steffenjacobs.opcuadisplay.shared.util;
+package me.steffenjacobs.opcuadisplay.shared.opcua;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;

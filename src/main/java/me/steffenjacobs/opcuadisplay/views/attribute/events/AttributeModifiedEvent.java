@@ -1,8 +1,8 @@
 package me.steffenjacobs.opcuadisplay.views.attribute.events;
 
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedBaseNode;
-import me.steffenjacobs.opcuadisplay.shared.util.EventBus.Event;
-import me.steffenjacobs.opcuadisplay.shared.util.EventBus.EventArgs;
+import me.steffenjacobs.opcuadisplay.shared.eventbus.EventBus.Event;
+import me.steffenjacobs.opcuadisplay.shared.eventbus.EventBus.EventArgs;
 /** @author Steffen Jacobs */
 public class AttributeModifiedEvent extends Event {
 

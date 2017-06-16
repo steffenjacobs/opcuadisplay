@@ -22,6 +22,8 @@ import me.steffenjacobs.opcuadisplay.shared.domain.CachedBaseNode;
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedObjectNode;
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedObjectTypeNode;
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedReference;
+import me.steffenjacobs.opcuadisplay.shared.opcua.NodeGenerator;
+import me.steffenjacobs.opcuadisplay.shared.opcua.NodeNavigator;
 import me.steffenjacobs.opcuadisplay.views.explorer.dialogs.DialogFactory.AddDialogType;
 
 public class TestNodeGenerator {

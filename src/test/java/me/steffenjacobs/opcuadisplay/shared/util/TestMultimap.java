@@ -9,6 +9,8 @@ import org.junit.Test;
 
 import com.google.common.collect.Lists;
 
+import me.steffenjacobs.opcuadisplay.shared.eventbus.MultiMap;
+
 public class TestMultimap {
 
 	/**

@@ -1,4 +1,4 @@
-package me.steffenjacobs.opcuadisplay.shared.util.opcua.xml;
+package me.steffenjacobs.opcuadisplay.shared.xml;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -39,8 +39,8 @@ import me.steffenjacobs.opcuadisplay.shared.domain.generated.UAReferenceType;
 import me.steffenjacobs.opcuadisplay.shared.domain.generated.UAVariable;
 import me.steffenjacobs.opcuadisplay.shared.domain.generated.UAVariableType;
 import me.steffenjacobs.opcuadisplay.shared.domain.generated.UAView;
-import me.steffenjacobs.opcuadisplay.shared.util.opcua.NodeNavigator;
-import me.steffenjacobs.opcuadisplay.shared.util.opcua.NodeNavigator.NodeManipulator;
+import me.steffenjacobs.opcuadisplay.shared.opcua.NodeNavigator;
+import me.steffenjacobs.opcuadisplay.shared.opcua.NodeNavigator.NodeManipulator;
 /** @author Steffen Jacobs */
 public class XmlExport {
 

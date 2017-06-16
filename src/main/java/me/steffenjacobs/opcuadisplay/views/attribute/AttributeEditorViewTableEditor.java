@@ -29,7 +29,7 @@ import me.steffenjacobs.opcuadisplay.shared.domain.CachedReferenceTypeNode;
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedVariableNode;
 import me.steffenjacobs.opcuadisplay.shared.domain.HasOnlyAbstract;
 import me.steffenjacobs.opcuadisplay.shared.domain.HasValueRank;
-import me.steffenjacobs.opcuadisplay.shared.util.EventBus;
+import me.steffenjacobs.opcuadisplay.shared.eventbus.EventBus;
 import me.steffenjacobs.opcuadisplay.shared.widgets.DropDownCheckedListBox;
 import me.steffenjacobs.opcuadisplay.shared.widgets.GenericComboBox;
 import me.steffenjacobs.opcuadisplay.shared.widgets.GenericComboBox.Renderer;

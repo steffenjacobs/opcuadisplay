@@ -2,7 +2,7 @@ package me.steffenjacobs.opcuadisplay.views;
 
 import org.eclipse.ui.part.ViewPart;
 
-import me.steffenjacobs.opcuadisplay.shared.util.EventBus;
+import me.steffenjacobs.opcuadisplay.shared.eventbus.EventBus;
 
 /** automatically unregisters listeners when view got closed 
  * 

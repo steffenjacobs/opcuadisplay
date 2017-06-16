@@ -10,9 +10,9 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedBaseNode;
-import me.steffenjacobs.opcuadisplay.shared.util.EventBus;
-import me.steffenjacobs.opcuadisplay.shared.util.opcua.NodeNavigator;
-import me.steffenjacobs.opcuadisplay.shared.util.opcua.OPCUaClient;
+import me.steffenjacobs.opcuadisplay.shared.eventbus.EventBus;
+import me.steffenjacobs.opcuadisplay.shared.opcua.NodeNavigator;
+import me.steffenjacobs.opcuadisplay.shared.opcua.OPCUaClient;
 import me.steffenjacobs.opcuadisplay.views.explorer.events.RootUpdatedEvent;
 /** @author Steffen Jacobs */
 public class OpcUaConnector implements ITreeContentProvider {

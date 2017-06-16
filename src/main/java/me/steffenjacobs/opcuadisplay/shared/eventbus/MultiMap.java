@@ -1,4 +1,4 @@
-package me.steffenjacobs.opcuadisplay.shared.util;
+package me.steffenjacobs.opcuadisplay.shared.eventbus;
 
 import java.util.ArrayList;
 import java.util.HashMap;
