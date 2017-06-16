@@ -11,6 +11,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.milo.opcua.sdk.client.OpcUaClient;
@@ -19,6 +20,7 @@ import org.eclipse.milo.opcua.sdk.client.api.identity.AnonymousProvider;
 import org.eclipse.milo.opcua.sdk.client.api.nodes.Node;
 import org.eclipse.milo.opcua.sdk.client.nodes.UaDataTypeNode;
 import org.eclipse.milo.opcua.sdk.client.nodes.UaMethodNode;
+import org.eclipse.milo.opcua.sdk.client.nodes.UaNode;
 import org.eclipse.milo.opcua.sdk.client.nodes.UaObjectNode;
 import org.eclipse.milo.opcua.sdk.client.nodes.UaObjectTypeNode;
 import org.eclipse.milo.opcua.sdk.client.nodes.UaReferenceTypeNode;
@@ -30,6 +32,7 @@ import org.eclipse.milo.opcua.stack.core.Identifiers;
 import org.eclipse.milo.opcua.stack.core.security.SecurityPolicy;
 import org.eclipse.milo.opcua.stack.core.types.builtin.LocalizedText;
 import org.eclipse.milo.opcua.stack.core.types.builtin.NodeId;
+import org.eclipse.milo.opcua.stack.core.types.builtin.QualifiedName;
 import org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.Unsigned;
 import org.eclipse.milo.opcua.stack.core.types.enumerated.BrowseDirection;
 import org.eclipse.milo.opcua.stack.core.types.enumerated.BrowseResultMask;
@@ -37,13 +40,10 @@ import org.eclipse.milo.opcua.stack.core.types.enumerated.NodeClass;
 import org.eclipse.milo.opcua.stack.core.types.structured.BrowseDescription;
 import org.eclipse.milo.opcua.stack.core.types.structured.BrowseResult;
 import org.eclipse.milo.opcua.stack.core.types.structured.EndpointDescription;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.MessageBox;
-import org.eclipse.swt.widgets.Shell;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import me.steffenjacobs.opcuadisplay.Activator;
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedBaseNode;
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedDataTypeNode;
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedMethodNode;
@@ -54,14 +54,23 @@ import me.steffenjacobs.opcuadisplay.shared.domain.CachedReferenceTypeNode;
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedVariableNode;
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedVariableTypeNode;
 import me.steffenjacobs.opcuadisplay.shared.domain.CachedViewNode;
-/** @author Steffen Jacobs */
-public class NodeDownloader {
 
-	private static final Logger logger = LoggerFactory.getLogger(NodeDownloader.class);
+/**
+ * retrieves the nodes from the OPC UA server
+ * 
+ * @author Steffen Jacobs
+ */
+public class OPCUaClient {
+
+	private static final Logger logger = LoggerFactory.getLogger(OPCUaClient.class);
 
 	private final HashMap<NodeId, String> typeNamesCache = new HashMap<>();
 
-	public CachedBaseNode retrieveNodes(String url, final IProgressMonitor monitor) throws Exception {
+	/**
+	 * @return all nodes from an opc server specified in <i>url</i> linked to
+	 *         their parents
+	 */
+	public CachedObjectNode retrieveNodes(String url, final IProgressMonitor monitor) throws Exception {
 		NodeNavigator.getInstance().resetHighestNodeId();
 
 		monitor.beginTask("Establishing connection with " + url + "...", 2);
@@ -84,7 +93,8 @@ public class NodeDownloader {
 
 		monitor.beginTask("Downloading Models...", 100);
 		// receive sub folders of root
-		final CachedBaseNode root = retrieveNodes(NodeGenerator.getInstance().generateRoot(), client, false);
+		final CachedObjectNode root = (CachedObjectNode) retrieveNodes(NodeGenerator.getInstance().generateRoot(),
+				client, false);
 
 		toList(root.getChildren()).forEach(root_xxx -> {
 
@@ -150,65 +160,47 @@ public class NodeDownloader {
 		return root;
 	}
 
-	private CachedBaseNode retrieveNodes(CachedBaseNode parent, OpcUaClient client, boolean recursive) {
-		BrowseDescription browse = new BrowseDescription(parent.getNodeId(), BrowseDirection.Forward,
-				Identifiers.References, true,
-				uint(NodeClass.Object.getValue() | NodeClass.DataType.getValue() | NodeClass.ObjectType.getValue()
-						| NodeClass.VariableType.getValue() | NodeClass.ReferenceType.getValue()
-						| NodeClass.Method.getValue() | NodeClass.Variable.getValue()),
+	private void retrieveNodesMonitored(final CachedBaseNode parent, OpcUaClient client, boolean recursive,
+			IProgressMonitor monitor, int value) {
+		retrieveNodes(parent, client, recursive);
+		monitor.worked(value);
+	}
 
-				uint(BrowseResultMask.All.getValue()));
-
+	/** @returns a list of all references associated with <i>node</i> */
+	private List<CachedReference> browseAllReferences(CachedBaseNode node, OpcUaClient client) {
+		List<CachedReference> ref = new ArrayList<>();
 		try {
+			BrowseDescription browse = new BrowseDescription(node.getNodeId(), BrowseDirection.Forward,
+					Identifiers.References, true,
+					uint(NodeClass.Object.getValue() | NodeClass.DataType.getValue() | NodeClass.ObjectType.getValue()
+							| NodeClass.VariableType.getValue() | NodeClass.ReferenceType.getValue()
+							| NodeClass.Method.getValue() | NodeClass.Variable.getValue()),
+
+					uint(BrowseResultMask.All.getValue()));
+
 			BrowseResult browseResult = client.browse(browse).get();
 
-			final List<CachedReference> refs = new ArrayList<>();
 			toList(browseResult.getReferences()).forEach(rd -> {
 
-				if ("HasTypeDefinition".equals(getNameOfNode(parent.getNodeId(), rd.getReferenceTypeId(), client))) {
-					return;
-				}
+				// pack the reference inside CachedReference
+				CachedReference cr = new CachedReference(getNameOfNode(rd.getReferenceTypeId(), client),
+						rd.getBrowseName(), getNameOfNode(rd.getTypeDefinition().local().orElse(null), client),
+						rd.getNodeId().local().get());
+				ref.add(cr);
 
-				// retrieve the node details from the reference
-				CachedBaseNode cbn = retrieveNodeDetails(parent.getNodeId(), rd.getNodeId().local().orElse(null),
-						client);
-
-				if (cbn == null) {
-					System.out.println(getNameOfNode(null, rd.getTypeId(), client));
-					System.out.println(rd.getBrowseName().getName());
-					System.out.println(rd.getNodeId().local().orElse(null));
-					System.out.println(getNameOfNode(parent.getNodeId(), rd.getNodeId().local().orElse(null), client));
-					System.out.println(getNameOfNode(parent.getNodeId(), parent.getNodeId(), client));
-				}
-
-				// add references
-				refs.add(new CachedReference(getNameOfNode(parent.getNodeId(), rd.getReferenceTypeId(), client),
-						rd.getBrowseName(),
-						getNameOfNode(parent.getNodeId(), rd.getTypeDefinition().local().orElse(null), client),
-						rd.getNodeId().local().get()));
-
-				// recursion
-				if (recursive) {
-					System.out.println("rec for " + cbn.getBrowseName().getName());
-					cbn = retrieveNodes(cbn, client, recursive);
-				}
-
-				addChildToNode(parent, cbn);
 			});
-
-			parent.setReferences(refs);
 		} catch (InterruptedException | ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("Browsing references for nodeId={} failed: {}", node, e.getMessage(), e);
 		}
-		return parent;
+
+		return ref;
 	}
 
 	/**
 	 * @return the name of the node associated to <i>id</i>. If the NodeId had
 	 *         already been queried, the associated name had been cached.
 	 */
-	public String getNameOfNode(NodeId parentNodeId, NodeId id, OpcUaClient client) {
+	public String getNameOfNode(NodeId id, OpcUaClient client) {
 		if (id == null) {
 			return "null";
 		}
@@ -219,17 +211,84 @@ public class NodeDownloader {
 		}
 
 		// retrieve node
-		CachedBaseNode node = retrieveNodeDetails(parentNodeId, id, client);
+		CachedBaseNode node = retrieveNodeDetails(id, client);
 
 		if (node == null) {
 			return "null";
 		}
 		if (node.getDisplayName() == null) {
-			return "[BROWSE]" + node.getBrowseName().getName();
+			return "null";
 		}
 		typeNamesCache.put(id, node.getDisplayName().getText());
 
 		return node.getDisplayName().getText();
+	}
+
+	/**
+	 * browses the references recursive, by taking the referenced nodeid,
+	 * retrieving the associated node and adding it to the parent recursively
+	 */
+	private List<CachedBaseNode> browseReferencesRecursive(CachedBaseNode node, OpcUaClient client, boolean recursive) {
+		List<CachedBaseNode> ref = new ArrayList<>();
+		try {
+			BrowseDescription browse = new BrowseDescription(node.getNodeId(), BrowseDirection.Forward,
+					Identifiers.References, true,
+					uint(NodeClass.Object.getValue() | NodeClass.DataType.getValue() | NodeClass.ObjectType.getValue()
+							| NodeClass.VariableType.getValue() | NodeClass.ReferenceType.getValue()
+							| NodeClass.Method.getValue() | NodeClass.Variable.getValue()),
+
+					uint(BrowseResultMask.All.getValue()));
+
+			BrowseResult browseResult = client.browse(browse).get();
+
+			final List<CachedReference> refs = new ArrayList<>();
+			toList(browseResult.getReferences()).forEach(rd -> {
+				// retrieve the node details from the reference
+				NodeId nodeId = rd.getNodeId().local().orElse(null);
+
+				CachedBaseNode cbn = retrieveNodeDetails(nodeId, client);
+
+				if (cbn != null) {
+					// this is probably a type
+					if (recursive) {
+						browseReferencesRecursive(cbn, client, recursive).forEach(nd -> addChildToNode(cbn, nd));
+					}
+					ref.add(cbn);
+				} else {
+					// this is probably something else in the types folder (e.g.
+					// objects, variables, etc.)
+
+					CachedBaseNode nn;
+					if (rd.getNodeClass() == NodeClass.Object) {
+						nn = new CachedObjectNode(nodeId);
+					} else if (rd.getNodeClass() == NodeClass.Variable) {
+
+						nn = new CachedVariableNode(nodeId);
+					} else if (rd.getNodeClass() == NodeClass.DataType) {
+						nn = new CachedDataTypeNode(nodeId);
+					} else {
+						nn = new CachedBaseNode(nodeId, rd.getNodeClass());
+					}
+
+					nn.setBrowseName(rd.getBrowseName());
+					nn.setDisplayName(rd.getDisplayName());
+
+					ref.add(nn);
+					nn.setReferences(browseAllReferences(nn, client));
+					retrieveNodes(nn, client, recursive);
+				}
+
+				// add references
+				refs.add(new CachedReference(getNameOfNode(rd.getReferenceTypeId(), client), rd.getBrowseName(),
+						getNameOfNode(rd.getTypeDefinition().local().orElse(null), client),
+						rd.getNodeId().local().get()));
+			});
+
+			node.setReferences(refs);
+		} catch (InterruptedException | ExecutionException | NullPointerException e) {
+			logger.error("Browsing references for nodeId={} failed: {}", node, e.getMessage(), e);
+		}
+		return ref;
 	}
 
 	/**
@@ -243,39 +302,16 @@ public class NodeDownloader {
 	}
 
 	/** retrieves the attributes of a node associated to <i>nodeId</i> */
-	private CachedBaseNode retrieveNodeDetails(NodeId parentId, NodeId nodeId, OpcUaClient client) {
-		Node node = null;
+	private CachedBaseNode retrieveNodeDetails(NodeId nodeId, OpcUaClient client) {
+		UaNode node = null;
 		try {
 			node = client.getAddressSpace().getNodeInstance(nodeId).get();
-
-		} catch (InterruptedException | ExecutionException e) {
-			// this is normal, if the requested NodeId had not been found
-		}
-
-		try {
-			if (node == null) {
-				List<Node> lst = client.getAddressSpace().browse(parentId).get();
-				node = lst.stream().filter(x -> {
-					try {
-						return x.getNodeId().get().equals(nodeId);
-					} catch (InterruptedException | ExecutionException e) {
-						e.printStackTrace();
-					}
-					return false;
-				}).findAny().orElse(null);
-			}
 
 			return parseNode(node);
 		} catch (InterruptedException | ExecutionException e) {
 			// this is normal, if the requested NodeId had not been found
 		}
 		return null;
-	}
-
-	private void retrieveNodesMonitored(final CachedBaseNode parent, OpcUaClient client, boolean recursive,
-			IProgressMonitor monitor, int value) {
-		retrieveNodes(parent, client, recursive);
-		monitor.worked(value);
 	}
 
 	/**
@@ -309,15 +345,83 @@ public class NodeDownloader {
 		}
 	}
 
-	private static void openMessageBox(final String title, final String message) {
-		Display.getDefault().syncExec(new Runnable() {
-			public void run() {
-				MessageBox box = new MessageBox(new Shell(), SWT.ICON_ERROR);
-				box.setText(title);
-				box.setMessage(message);
-				box.open();
+	/**
+	 * retrieves the child nodes of <i>parent</i>
+	 * 
+	 * @param parent
+	 *            the parent which children should be retrieved
+	 * @param client
+	 *            the OpcUaClient which is holding the connection open
+	 * @param recursive
+	 *            whether the child nodes should be retrieved recursively
+	 * 
+	 * 
+	 * @return <i>parent</i> with the associated children linked to it
+	 */
+	private CachedBaseNode retrieveNodes(final CachedBaseNode parent, OpcUaClient client, final boolean recursive) {
+
+		try {
+			// TODO: retrieve root, if necessary
+
+			List<Node> lst = client.getAddressSpace().browse(parent.getNodeId()).get();
+
+			if (NodeNavigator.getInstance().isInTypesFolder(parent)) {
+				List<CachedBaseNode> lstRef = browseReferencesRecursive(parent, client, recursive);
+				lstRef.forEach(n -> {
+					// TODO fix references of XML Schema and Binary Schema nodes
+					// when deduplicating
+					addChildToNode(parent, n);
+				});
+
+				List<QualifiedName> names = lstRef.stream().map(CachedBaseNode::getBrowseName)
+						.collect(Collectors.toList());
+
+				// deduplicating
+				lst = lst.stream().filter(n -> {
+					try {
+						return !names.contains(n.getBrowseName().get());
+					} catch (InterruptedException | ExecutionException e1) {
+						e1.printStackTrace();
+					}
+					return true;
+				}).collect(Collectors.toList());
 			}
-		});
+
+			lst.forEach(node -> {
+
+				try {
+					// cache node
+					CachedBaseNode cn = parseNode(node);
+
+					// set parent
+					cn.setParent(parent);
+
+					// references
+
+					// if in type folder, retrieve all references recursively
+					// and add them as children
+					if (NodeNavigator.getInstance().isInTypesFolder(cn) && recursive) {
+						browseReferencesRecursive(cn, client, recursive).forEach(ref -> addChildToNode(cn, ref));
+					}
+					cn.setReferences(browseAllReferences(cn, client));
+
+					// retrieve children
+					if (recursive) {
+						retrieveNodes(cn, client, recursive);
+					}
+
+					// add child to parent
+					addChildToNode(parent, cn);
+				} catch (InterruptedException | ExecutionException e) {
+					e.printStackTrace();
+				}
+
+			});
+		} catch (InterruptedException | ExecutionException e) {
+			logger.error("Browsing nodeId={} failed: {}", parent.getNodeId(), e.getMessage(), e);
+		}
+
+		return parent;
 	}
 
 	/**
@@ -333,9 +437,9 @@ public class NodeDownloader {
 			endpoints = UaTcpStackClient.getEndpoints(url).get();
 		} catch (Exception excep) {
 			if (excep.getMessage().startsWith("UaException: status=Bad_TcpEndpointUrlInvalid")) {
-				openMessageBox("OPC UA Display", "Invalid hostname: " + url);
+				Activator.openMessageBox("OPC UA Display", "Invalid hostname: " + url);
 			} else {
-				openMessageBox("OPC UA Display", excep.getLocalizedMessage());
+				Activator.openMessageBox("OPC UA Display", excep.getLocalizedMessage());
 			}
 			return null;
 		}
@@ -359,5 +463,4 @@ public class NodeDownloader {
 
 		return new OpcUaClient(opcConfig);
 	}
-
 }
