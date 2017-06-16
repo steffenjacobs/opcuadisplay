@@ -3,11 +3,11 @@ package me.steffenjacobs.opcuadisplay.shared.util;
 import me.steffenjacobs.opcuadisplay.Activator;
 /** @author Steffen Jacobs */
 public enum Images {
-	IMG_COLLAPSE_ALL("icons/collapseall.png", "collapseall"),
-	IMG_EXPAND_ALL("icons/expandall.png", "expandall"),
-	IMG_IMPORT("icons/import.png", "import"),
-	IMG_EXPORT("icons/export.png", "export"),
-	OPCUA("icons/opcua.png", "opocua");
+	IMG_COLLAPSE_ALL("src/main/resources/icons/collapseall.png", "collapseall"),
+	IMG_EXPAND_ALL("src/main/resources/icons/expandall.png", "expandall"),
+	IMG_IMPORT("src/main/resources/icons/import.png", "import"),
+	IMG_EXPORT("src/main/resources/icons/export.png", "export"),
+	OPCUA("src/main/resources/icons/opcua.png", "opocua");
 
 	private final String path, identifier;
 
@@ -30,19 +30,19 @@ public enum Images {
 	}
 
 	public static enum ExplorerView {
-		TYPE("icons/view/type.png", "type"),
-		PROPERTY("icons/view/file.png", "property"),
-		VARIABLE("icons/view/file_yellow.png", "variable"),
-		FOLDER("icons/view/folder.png", "folder"),
-		METHOD("icons/view/method.png", "method"),
-		OBJECT("icons/view/object.png", "object"),
-		OBJECT_TYPE("icons/view/objectType.png", "objectType"),
-		REFERENCE_TYPE("icons/view/referenceType.png", "referenceType"),
-		REFERENCE("icons/view/reference.png", "reference"),
-		DATA_TYPE("icons/view/dataType.png", "dataType"),
-		VARIABLE_TYPE("icons/view/variableType.png", "variableType"),
-		REMOVE("icons/view/delete.png", "remove"),
-		UNKNOWN("icons/view/unknown.png", "unknown");
+		TYPE("src/main/resources/icons/view/type.png", "type"),
+		PROPERTY("src/main/resources/icons/view/file.png", "property"),
+		VARIABLE("src/main/resources/icons/view/file_yellow.png", "variable"),
+		FOLDER("src/main/resources/icons/view/folder.png", "folder"),
+		METHOD("src/main/resources/icons/view/method.png", "method"),
+		OBJECT("src/main/resources/icons/view/object.png", "object"),
+		OBJECT_TYPE("src/main/resources/icons/view/objectType.png", "objectType"),
+		REFERENCE_TYPE("src/main/resources/icons/view/referenceType.png", "referenceType"),
+		REFERENCE("src/main/resources/icons/view/reference.png", "reference"),
+		DATA_TYPE("src/main/resources/icons/view/dataType.png", "dataType"),
+		VARIABLE_TYPE("src/main/resources/icons/view/variableType.png", "variableType"),
+		REMOVE("src/main/resources/icons/view/delete.png", "remove"),
+		UNKNOWN("src/main/resources/icons/view/unknown.png", "unknown");
 
 		private final String path, identifier;
 
@@ -66,8 +66,8 @@ public enum Images {
 	}
 
 	public static enum AttributeEditorView {
-		CHECKED("icons/view/attribute/checked.gif", "checked"),
-		UNCHECKED("icons/view/attribute/unchecked.gif", "unchecked");
+		CHECKED("src/main/resources/icons/view/attribute/checked.gif", "checked"),
+		UNCHECKED("src/main/resources/icons/view/attribute/unchecked.gif", "unchecked");
 
 		private final String path, identifier;
 
@@ -91,7 +91,7 @@ public enum Images {
 	}
 
 	public static enum StarSchemaView {
-		UP("icons/view/starschema/up.gif", "up");
+		UP("src/main/resources/icons/view/starschema/up.gif", "up");
 
 		private final String path, identifier;
 

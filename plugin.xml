@@ -6,33 +6,33 @@
          point="org.eclipse.ui.views">
       <category
             name="OPC UA"
-            icon="icons/opcua.png"
+            icon="src/main/resources/icons/opcua.png"
             id="me.steffenjacobs.opcuadisplay">
       </category>
       <view
             name="OPC UA Explorer View"
-            icon="icons/view/folder.png"
+            icon="src/main/resources/icons/view/folder.png"
             category="me.steffenjacobs.opcuadisplay"
             class="me.steffenjacobs.opcuadisplay.views.explorer.OpcUaExplorerView"
             id="me.steffenjacobs.opcuadisplay.views.explorer.OpcUaExplorerView">
       </view>
        <view
             name="OPC UA Attribute View"
-            icon="icons/attributes.png"
+            icon="src/main/resources/icons/attributes.png"
             category="me.steffenjacobs.opcuadisplay"
             class="me.steffenjacobs.opcuadisplay.views.attribute.AttributeEditorView"
             id="me.steffenjacobs.opcuadisplay.views.attribute.AttributeEditorView">
       </view>
        <view
             name="OPC UA References View"
-            icon="icons/view/reference.png"
+            icon="src/main/resources/icons/view/reference.png"
             category="me.steffenjacobs.opcuadisplay"
             class="me.steffenjacobs.opcuadisplay.views.reference.ReferenceView"
             id="me.steffenjacobs.opcuadisplay.views.reference.ReferenceView">
       </view>
        <view
             name="OPC UA Star Schema View"
-            icon="icons/view/starschema.png"
+            icon="src/main/resources/icons/view/starschema.png"
             category="me.steffenjacobs.opcuadisplay"
             class="me.steffenjacobs.opcuadisplay.views.starschema.StarSchemaView"
             id="me.steffenjacobs.opcuadisplay.views.starschema.StarSchemaView">
@@ -55,7 +55,7 @@
             name="Import OPC UA Model"
             class="me.steffenjacobs.opcuadisplay.wizard.imp.OpcUaImportWizard"
             category="me.steffenjacobs.opcuadisplay"
-            icon="icons/opcua.png"
+            icon="src/main/resources/icons/opcua.png"
             id="me.steffenjacobs.opcuadisplay.wizard.imp.OpcUaImportWizard">
             
       </wizard>      
@@ -71,7 +71,7 @@
             name="Export OPC UA Model"
             class="me.steffenjacobs.opcuadisplay.wizard.exp.OpcUaExportWizard"
             category="me.steffenjacobs.opcuadisplay"
-            icon="icons/opcua.png"
+            icon="src/main/resources/icons/opcua.png"
             id="me.steffenjacobs.opcuadisplay.wizard.exp.OpcUaExportWizard">
             
       </wizard>      
@@ -87,7 +87,7 @@
             name="OPC UA Model"
             class="me.steffenjacobs.opcuadisplay.wizard.newProject.NewProjectWizard"
             category="me.steffenjacobs.opcuadisplay"
-            icon="icons/opcua.png"
+            icon="src/main/resources/icons/opcua.png"
             id="me.steffenjacobs.opcuadisplay.wizard.newProject.NewProjectWizard">
             
       </wizard>      
@@ -97,7 +97,7 @@
          point="org.eclipse.ui.perspectives">
       <perspective
             class="me.steffenjacobs.opcuadisplay.perspectives.OpcUaPerspective"
-            icon="icons/opcua.png"
+            icon="src/main/resources/icons/opcua.png"
             id="me.steffenjacobs.opcuadisplay.perspectives.OpcUaPerspective"
             name="OPC UA Perspective">
       </perspective>
