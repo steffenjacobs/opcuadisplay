@@ -7,6 +7,7 @@ import java.util.List;
 import org.eclipse.swt.widgets.Display;
 
 import me.steffenjacobs.opcuadisplay.views.CloseableView;
+
 /** @author Steffen Jacobs */
 public class EventBus {
 
@@ -50,8 +51,13 @@ public class EventBus {
 		});
 	}
 
-	@SuppressWarnings("unchecked")
 	public <T extends Event> void addListener(CloseableView registerer, String eventIdentifier,
+			EventListener<T> listener) {
+		this.addListener(registerer.getIdentifier(), eventIdentifier, listener);
+	}
+
+	@SuppressWarnings("unchecked")
+	public <T extends Event> void addListener(String registererIdentifier, String eventIdentifier,
 			EventListener<T> listener) {
 		List<EventListener<Event>> list = listeners.get(eventIdentifier);
 		if (list == null) {
@@ -60,12 +66,12 @@ public class EventBus {
 		list.add((EventListener<Event>) listener);
 		listeners.put(eventIdentifier, list);
 
-		registeredEvents.add(registerer.getIdentifier(),
+		registeredEvents.add(registererIdentifier,
 				new RegisteredEvent(eventIdentifier, (EventListener<Event>) listener));
 	}
 
 	public void unregisterAllListeners(final CloseableView registerer) {
-		if(!registeredEvents.contains(registerer.getIdentifier())){
+		if (!registeredEvents.contains(registerer.getIdentifier())) {
 			return;
 		}
 		registeredEvents.get(registerer.getIdentifier()).stream()
