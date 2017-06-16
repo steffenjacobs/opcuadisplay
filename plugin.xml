@@ -13,29 +13,29 @@
             name="OPC UA Explorer View"
             icon="src/main/resources/icons/view/folder.png"
             category="me.steffenjacobs.opcuadisplay"
-            class="me.steffenjacobs.opcuadisplay.views.explorer.OpcUaExplorerView"
-            id="me.steffenjacobs.opcuadisplay.views.explorer.OpcUaExplorerView">
+            class="me.steffenjacobs.opcuadisplay.ui.views.explorer.OpcUaExplorerView"
+            id="me.steffenjacobs.opcuadisplay.ui.views.explorer.OpcUaExplorerView">
       </view>
        <view
             name="OPC UA Attribute View"
             icon="src/main/resources/icons/attributes.png"
             category="me.steffenjacobs.opcuadisplay"
-            class="me.steffenjacobs.opcuadisplay.views.attribute.AttributeEditorView"
-            id="me.steffenjacobs.opcuadisplay.views.attribute.AttributeEditorView">
+            class="me.steffenjacobs.opcuadisplay.ui.views.attribute.AttributeEditorView"
+            id="me.steffenjacobs.opcuadisplay.ui.views.attribute.AttributeEditorView">
       </view>
        <view
             name="OPC UA References View"
             icon="src/main/resources/icons/view/reference.png"
             category="me.steffenjacobs.opcuadisplay"
-            class="me.steffenjacobs.opcuadisplay.views.reference.ReferenceView"
-            id="me.steffenjacobs.opcuadisplay.views.reference.ReferenceView">
+            class="me.steffenjacobs.opcuadisplay.ui.views.reference.ReferenceView"
+            id="me.steffenjacobs.opcuadisplay.ui.views.reference.ReferenceView">
       </view>
        <view
             name="OPC UA Star Schema View"
             icon="src/main/resources/icons/view/starschema.png"
             category="me.steffenjacobs.opcuadisplay"
-            class="me.steffenjacobs.opcuadisplay.views.starschema.StarSchemaView"
-            id="me.steffenjacobs.opcuadisplay.views.starschema.StarSchemaView">
+            class="me.steffenjacobs.opcuadisplay.ui.views.starschema.StarSchemaView"
+            id="me.steffenjacobs.opcuadisplay.ui.views.starschema.StarSchemaView">
       </view>
    </extension>
    <extension
@@ -53,10 +53,10 @@
       
       <wizard
             name="Import OPC UA Model"
-            class="me.steffenjacobs.opcuadisplay.wizard.imp.OpcUaImportWizard"
+            class="me.steffenjacobs.opcuadisplay.ui.wizard.imp.OpcUaImportWizard"
             category="me.steffenjacobs.opcuadisplay"
             icon="src/main/resources/icons/opcua.png"
-            id="me.steffenjacobs.opcuadisplay.wizard.imp.OpcUaImportWizard">
+            id="me.steffenjacobs.opcuadisplay.ui.wizard.imp.OpcUaImportWizard">
             
       </wizard>      
    </extension>
@@ -69,10 +69,10 @@
       
       <wizard
             name="Export OPC UA Model"
-            class="me.steffenjacobs.opcuadisplay.wizard.exp.OpcUaExportWizard"
+            class="me.steffenjacobs.opcuadisplay.ui.wizard.exp.OpcUaExportWizard"
             category="me.steffenjacobs.opcuadisplay"
             icon="src/main/resources/icons/opcua.png"
-            id="me.steffenjacobs.opcuadisplay.wizard.exp.OpcUaExportWizard">
+            id="me.steffenjacobs.opcuadisplay.ui.wizard.exp.OpcUaExportWizard">
             
       </wizard>      
    </extension>
@@ -85,10 +85,10 @@
       
       <wizard
             name="OPC UA Model"
-            class="me.steffenjacobs.opcuadisplay.wizard.newProject.NewProjectWizard"
+            class="me.steffenjacobs.opcuadisplay.ui.wizard.newProject.NewProjectWizard"
             category="me.steffenjacobs.opcuadisplay"
             icon="src/main/resources/icons/opcua.png"
-            id="me.steffenjacobs.opcuadisplay.wizard.newProject.NewProjectWizard">
+            id="me.steffenjacobs.opcuadisplay.ui.wizard.newProject.NewProjectWizard">
             
       </wizard>      
    </extension>
@@ -96,9 +96,9 @@
    <extension
          point="org.eclipse.ui.perspectives">
       <perspective
-            class="me.steffenjacobs.opcuadisplay.perspectives.OpcUaPerspective"
+            class="me.steffenjacobs.opcuadisplay.ui.perspectives.OpcUaPerspective"
             icon="src/main/resources/icons/opcua.png"
-            id="me.steffenjacobs.opcuadisplay.perspectives.OpcUaPerspective"
+            id="me.steffenjacobs.opcuadisplay.ui.perspectives.OpcUaPerspective"
             name="OPC UA Perspective">
       </perspective>
    </extension>

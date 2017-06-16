@@ -18,13 +18,13 @@ import org.junit.Test;
 
 import com.google.common.collect.Lists;
 
-import me.steffenjacobs.opcuadisplay.shared.domain.CachedBaseNode;
-import me.steffenjacobs.opcuadisplay.shared.domain.CachedObjectNode;
-import me.steffenjacobs.opcuadisplay.shared.domain.CachedObjectTypeNode;
-import me.steffenjacobs.opcuadisplay.shared.domain.CachedReference;
-import me.steffenjacobs.opcuadisplay.shared.opcua.NodeGenerator;
-import me.steffenjacobs.opcuadisplay.shared.opcua.NodeNavigator;
-import me.steffenjacobs.opcuadisplay.views.explorer.dialogs.DialogFactory.AddDialogType;
+import me.steffenjacobs.opcuadisplay.management.node.NodeGenerator;
+import me.steffenjacobs.opcuadisplay.management.node.NodeNavigator;
+import me.steffenjacobs.opcuadisplay.management.node.domain.CachedBaseNode;
+import me.steffenjacobs.opcuadisplay.management.node.domain.CachedObjectNode;
+import me.steffenjacobs.opcuadisplay.management.node.domain.CachedObjectTypeNode;
+import me.steffenjacobs.opcuadisplay.management.node.domain.CachedReference;
+import me.steffenjacobs.opcuadisplay.ui.views.explorer.dialogs.DialogFactory.AddDialogType;
 
 public class TestNodeGenerator {
 
