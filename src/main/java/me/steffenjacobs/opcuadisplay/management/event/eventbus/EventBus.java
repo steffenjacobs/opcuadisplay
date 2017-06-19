@@ -8,9 +8,18 @@ import org.eclipse.swt.widgets.Display;
 
 import me.steffenjacobs.opcuadisplay.ui.views.CloseableView;
 
-/** @author Steffen Jacobs */
+/**
+ * A simple synchronous EventBus system. Listeners can be registered for an
+ * event and will be called synchronously after the event has been fired.
+ * 
+ * @author Steffen Jacobs
+ */
 public class EventBus {
 
+	/**
+	 * tuple of the event identifier and the listener that should be called when
+	 * an event with the associated identifier had been fired
+	 */
 	private class RegisteredEvent {
 		String eventIdentifier;
 		EventListener<Event> listener;
@@ -32,6 +41,7 @@ public class EventBus {
 		// singleton
 	}
 
+	/** @return the singleton instance of the event bus */
 	public static EventBus getInstance() {
 		if (INSTANCE == null) {
 			INSTANCE = new EventBus();
@@ -39,6 +49,12 @@ public class EventBus {
 		return INSTANCE;
 	}
 
+	/**
+	 * fires and event
+	 * 
+	 * @param event
+	 *            the event to fire
+	 */
 	public void fireEvent(Event event) {
 		Display.getDefault().syncExec(new Runnable() {
 			@Override
@@ -51,11 +67,32 @@ public class EventBus {
 		});
 	}
 
+	/**
+	 * adds a listener for an event (UI method: call the overloaded method for
+	 * general registerers)
+	 * 
+	 * @param registerer
+	 *            the UI view to register the event (is needed for
+	 *            deregistration)
+	 * @param eventIdentifier
+	 *            the identifier of the event for which the listener should be
+	 *            registered
+	 */
 	public <T extends Event> void addListener(CloseableView registerer, String eventIdentifier,
 			EventListener<T> listener) {
 		this.addListener(registerer.getIdentifier(), eventIdentifier, listener);
 	}
 
+	/**
+	 * adds a listener for an event (general method)
+	 * 
+	 * @param registerer
+	 *            identifier of the party registering the listener (is needed
+	 *            for deregistration)
+	 * @param eventIdentifier
+	 *            the identifier of the event for which the listener should be
+	 *            registered
+	 */
 	@SuppressWarnings("unchecked")
 	public <T extends Event> void addListener(String registererIdentifier, String eventIdentifier,
 			EventListener<T> listener) {
@@ -70,6 +107,7 @@ public class EventBus {
 				new RegisteredEvent(eventIdentifier, (EventListener<Event>) listener));
 	}
 
+	/** unregisters all listeners for a registerer */
 	public void unregisterAllListeners(final CloseableView registerer) {
 		if (!registeredEvents.contains(registerer.getIdentifier())) {
 			return;
@@ -78,6 +116,7 @@ public class EventBus {
 				.forEach(l -> unregisterListener(registerer, l.eventIdentifier, l.listener));
 	}
 
+	/** unregisters a specific listener for a registerer */
 	public void unregisterListener(CloseableView registerer, String eventIdentifier, EventListener<Event> listener) {
 		List<EventListener<Event>> list = listeners.get(eventIdentifier);
 
@@ -105,6 +144,9 @@ public class EventBus {
 		void onAction(T event);
 	}
 
+	/**
+	 * represents a general event. Inherit this class to create custom events.
+	 */
 	public static abstract class Event {
 		private final String identifier;
 		private final EventArgs args;
