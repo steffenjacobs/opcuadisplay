@@ -6,11 +6,36 @@ import java.util.List;
 public class SpiralLogic {
 
 	public static void main(String[] args) {
-		new SpiralLogic(3, 3);
+		int[][] d = new SpiralLogic(3, 3).getData();
+
+		int[][] rd =
+			{
+					{ 1, 2, 3 },
+					{ 4, 5, 6 },
+					{ 7, 8, 9 } };
+
+		for (int i = 0; i < d.length; i++) {
+			for (int j = 0; j < d[i].length; j++) {
+				System.out.print(d[i][j] + " ");
+			}
+			System.out.println();
+		}
+
+		for (int i = 0; i < d.length; i++) {
+			System.out.print(rd[d[i][0]][d[i][1]] + " ");
+		}
+
 	}
 
 	enum Direction {
-		LEFT(new int[] { -1, 0 }), RIGHT(new int[] { 1, 0 }), UP(new int[] { 0, -1 }), DOWN(new int[] { 0, 1 });
+		LEFT(new int[]
+		{ -1, 0 }),
+		RIGHT(new int[]
+		{ 1, 0 }),
+		UP(new int[]
+		{ 0, -1 }),
+		DOWN(new int[]
+		{ 0, 1 });
 
 		private final int[] delta;
 
@@ -46,6 +71,11 @@ public class SpiralLogic {
 	}
 
 	private int[][] data;
+
+	public int[][] getData() {
+		return data;
+	}
+
 	private int index = 0, maxLength;
 
 	public SpiralLogic(int elemCount) {
@@ -68,15 +98,18 @@ public class SpiralLogic {
 
 		List<int[]> list = new LinkedList<int[]>();
 
-		list.add(new int[] { curX, curY });
+		list.add(new int[]
+			{ curX, curY });
 
-		for (int i = 1; i < maxLength; i++) {
-			for (int j = 0; j < 2; j++) {
-				for (int k = 0; k < i; k++) {
+		// last round with i = maxLength does not have last strokes
+		for (int i = 1; i <= maxLength; i++) {
+			for (int j = 0; i == maxLength ? j < 1 : j < 2; j++) {
+				for (int k = 0; i == maxLength ? k < i - 1 : k < i; k++) {
 					curX += dir.getDeltaX();
 					curY += dir.getDeltaY();
 
-					list.add(new int[] { curX, curY });
+					list.add(new int[]
+						{ curX, curY });
 				}
 				dir = dir.next();
 			}
