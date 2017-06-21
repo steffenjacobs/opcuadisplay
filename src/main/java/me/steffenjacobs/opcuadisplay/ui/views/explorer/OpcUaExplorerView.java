@@ -53,6 +53,7 @@ import me.steffenjacobs.opcuadisplay.ui.wizard.imp.OpcUaImportWizard;
 import me.steffenjacobs.opcuadisplay.ui.wizard.imp.events.ImportWizardCancelEvent;
 import me.steffenjacobs.opcuadisplay.ui.wizard.imp.events.ImportWizardFinishEvent;
 import me.steffenjacobs.opcuadisplay.ui.wizard.imp.events.ImportWizardOpenEvent;
+import me.steffenjacobs.opcuadisplay.ui.wizard.newProject.NewProjectWizard;
 import me.steffenjacobs.opcuadisplay.ui.wizard.newProject.events.NewProjectWizardFinishEvent;
 
 /**
@@ -81,7 +82,7 @@ public class OpcUaExplorerView extends CloseableView {
 
 	private TreeViewer viewer;
 	private Action doubleClickAction, selectionChangedAction;
-	private Action openImportWizard, openExportWizard;
+	private Action openImportWizard, openExportWizard, newProjectWizard;
 	private Action collapseAllAction, expandAllAction;
 	private Action addVariable, addMethod, addObject, addProperty, addObjectType, addVariableType, addDataType;
 	private Action removeAction;
@@ -271,6 +272,7 @@ public class OpcUaExplorerView extends CloseableView {
 	}
 
 	private void fillContextMenu(IMenuManager manager) {
+		manager.add(newProjectWizard);
 		manager.add(openImportWizard);
 		manager.add(openExportWizard);
 		manager.add(new Separator());
@@ -289,6 +291,7 @@ public class OpcUaExplorerView extends CloseableView {
 	}
 
 	private void fillLocalToolBar(IToolBarManager manager) {
+		manager.add(newProjectWizard);
 		manager.add(openImportWizard);
 		manager.add(openExportWizard);
 		manager.add(new Separator());
@@ -385,7 +388,8 @@ public class OpcUaExplorerView extends CloseableView {
 				@Override
 				protected IStatus run(IProgressMonitor monitor) {
 					try {
-						NodeNavigator.getInstance().setRoot(XmlImport.getInstance().parseFile(importUrl, baseDataTypesImplicit));
+						NodeNavigator.getInstance()
+								.setRoot(XmlImport.getInstance().parseFile(importUrl, baseDataTypesImplicit));
 
 						Display.getDefault().syncExec(new Runnable() {
 							@Override
@@ -529,6 +533,16 @@ public class OpcUaExplorerView extends CloseableView {
 
 	private void makeActions() {
 		makeEditActions();
+
+		// new project wizards
+		newProjectWizard = new Action() {
+			public void run() {
+				new WizardDialog(new Shell(), new NewProjectWizard()).open();
+			}
+		};
+		newProjectWizard.setText("New OPC UA Model...");
+		newProjectWizard.setToolTipText("New OPC UA Model...");
+		newProjectWizard.setImageDescriptor(Activator.getImageDescriptor(Images.ExplorerView.PROPERTY.getIdentifier()));
 
 		// open import wizard
 		openImportWizard = new Action() {
