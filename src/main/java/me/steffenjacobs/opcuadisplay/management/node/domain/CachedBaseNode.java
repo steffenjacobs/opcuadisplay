@@ -322,6 +322,6 @@ public class CachedBaseNode implements Comparable<CachedBaseNode> {
 
 	@Override
 	public int compareTo(CachedBaseNode o) {
-		return this.getDisplayName().getText().compareTo(o.getDisplayName().getText());
+		return this.getDisplayName().getText().toLowerCase().compareTo(o.getDisplayName().getText().toLowerCase());
 	}
 }
