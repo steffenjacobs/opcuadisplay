@@ -1,6 +1,7 @@
 package me.steffenjacobs.opcuadisplay.management.node.domain;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -14,8 +15,9 @@ import org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.UInteger;
 import org.eclipse.milo.opcua.stack.core.types.enumerated.NodeClass;
 
 import me.steffenjacobs.opcuadisplay.management.node.NodeNavigator;
+
 /** @author Steffen Jacobs */
-public class CachedBaseNode {
+public class CachedBaseNode implements Comparable<CachedBaseNode> {
 	private final NodeId nodeId;
 	private NodeClass nodeClass;
 	private QualifiedName browseName;
@@ -218,7 +220,6 @@ public class CachedBaseNode {
 	/** @return a passive copy of the datastructure containing the children */
 	public CachedBaseNode[] getChildren() {
 		// clean up if necessary
-		// TODO: remove hack
 		final List<QualifiedName> names = this.getReferences().stream()
 				.filter(ref -> ref.getReferenceType().equals("HasTypeDefinition")).map(CachedReference::getBrowseName)
 				.collect(Collectors.toList());
@@ -227,6 +228,9 @@ public class CachedBaseNode {
 		// return children
 		CachedBaseNode[] childs = new CachedBaseNode[children.size()];
 		childs = children.toArray(childs);
+
+		// sort children
+		Arrays.sort(childs);
 		return childs;
 	}
 
@@ -314,5 +318,10 @@ public class CachedBaseNode {
 		} else if (!nodeId.equals(other.nodeId))
 			return false;
 		return true;
+	}
+
+	@Override
+	public int compareTo(CachedBaseNode o) {
+		return this.getDisplayName().getText().compareTo(o.getDisplayName().getText());
 	}
 }
