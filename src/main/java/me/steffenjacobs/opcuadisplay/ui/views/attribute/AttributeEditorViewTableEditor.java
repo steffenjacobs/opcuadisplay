@@ -1,5 +1,7 @@
 package me.steffenjacobs.opcuadisplay.ui.views.attribute;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -8,7 +10,7 @@ import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.milo.opcua.stack.core.types.builtin.LocalizedText;
+import org.eclipse.milo.opcua.stack.core.types.builtin.DateTime;
 import org.eclipse.milo.opcua.stack.core.types.builtin.NodeId;
 import org.eclipse.milo.opcua.stack.core.types.builtin.QualifiedName;
 import org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.UInteger;
@@ -28,6 +30,7 @@ import me.steffenjacobs.opcuadisplay.management.node.domain.BetterValueRank;
 import me.steffenjacobs.opcuadisplay.management.node.domain.CachedMethodNode;
 import me.steffenjacobs.opcuadisplay.management.node.domain.CachedReferenceTypeNode;
 import me.steffenjacobs.opcuadisplay.management.node.domain.CachedVariableNode;
+import me.steffenjacobs.opcuadisplay.management.node.domain.CachedViewNode;
 import me.steffenjacobs.opcuadisplay.management.node.domain.HasOnlyAbstract;
 import me.steffenjacobs.opcuadisplay.management.node.domain.HasValueRank;
 import me.steffenjacobs.opcuadisplay.ui.views.attribute.domain.NodeEntryFactory.NodeEntry;
@@ -35,6 +38,7 @@ import me.steffenjacobs.opcuadisplay.ui.views.attribute.events.AttributeModified
 import me.steffenjacobs.opcuadisplay.ui.widgets.DropDownCheckedListBox;
 import me.steffenjacobs.opcuadisplay.ui.widgets.GenericComboBox;
 import me.steffenjacobs.opcuadisplay.ui.widgets.GenericComboBox.Renderer;
+
 /** @author Steffen Jacobs */
 public class AttributeEditorViewTableEditor {
 	private TableEditor editor;
@@ -70,8 +74,8 @@ public class AttributeEditorViewTableEditor {
 					@SuppressWarnings("unchecked")
 					final NodeEntry<Object> entry = (NodeEntry<Object>) obj;
 
-					// Qualified name -> BrowseName
-					if (entry.getValue().getClass() == QualifiedName.class) {
+					switch (entry.getText()) {
+					case "BrowseName":
 						Consumer<String> setter = new Consumer<String>() {
 
 							@Override
@@ -87,231 +91,258 @@ public class AttributeEditorViewTableEditor {
 							}
 						};
 						textEditor(table, entry, editableColumn, item, setter, getter);
-					}
+						break;
+					case "NodeId":
+						break;
+					case "DataType":
+						Consumer<String> setter2 = new Consumer<String>() {
+							@Override
+							public void accept(String t) {
+								((CachedVariableNode) entry.getCachedNode()).setDataType(NodeId.parse(t));
+							}
+						};
 
-					// NodeId -> NodeId, DataType
-					else if (entry.getValue().getClass() == NodeId.class) {
-						switch (entry.getText()) {
-						case "NodeId":
-							// no editor for NodeId of BaseNode
-							break;
-						case "DataType":
-							Consumer<String> setter = new Consumer<String>() {
-								@Override
-								public void accept(String t) {
-									((CachedVariableNode) entry.getCachedNode()).setDataType(NodeId.parse(t));
-								}
-							};
+						Supplier<Object> getter2 = new Supplier<Object>() {
+							@Override
+							public Object get() {
+								return ((CachedVariableNode) entry.getCachedNode()).getDataType();
+							}
+						};
+						textEditor(table, entry, editableColumn, item, setter2, getter2);
+						break;
+					case "Description":
+						setter = new Consumer<String>() {
+							@Override
+							public void accept(String t) {
+								entry.getCachedNode().setDescription(AttributeValueParser.parseLocalizedText(t));
+							}
+						};
 
-							Supplier<Object> getter = new Supplier<Object>() {
-								@Override
-								public Object get() {
-									return ((CachedVariableNode) entry.getCachedNode()).getDataType();
-								}
-							};
-							textEditor(table, entry, editableColumn, item, setter, getter);
-							break;
-						}
-					}
-
-					// Localized Text -> DisplayName, Description, InverseName
-					else if (entry.getValue().getClass() == LocalizedText.class) {
-
-						Consumer<String> setter = null;
-						Supplier<Object> getter = null;
-						switch (entry.getText()) {
-						case "Description":
-							setter = new Consumer<String>() {
-								@Override
-								public void accept(String t) {
-									entry.getCachedNode().setDescription(AttributeValueParser.parseLocalizedText(t));
-								}
-							};
-
-							getter = new Supplier<Object>() {
-								@Override
-								public Object get() {
-									return entry.getCachedNode().getDescription();
-								}
-							};
-							break;
-						case "DisplayName":
-							setter = new Consumer<String>() {
-								@Override
-								public void accept(String t) {
-									entry.getCachedNode().setDisplayName(AttributeValueParser.parseLocalizedText(t));
-									EventBus.getInstance().fireEvent(new AttributeModifiedEvent(entry.getCachedNode()));
-								}
-							};
-
-							getter = new Supplier<Object>() {
-								@Override
-								public Object get() {
-									return entry.getCachedNode().getDisplayName();
-								}
-							};
-							break;
-
-						case "InverseName":
-							setter = new Consumer<String>() {
-								@Override
-								public void accept(String t) {
-									((CachedReferenceTypeNode) entry.getCachedNode())
-											.setInverseName(AttributeValueParser.parseLocalizedText(t));
-								}
-							};
-
-							getter = new Supplier<Object>() {
-								@Override
-								public Object get() {
-									return ((CachedReferenceTypeNode) entry.getCachedNode()).getInverseName();
-								}
-							};
-							break;
-						}
-
+						getter = new Supplier<Object>() {
+							@Override
+							public Object get() {
+								return entry.getCachedNode().getDescription();
+							}
+						};
 						textEditor(table, entry, editableColumn, item, setter, getter);
+						break;
+					case "DisplayName":
+						setter = new Consumer<String>() {
+							@Override
+							public void accept(String t) {
+								entry.getCachedNode().setDisplayName(AttributeValueParser.parseLocalizedText(t));
+								EventBus.getInstance().fireEvent(new AttributeModifiedEvent(entry.getCachedNode()));
+							}
+						};
 
-					}
-					// NodeClass -> NodeClass
-					else if (entry.getValue().getClass() == NodeClass.class) {
+						getter = new Supplier<Object>() {
+							@Override
+							public Object get() {
+								return entry.getCachedNode().getDisplayName();
+							}
+						};
+						textEditor(table, entry, editableColumn, item, setter, getter);
+						break;
+					case "InverseName":
+						setter = new Consumer<String>() {
+							@Override
+							public void accept(String t) {
+								((CachedReferenceTypeNode) entry.getCachedNode())
+										.setInverseName(AttributeValueParser.parseLocalizedText(t));
+							}
+						};
+
+						getter = new Supplier<Object>() {
+							@Override
+							public Object get() {
+								return ((CachedReferenceTypeNode) entry.getCachedNode()).getInverseName();
+							}
+						};
+						textEditor(table, entry, editableColumn, item, setter, getter);
+						break;
+					case "NodeClass":
 						nodeclassEditor(table, entry, editableColumn, item);
-					}
-					// UInteger -> WriteMask, UserWriteMask,
-					else if (entry.getValue().getClass() == UInteger.class) {
-						Consumer<UInteger> setter = null;
+						break;
+					case "UserWriteMask":
+						Consumer<UInteger> setter6 = new Consumer<UInteger>() {
 
-						switch (entry.getText()) {
-						case "UserWriteMask":
-							setter = new Consumer<UInteger>() {
-
-								@Override
-								public void accept(UInteger t) {
-									entry.getCachedNode().setUserWriteMask(t);
-								}
-							};
-							break;
-						case "WriteMask":
-							setter = new Consumer<UInteger>() {
-
-								@Override
-								public void accept(UInteger t) {
-									entry.getCachedNode().setWriteMask(t);
-								}
-							};
-							break;
-						}
-						uintegerEditor(table, entry, editableColumn, item, setter);
-					}
-					// Integer -> ValueRank (Variable, VariableType)
-					else if (entry.getValue().getClass() == Integer.class) {
-						switch (entry.getText()) {
-						case "ValueRank":
-							valueRankEditor(table, entry, editableColumn, item);
-							break;
-						}
-					}
-					// Double -> MinimumSamplingInterval
-					else if (entry.getValue().getClass() == Double.class) {
-						Consumer<String> setter = null;
-						Supplier<Object> getter = null;
-
-						switch (entry.getText()) {
-						case "MinimumSamplingInterval":
-							setter = new Consumer<String>() {
-								@Override
-								public void accept(String t) {
-									((CachedVariableNode) entry.getCachedNode())
-											.setMinimumSamplingInterval(Double.parseDouble(t));
-								}
-							};
-
-							getter = new Supplier<Object>() {
-
-								@Override
-								public Object get() {
-									return ((CachedVariableNode) entry.getCachedNode()).getMinimumSamplingInterval();
-								}
-							};
-							break;
-						}
-						textEditor(table, entry, editableColumn, item, setter, getter);
-					}
-
-					// Boolean -> Historizing, Executable, UserExecutable,
-					// IsSymmetric, IsAbstract (ReferenceType, ObjectType,
-					// VariableType, DataType), ContainsNoLoops
-					else if (entry.getValue().getClass() == Boolean.class) {
-						Consumer<Boolean> setter = null;
-
-						// CachedVariableNode -> only boolean is historizing
-						if (entry.getCachedNode() instanceof CachedVariableNode) {
-							setter = new Consumer<Boolean>() {
-								@Override
-								public void accept(Boolean t) {
-									((CachedVariableNode) entry.getCachedNode()).setHistorizing(t);
-								}
-							};
-						}
-
-						// CachedMethodNode -> boolean can be executable or
-						// userExecutable
-						else if (entry.getCachedNode() instanceof CachedMethodNode) {
-							switch (entry.getText()) {
-							case "Executable":
-								setter = new Consumer<Boolean>() {
-									@Override
-									public void accept(Boolean t) {
-										((CachedMethodNode) entry.getCachedNode()).setExecutable(t);
-									}
-								};
-								break;
-							case "UserExecutable":
-								setter = new Consumer<Boolean>() {
-									@Override
-									public void accept(Boolean t) {
-										((CachedMethodNode) entry.getCachedNode()).setUserExecutable(t);
-									}
-								};
-								break;
+							@Override
+							public void accept(UInteger t) {
+								entry.getCachedNode().setUserWriteMask(t);
 							}
-						}
+						};
+						uintegerEditor(table, entry, editableColumn, item, setter6);
+						break;
+					case "WriteMask":
+						Consumer<UInteger> setter7 = new Consumer<UInteger>() {
 
-						// Reference Type --> boolean can be IsAbstract or
-						// Symmetric
-						else if (entry.getCachedNode() instanceof CachedReferenceTypeNode) {
-							switch (entry.getText()) {
-							case "IsAbstract":
-								setter = new Consumer<Boolean>() {
-									@Override
-									public void accept(Boolean t) {
-										((CachedReferenceTypeNode) entry.getCachedNode()).setAbstract(t);
-									}
-								};
-								break;
-							case "Symmetric":
-								setter = new Consumer<Boolean>() {
-									@Override
-									public void accept(Boolean t) {
-										((CachedReferenceTypeNode) entry.getCachedNode()).setSymmetric(t);
-									}
-								};
-								break;
+							@Override
+							public void accept(UInteger t) {
+								entry.getCachedNode().setWriteMask(t);
 							}
-						}
+						};
+						uintegerEditor(table, entry, editableColumn, item, setter7);
+						break;
+					case "ValueRank":
+						valueRankEditor(table, entry, editableColumn, item);
+						break;
 
-						// Data Type, Object Type, VariableType -> only boolean
-						// is IsAbstract
-						if (entry.getCachedNode() instanceof HasOnlyAbstract) {
-							setter = new Consumer<Boolean>() {
-								@Override
-								public void accept(Boolean t) {
+					case "MinimumSamplingInterval":
+						Consumer<String> setter8 = new Consumer<String>() {
+							@Override
+							public void accept(String t) {
+								((CachedVariableNode) entry.getCachedNode())
+										.setMinimumSamplingInterval(Double.parseDouble(t));
+							}
+						};
+
+						Supplier<Object> getter8 = new Supplier<Object>() {
+
+							@Override
+							public Object get() {
+								return ((CachedVariableNode) entry.getCachedNode()).getMinimumSamplingInterval();
+							}
+						};
+						textEditor(table, entry, editableColumn, item, setter8, getter8);
+						break;
+					case "Value":
+						handleValue(table, entry, editableColumn, item);
+						break;
+					case "Historizing":
+						Consumer<Boolean> setter9 = new Consumer<Boolean>() {
+							@Override
+							public void accept(Boolean t) {
+								((CachedVariableNode) entry.getCachedNode()).setHistorizing(t);
+							}
+						};
+						booleanEditor(table, entry, editableColumn, item, setter9);
+						break;
+					case "Executable":
+						Consumer<Boolean> setter10 = new Consumer<Boolean>() {
+							@Override
+							public void accept(Boolean t) {
+								((CachedMethodNode) entry.getCachedNode()).setExecutable(t);
+							}
+						};
+						booleanEditor(table, entry, editableColumn, item, setter10);
+						break;
+					case "UserExecutable":
+						Consumer<Boolean> setter11 = new Consumer<Boolean>() {
+							@Override
+							public void accept(Boolean t) {
+								((CachedMethodNode) entry.getCachedNode()).setUserExecutable(t);
+							}
+						};
+						booleanEditor(table, entry, editableColumn, item, setter11);
+						break;
+					case "Symmetric":
+						Consumer<Boolean> setter12 = new Consumer<Boolean>() {
+							@Override
+							public void accept(Boolean t) {
+								((CachedReferenceTypeNode) entry.getCachedNode()).setSymmetric(t);
+							}
+						};
+						booleanEditor(table, entry, editableColumn, item, setter12);
+						break;
+					case "IsAbstract":
+						Consumer<Boolean> setter13 = new Consumer<Boolean>() {
+							@Override
+							public void accept(Boolean t) {
+								if (entry.getCachedNode().getClass() == CachedReferenceTypeNode.class) {
+									((CachedReferenceTypeNode) entry.getCachedNode()).setAbstract(t);
+								} else {
 									((HasOnlyAbstract) entry.getCachedNode()).setAbstract(t);
 								}
-							};
-						}
-						booleanEditor(table, entry, editableColumn, item, setter);
+							}
+						};
+						booleanEditor(table, entry, editableColumn, item, setter13);
+						break;
+					case "ContainsNoLoops":
+						Consumer<Boolean> setter14 = new Consumer<Boolean>() {
+							@Override
+							public void accept(Boolean t) {
+								((CachedViewNode) entry.getCachedNode()).setContainsNoLoop(t);
+
+							}
+						};
+						booleanEditor(table, entry, editableColumn, item, setter14);
+						break;
 					}
+				}
+			}
+
+			private void handleValue(Table table, NodeEntry<Object> entry, int editableColumn, TableItem item) {
+				Supplier<Object> getter = new Supplier<Object>() {
+
+					@Override
+					public Object get() {
+						return ((CachedVariableNode) entry.getCachedNode()).getValue();
+					}
+				};
+
+				if (entry.getValue().getClass() == String.class) {
+					Consumer<String> setter = new Consumer<String>() {
+						@Override
+						public void accept(String t) {
+							((CachedVariableNode) entry.getCachedNode()).setValue(t);
+						}
+					};
+					textEditor(table, entry, editableColumn, item, setter, getter);
+				} else if (entry.getValue().getClass() == Double.class) {
+					Consumer<String> setter = new Consumer<String>() {
+						@Override
+						public void accept(String t) {
+							((CachedVariableNode) entry.getCachedNode()).setValue(Double.parseDouble(t));
+						}
+					};
+					textEditor(table, entry, editableColumn, item, setter, getter);
+				} else if (entry.getValue().getClass() == Integer.class) {
+					Consumer<String> setter = new Consumer<String>() {
+						@Override
+						public void accept(String t) {
+							((CachedVariableNode) entry.getCachedNode()).setValue(Integer.parseInt(t));
+						}
+					};
+					textEditor(table, entry, editableColumn, item, setter, getter);
+				} else if (entry.getValue().getClass() == Long.class) {
+					Consumer<String> setter = new Consumer<String>() {
+						@Override
+						public void accept(String t) {
+							((CachedVariableNode) entry.getCachedNode()).setValue(Long.parseLong(t));
+						}
+					};
+					textEditor(table, entry, editableColumn, item, setter, getter);
+				} else if (entry.getValue().getClass() == UInteger.class) {
+					Consumer<String> setter = new Consumer<String>() {
+						@Override
+						public void accept(String t) {
+							((CachedVariableNode) entry.getCachedNode()).setValue(UInteger.valueOf(t));
+						}
+					};
+					textEditor(table, entry, editableColumn, item, setter, getter);
+				} else if (entry.getValue().getClass() == Boolean.class) {
+					Consumer<Boolean> setter = new Consumer<Boolean>() {
+						@Override
+						public void accept(Boolean t) {
+							((CachedVariableNode) entry.getCachedNode()).setValue(t);
+						}
+					};
+					booleanEditor(table, entry, editableColumn, item, setter);
+				} else if (entry.getValue().getClass() == DateTime.class) {
+					Consumer<String> setter = new Consumer<String>() {
+						@Override
+						public void accept(String t) {
+							SimpleDateFormat sdf = new SimpleDateFormat("YYYY/MM/dd hh/mm/ss/SSS Z");
+
+							try {
+								((CachedVariableNode) entry.getCachedNode()).setValue(new DateTime(sdf.parse(t)));
+							} catch (ParseException e) {
+								throw new NumberFormatException(
+										"Invalid date. Please use format 'YYYY/MM/dd hh/mm/ss/SSS Z'.");
+							}
+						}
+					};
+					textEditor(table, entry, editableColumn, item, setter, getter);
 				}
 			}
 		});
