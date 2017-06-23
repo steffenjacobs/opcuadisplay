@@ -1,7 +1,7 @@
 package me.steffenjacobs.opcuadisplay.ui.wizard.exp.events;
 
-import me.steffenjacobs.opcuadisplay.management.event.eventbus.EventBus.Event;
-import me.steffenjacobs.opcuadisplay.management.event.eventbus.EventBus.EventArgs;
+import me.steffenjacobs.opcuadisplay.eventbus.EventBus.Event;
+import me.steffenjacobs.opcuadisplay.eventbus.EventBus.EventArgs;
 /** @author Steffen Jacobs */
 public class ExportWizardOpenEvent extends Event {
 

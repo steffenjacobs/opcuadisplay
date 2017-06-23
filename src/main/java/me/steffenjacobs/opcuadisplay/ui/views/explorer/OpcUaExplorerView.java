@@ -30,9 +30,9 @@ import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.PlatformUI;
 
 import me.steffenjacobs.opcuadisplay.Activator;
-import me.steffenjacobs.opcuadisplay.management.event.eventbus.EventBus;
-import me.steffenjacobs.opcuadisplay.management.event.eventbus.EventBus.Event;
-import me.steffenjacobs.opcuadisplay.management.event.eventbus.EventBus.EventListener;
+import me.steffenjacobs.opcuadisplay.eventbus.EventBus;
+import me.steffenjacobs.opcuadisplay.eventbus.EventBus.Event;
+import me.steffenjacobs.opcuadisplay.eventbus.EventBus.EventListener;
 import me.steffenjacobs.opcuadisplay.management.node.NodeGenerator;
 import me.steffenjacobs.opcuadisplay.management.node.NodeNavigator;
 import me.steffenjacobs.opcuadisplay.management.node.domain.CachedBaseNode;

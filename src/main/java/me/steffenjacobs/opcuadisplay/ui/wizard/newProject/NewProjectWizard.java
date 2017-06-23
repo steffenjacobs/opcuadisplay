@@ -5,7 +5,7 @@ import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchWizard;
 
-import me.steffenjacobs.opcuadisplay.management.event.eventbus.EventBus;
+import me.steffenjacobs.opcuadisplay.eventbus.EventBus;
 import me.steffenjacobs.opcuadisplay.ui.wizard.newProject.events.NewProjectWizardCancelEvent;
 import me.steffenjacobs.opcuadisplay.ui.wizard.newProject.events.NewProjectWizardFinishEvent;
 import me.steffenjacobs.opcuadisplay.ui.wizard.newProject.events.NewProjectWizardOpenEvent;

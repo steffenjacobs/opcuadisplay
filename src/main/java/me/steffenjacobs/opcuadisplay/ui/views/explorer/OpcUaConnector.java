@@ -9,7 +9,7 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
-import me.steffenjacobs.opcuadisplay.management.event.eventbus.EventBus;
+import me.steffenjacobs.opcuadisplay.eventbus.EventBus;
 import me.steffenjacobs.opcuadisplay.management.node.NodeNavigator;
 import me.steffenjacobs.opcuadisplay.management.node.domain.CachedBaseNode;
 import me.steffenjacobs.opcuadisplay.opcInterface.opcClient.OPCUaClient;

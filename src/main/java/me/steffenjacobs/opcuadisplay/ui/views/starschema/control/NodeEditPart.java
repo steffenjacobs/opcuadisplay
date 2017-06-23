@@ -16,7 +16,7 @@ import org.eclipse.gef.ConnectionEditPart;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
 import org.eclipse.swt.graphics.Color;
 
-import me.steffenjacobs.opcuadisplay.management.event.eventbus.EventBus;
+import me.steffenjacobs.opcuadisplay.eventbus.EventBus;
 import me.steffenjacobs.opcuadisplay.management.node.NodeNavigator;
 import me.steffenjacobs.opcuadisplay.ui.views.explorer.events.ChangeSelectedNodeEvent;
 import me.steffenjacobs.opcuadisplay.ui.views.starschema.ColorSet;

@@ -25,7 +25,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 
-import me.steffenjacobs.opcuadisplay.management.event.eventbus.EventBus;
+import me.steffenjacobs.opcuadisplay.eventbus.EventBus;
 import me.steffenjacobs.opcuadisplay.management.node.domain.BetterValueRank;
 import me.steffenjacobs.opcuadisplay.management.node.domain.CachedMethodNode;
 import me.steffenjacobs.opcuadisplay.management.node.domain.CachedReferenceTypeNode;

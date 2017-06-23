@@ -1,7 +1,7 @@
 package me.steffenjacobs.opcuadisplay.ui.views.explorer.events;
 
-import me.steffenjacobs.opcuadisplay.management.event.eventbus.EventBus.Event;
-import me.steffenjacobs.opcuadisplay.management.event.eventbus.EventBus.EventArgs;
+import me.steffenjacobs.opcuadisplay.eventbus.EventBus.Event;
+import me.steffenjacobs.opcuadisplay.eventbus.EventBus.EventArgs;
 import me.steffenjacobs.opcuadisplay.management.node.domain.CachedBaseNode;
 
 /** is called, after the selected node has changed 

@@ -9,7 +9,7 @@ import org.junit.Test;
 
 import com.google.common.collect.Lists;
 
-import me.steffenjacobs.opcuadisplay.management.event.eventbus.MultiMap;
+import me.steffenjacobs.opcuadisplay.eventbus.MultiMap;
 
 public class TestMultimap {
 

@@ -15,8 +15,8 @@ import org.eclipse.milo.opcua.stack.core.types.enumerated.IdType;
 
 import com.google.common.collect.Lists;
 
-import me.steffenjacobs.opcuadisplay.management.event.eventbus.EventBus;
-import me.steffenjacobs.opcuadisplay.management.event.eventbus.EventBus.EventListener;
+import me.steffenjacobs.opcuadisplay.eventbus.EventBus;
+import me.steffenjacobs.opcuadisplay.eventbus.EventBus.EventListener;
 import me.steffenjacobs.opcuadisplay.management.node.domain.CachedBaseNode;
 import me.steffenjacobs.opcuadisplay.management.node.domain.CachedObjectNode;
 import me.steffenjacobs.opcuadisplay.management.node.domain.CachedReference;

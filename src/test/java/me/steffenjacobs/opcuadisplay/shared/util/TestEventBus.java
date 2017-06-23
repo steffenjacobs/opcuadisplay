@@ -10,10 +10,10 @@ import java.util.concurrent.TimeUnit;
 import org.eclipse.swt.widgets.Composite;
 import org.junit.Test;
 
-import me.steffenjacobs.opcuadisplay.management.event.eventbus.EventBus;
-import me.steffenjacobs.opcuadisplay.management.event.eventbus.EventBus.Event;
-import me.steffenjacobs.opcuadisplay.management.event.eventbus.EventBus.EventArgs;
-import me.steffenjacobs.opcuadisplay.management.event.eventbus.EventBus.EventListener;
+import me.steffenjacobs.opcuadisplay.eventbus.EventBus;
+import me.steffenjacobs.opcuadisplay.eventbus.EventBus.Event;
+import me.steffenjacobs.opcuadisplay.eventbus.EventBus.EventArgs;
+import me.steffenjacobs.opcuadisplay.eventbus.EventBus.EventListener;
 import me.steffenjacobs.opcuadisplay.ui.views.CloseableView;
 
 /** @author Steffen Jacobs */
