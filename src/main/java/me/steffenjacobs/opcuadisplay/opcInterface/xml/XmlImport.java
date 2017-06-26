@@ -83,7 +83,13 @@ public class XmlImport {
 			Unmarshaller um = context.createUnmarshaller();
 			UANodeSet nodeSet = (UANodeSet) um.unmarshal(xmlReader);
 
-			this.aliases = nodeSet.getAliases();
+			if (this.aliases == null) {
+				this.aliases = nodeSet.getAliases();
+			} else {
+				if (nodeSet.getAliases() != null) {
+					this.aliases.getAlias().addAll(nodeSet.getAliases().getAlias());
+				}
+			}
 			CopyOnWriteArrayList<UANode> nodes = new CopyOnWriteArrayList<>();
 			nodes.addAll(nodeSet.getUAObjectOrUAVariableOrUAMethod());
 
