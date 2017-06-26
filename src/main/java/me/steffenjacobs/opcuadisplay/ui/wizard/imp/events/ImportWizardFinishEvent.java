@@ -8,13 +8,14 @@ public class ImportWizardFinishEvent extends Event {
 	public static String IDENTIFIER = "importWizardFinish";
 
 	private final String url;
-	private final boolean server, baseDataTypesImplicit;
+	private final boolean server, baseDataTypesImplicit, freeOPpcUaModeler;
 
-	public ImportWizardFinishEvent(String url, boolean server, boolean baseDataTypesImplicit) {
+	public ImportWizardFinishEvent(String url, boolean server, boolean baseDataTypesImplicit, boolean freeOPpcUaModeler) {
 		super(IDENTIFIER, EventArgs.NONE);
 		this.url = url;
 		this.server = server;
 		this.baseDataTypesImplicit = baseDataTypesImplicit;
+		this.freeOPpcUaModeler = freeOPpcUaModeler;
 	}
 
 	public String getUrl() {
@@ -23,6 +24,10 @@ public class ImportWizardFinishEvent extends Event {
 
 	public boolean isServer() {
 		return server;
+	}
+	
+	public boolean isFreeOpcUaModeler() {
+		return freeOPpcUaModeler;
 	}
 
 	public boolean isBaseDataTypesImplicit() {

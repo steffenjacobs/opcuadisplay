@@ -8,6 +8,8 @@ import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -16,11 +18,12 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+
 /** @author Steffen Jacobs */
 public class XmlPage extends WizardPage {
 
 	private Text textUrl;
-	private Button checkboxBaseTypesImplicit;
+	private Button checkboxBaseTypesImplicit, checkboxFreeOpcUaModelerCompatibility;
 	private Composite container;
 	private boolean isImport;
 
@@ -93,11 +96,40 @@ public class XmlPage extends WizardPage {
 
 		textUrl.setFocus();
 		textUrl.setSelection(0, textUrl.getText().length());
-		
+
 		checkboxBaseTypesImplicit = new Button(container, SWT.CHECK);
 		
+		checkboxBaseTypesImplicit.setLayoutData(gd);
+
 		checkboxBaseTypesImplicit.setText("Base Types implicit");
 		checkboxBaseTypesImplicit.setSelection(true);
+		
+		Composite spc = new Composite(container, SWT.NONE);
+		spc.setLayoutData(gd);
+
+		checkboxFreeOpcUaModelerCompatibility = new Button(container, SWT.CHECK);
+		checkboxFreeOpcUaModelerCompatibility.setLayoutData(gd);
+
+		checkboxFreeOpcUaModelerCompatibility.setText("Free OPC UA Modeler Compatibility");
+		checkboxFreeOpcUaModelerCompatibility.setSelection(false);
+		
+		checkboxFreeOpcUaModelerCompatibility.addSelectionListener(new SelectionAdapter() {			
+			@Override
+			public void widgetSelected(SelectionEvent arg0) {
+				if(checkboxFreeOpcUaModelerCompatibility.getSelection()){
+					checkboxBaseTypesImplicit.setSelection(true);
+				}
+			}
+		});
+		
+		checkboxBaseTypesImplicit.addSelectionListener(new SelectionAdapter() {			
+			@Override
+			public void widgetSelected(SelectionEvent arg0) {
+				if(!checkboxBaseTypesImplicit.getSelection()){
+					checkboxFreeOpcUaModelerCompatibility.setSelection(false);
+				}
+			}
+		});
 
 		// required to avoid an error in the system
 		setControl(container);
@@ -133,8 +165,12 @@ public class XmlPage extends WizardPage {
 	public String getUrl() {
 		return textUrl.getText();
 	}
-	
-	public boolean isBaseTypesImplicit(){
+
+	public boolean isBaseTypesImplicit() {
 		return checkboxBaseTypesImplicit.getSelection();
+	}
+	
+	public boolean isFreeOpcUaModelerCompatibility(){
+		return checkboxFreeOpcUaModelerCompatibility.getSelection();
 	}
 }

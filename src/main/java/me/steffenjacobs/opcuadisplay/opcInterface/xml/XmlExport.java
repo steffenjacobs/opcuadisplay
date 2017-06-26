@@ -45,7 +45,7 @@ import me.steffenjacobs.opcuadisplay.management.node.domain.generated.UAView;
 public class XmlExport {
 
 	public static void main(String[] args) {
-		CachedBaseNode cbn = XmlImport.getInstance().parseFile("C:/Users/sjacobs/Desktop/dump.xml", false);
+		CachedBaseNode cbn = XmlImport.getInstance().parseFile("C:/Users/sjacobs/Desktop/dump.xml", false, false);
 		XmlExport.getInstance().writeToFile("C:/Users/sjacobs/Desktop/dump.xml2", cbn);
 	}
 

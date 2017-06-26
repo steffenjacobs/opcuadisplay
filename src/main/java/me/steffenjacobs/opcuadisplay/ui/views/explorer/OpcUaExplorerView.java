@@ -186,7 +186,7 @@ public class OpcUaExplorerView extends CloseableView {
 				new EventListener<ImportWizardFinishEvent>() {
 					@Override
 					public void onAction(ImportWizardFinishEvent event) {
-						onImportWizardFinish(event.getUrl(), event.isServer(), event.isBaseDataTypesImplicit());
+						onImportWizardFinish(event.getUrl(), event.isServer(), event.isBaseDataTypesImplicit(), event.isFreeOpcUaModeler());
 					}
 				});
 
@@ -384,14 +384,14 @@ public class OpcUaExplorerView extends CloseableView {
 	}
 
 	/** can be called, after the import wizard has finished */
-	public void onImportWizardFinish(String importUrl, boolean server, final boolean baseDataTypesImplicit) {
+	public void onImportWizardFinish(String importUrl, boolean server, final boolean baseDataTypesImplicit, boolean freeOpcUaModelerCompatibility) {
 		if (!server) {
 			Job job = new Job("Importing OPC UA nodes...") {
 				@Override
 				protected IStatus run(IProgressMonitor monitor) {
 					try {
 						NodeNavigator.getInstance()
-								.setRoot(XmlImport.getInstance().parseFile(importUrl, baseDataTypesImplicit));
+								.setRoot(XmlImport.getInstance().parseFile(importUrl, baseDataTypesImplicit, freeOpcUaModelerCompatibility));
 
 						Display.getDefault().syncExec(new Runnable() {
 							@Override

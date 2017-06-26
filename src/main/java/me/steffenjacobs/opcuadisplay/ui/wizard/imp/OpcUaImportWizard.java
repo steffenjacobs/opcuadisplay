@@ -11,6 +11,7 @@ import me.steffenjacobs.opcuadisplay.ui.wizard.imp.events.ImportWizardFinishEven
 import me.steffenjacobs.opcuadisplay.ui.wizard.imp.events.ImportWizardOpenEvent;
 import me.steffenjacobs.opcuadisplay.ui.wizard.shared.WizardWithUrlAndType;
 import me.steffenjacobs.opcuadisplay.ui.wizard.shared.XmlPage;
+
 /** @author Steffen Jacobs */
 public class OpcUaImportWizard extends Wizard implements IWorkbenchWizard, WizardWithUrlAndType {
 
@@ -35,8 +36,8 @@ public class OpcUaImportWizard extends Wizard implements IWorkbenchWizard, Wizar
 	@Override
 	public void addPages() {
 		selectionPage = new ImportTypeSelectionPage();
-		xmlPage = new XmlPage("Import model from XML file",
-				"Please enter URI to an XML file to import the model from.",true);
+		xmlPage = new XmlPage("Import model from XML file", "Please enter URI to an XML file to import the model from.",
+				true);
 		serverPage = new ImportFromServerPage();
 		super.addPage(selectionPage);
 		super.addPage(xmlPage);
@@ -45,7 +46,8 @@ public class OpcUaImportWizard extends Wizard implements IWorkbenchWizard, Wizar
 
 	@Override
 	public boolean performFinish() {
-		EventBus.getInstance().fireEvent(new ImportWizardFinishEvent(this.getUrl(), this.isType(), xmlPage.isBaseTypesImplicit()));
+		EventBus.getInstance().fireEvent(new ImportWizardFinishEvent(this.getUrl(), this.isType(),
+				xmlPage.isBaseTypesImplicit(), xmlPage.isFreeOpcUaModelerCompatibility()));
 		return true;
 	}
 

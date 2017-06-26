@@ -50,6 +50,7 @@ import me.steffenjacobs.opcuadisplay.management.node.domain.generated.UAReferenc
 import me.steffenjacobs.opcuadisplay.management.node.domain.generated.UAVariable;
 import me.steffenjacobs.opcuadisplay.management.node.domain.generated.UAVariableType;
 import me.steffenjacobs.opcuadisplay.management.node.domain.generated.UAView;
+
 /** @author Steffen Jacobs */
 public class XmlImport {
 
@@ -73,7 +74,8 @@ public class XmlImport {
 		return instance;
 	}
 
-	public CachedObjectNode parseFile(Reader xmlReader, boolean baseDataTypesImplicit) {
+	public CachedObjectNode parseFile(Reader xmlReader, boolean baseDataTypesImplicit,
+			boolean freeOpcUaModelerCompatibility) {
 		try {
 			// create JAXB context and instantiate marshaller
 			JAXBContext context = JAXBContext.newInstance(UANodeSet.class);
@@ -85,7 +87,7 @@ public class XmlImport {
 			CopyOnWriteArrayList<UANode> nodes = new CopyOnWriteArrayList<>();
 			nodes.addAll(nodeSet.getUAObjectOrUAVariableOrUAMethod());
 
-			CachedObjectNode rootFolder = buildFullTree(nodes, baseDataTypesImplicit);
+			CachedObjectNode rootFolder = buildFullTree(nodes, baseDataTypesImplicit, freeOpcUaModelerCompatibility);
 
 			return rootFolder;
 		} catch (JAXBException e) {
@@ -96,9 +98,10 @@ public class XmlImport {
 		return null;
 	}
 
-	public CachedObjectNode parseFile(String xmlFile, boolean baseDataTypesImplicit) {
+	public CachedObjectNode parseFile(String xmlFile, boolean baseDataTypesImplicit,
+			boolean freeOpcUaModelerCompatibility) {
 		try {
-			return parseFile(new FileReader(xmlFile), baseDataTypesImplicit);
+			return parseFile(new FileReader(xmlFile), baseDataTypesImplicit, freeOpcUaModelerCompatibility);
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -106,11 +109,13 @@ public class XmlImport {
 		return null;
 	}
 
-	public CachedObjectNode parseFile(InputStream is, boolean baseDataTypesImplicit) {
-		return parseFile(new InputStreamReader(is), baseDataTypesImplicit);
+	public CachedObjectNode parseFile(InputStream is, boolean baseDataTypesImplicit,
+			boolean freeOpcUaModelerCompatibility) {
+		return parseFile(new InputStreamReader(is), baseDataTypesImplicit, freeOpcUaModelerCompatibility);
 	}
 
-	private CachedObjectNode buildFullTree(List<UANode> nodes, boolean baseDataTypesImplicit) {
+	private CachedObjectNode buildFullTree(List<UANode> nodes, boolean baseDataTypesImplicit,
+			boolean freeOpcUaModelerCompatibility) {
 		CachedObjectNode root;
 		if (baseDataTypesImplicit) {
 			NodeGenerator.getInstance().generateBaseTypes();
@@ -131,24 +136,24 @@ public class XmlImport {
 		parseReferencesStep2();
 		parseReferencesStep3();
 
+		// needed, if xml file from free opc ua modeler had been loaded
+		if (freeOpcUaModelerCompatibility) {
+			for (UANode node : nodes) {
+				if (node.getBrowseName().startsWith("0:")) {
+					for (Reference ref : node.getReferences().getReference()) {
+						if (!ref.isIsForward()) {
+							CachedBaseNode parent = loadedNodes.get(NodeId.parse(ref.getValue()));
+							CachedBaseNode n = parseNode(0, node);
+							NodeGenerator.getInstance().insertNode(n, parent, true);
+							loadedNodes.put(n.getNodeId(), n);
+						}
+					}
+				}
+			}
+		}
+
 		return root;
 	}
-
-//	private CachedBaseNode buildObjectTree(List<UANode> nodes) {
-
-		// // create object node
-		// CachedObjectNode objectBase = new
-		// CachedObjectNode(Identifiers.ObjectsFolder);
-		// objectBase.setBrowseName(new QualifiedName(0, "Objects"));
-		// objectBase.setDescription(new LocalizedText("en",
-		// "The browse entry point when looking for objects in the server
-		// address space."));
-		// objectBase.setDisplayName(new LocalizedText("en", "Objects"));
-		// objectBase.setEventNotifier(UByte.valueOf(0));
-		// objectBase.setUserWriteMask(UInteger.valueOf(0));
-		// objectBase.setWriteMask(UInteger.valueOf(0));
-//		return buildReferenceBased(NodeNavigator.getInstance().navigateByName("Root/Objects"), nodes);
-//	}
 
 	/**
 	 * build the tree based on the references of the root node. Nodes are
@@ -191,8 +196,8 @@ public class XmlImport {
 
 				buildReferenceBased(childNode, nodes);
 			}
-		}		
-		
+		}
+
 		return root;
 
 	}
@@ -312,7 +317,8 @@ public class XmlImport {
 		cbn.setBrowseName(new QualifiedName(namespaceIndex, uaNode.getBrowseName()));
 
 		// set description
-		List<me.steffenjacobs.opcuadisplay.management.node.domain.generated.LocalizedText> list = uaNode.getDescription();
+		List<me.steffenjacobs.opcuadisplay.management.node.domain.generated.LocalizedText> list = uaNode
+				.getDescription();
 		if (list.size() > 0) {
 			cbn.setDescription(parseLocalizedText(list.get(0)));
 		}
@@ -394,7 +400,8 @@ public class XmlImport {
 		});
 	}
 
-	private LocalizedText parseLocalizedText(me.steffenjacobs.opcuadisplay.management.node.domain.generated.LocalizedText lt) {
+	private LocalizedText parseLocalizedText(
+			me.steffenjacobs.opcuadisplay.management.node.domain.generated.LocalizedText lt) {
 		return new LocalizedText(lt.getLocale(), lt.getValue());
 	}
 }
