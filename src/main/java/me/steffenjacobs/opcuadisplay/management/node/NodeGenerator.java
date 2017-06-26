@@ -120,7 +120,7 @@ public class NodeGenerator {
 		parent.addChild(cvn);
 		cvn.setParent(parent);
 		parent.getReferences().add(new CachedReference("HasComponent", cvn.getBrowseName(),
-				type.getBrowseName().getName(), type.getNodeId()));
+				type.getBrowseName().getName(), cvn.getNodeId()));
 
 		// rerender tree viewer
 		EventBus.getInstance().fireEvent(new AttributeModifiedEvent(parent));
@@ -143,7 +143,7 @@ public class NodeGenerator {
 		parent.addChild(cvn);
 		cvn.setParent(parent);
 		parent.getReferences().add(new CachedReference("HasProperty", cvn.getBrowseName(),
-				type.getBrowseName().getName(), type.getNodeId()));
+				type.getBrowseName().getName(), cvn.getNodeId()));
 
 		// rerender tree viewer
 		EventBus.getInstance().fireEvent(new AttributeModifiedEvent(parent));
@@ -235,6 +235,7 @@ public class NodeGenerator {
 	}
 
 	public CachedBaseNode mergeInsertNode(CachedBaseNode child, CachedBaseNode parent) {
+		NodeNavigator.getInstance().increaseHighestNodeIdIfNecessarySafe(child);
 		List<CachedBaseNode> children = Lists.newArrayList(parent.getChildren());
 		int index = children.indexOf(child);
 		// copy subchilds to merge existing base structure with loaded xml
@@ -253,6 +254,7 @@ public class NodeGenerator {
 	}
 
 	public void insertNode(CachedBaseNode child, CachedBaseNode parent, boolean suppressEvent) {
+		NodeNavigator.getInstance().increaseHighestNodeIdIfNecessarySafe(child);
 
 		parent.addChild(child);
 		child.setParent(parent);
