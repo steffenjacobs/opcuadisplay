@@ -236,7 +236,9 @@ public class OpcUaExplorerView extends CloseableView {
 	}
 
 	private void fillLocalPullDown(IMenuManager manager) {
+		manager.add(newProjectWizard);
 		manager.add(openImportWizard);
+		manager.add(openExportWizard);
 		manager.add(new Separator());
 		manager.add(collapseAllAction);
 		manager.add(expandAllAction);
