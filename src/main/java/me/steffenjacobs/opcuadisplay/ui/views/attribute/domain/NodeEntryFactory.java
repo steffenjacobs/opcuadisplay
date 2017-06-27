@@ -9,6 +9,8 @@ import org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.UByte;
 import org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.UInteger;
 import org.eclipse.milo.opcua.stack.core.types.enumerated.NodeClass;
 
+import me.steffenjacobs.opcuadisplay.management.node.NodeNavigator;
+import me.steffenjacobs.opcuadisplay.management.node.NodeNavigator.NodeManipulator;
 import me.steffenjacobs.opcuadisplay.management.node.domain.CachedBaseNode;
 import me.steffenjacobs.opcuadisplay.management.node.domain.CachedDataTypeNode;
 import me.steffenjacobs.opcuadisplay.management.node.domain.CachedMethodNode;
@@ -18,6 +20,7 @@ import me.steffenjacobs.opcuadisplay.management.node.domain.CachedReferenceTypeN
 import me.steffenjacobs.opcuadisplay.management.node.domain.CachedVariableNode;
 import me.steffenjacobs.opcuadisplay.management.node.domain.CachedVariableTypeNode;
 import me.steffenjacobs.opcuadisplay.management.node.domain.CachedViewNode;
+
 /** @author Steffen Jacobs */
 public class NodeEntryFactory {
 
@@ -142,14 +145,31 @@ public class NodeEntryFactory {
 	public static class NodeEntry<T> {
 
 		private final String text;
-		private final String typeName;
+		private String typeName;
 		private T value;
 		private final CachedBaseNode parentNode;
 
 		private NodeEntry(String text, T value, CachedBaseNode parent) {
 			this.text = text;
 			this.value = value;
-			this.typeName = value!=null?value.getClass().getSimpleName():"";
+			if (value == null) {
+				if (parent instanceof CachedVariableNode) {
+					NodeNavigator.getInstance().iterateNodes(NodeNavigator.getInstance().getRoot(),
+							new NodeManipulator() {
+
+								@Override
+								public void manipulate(CachedBaseNode cbn) {
+									if (cbn.getNodeId().equals(((CachedVariableNode) parent).getDataType())) {
+										typeName = cbn.getBrowseName().getName();
+									}
+								}
+							});
+				} else {
+					this.typeName = "";
+				}
+			} else {
+				this.typeName = value.getClass().getSimpleName();
+			}
 			this.parentNode = parent;
 		}
 

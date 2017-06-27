@@ -25,6 +25,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 
+import me.steffenjacobs.opcuadisplay.Activator;
 import me.steffenjacobs.opcuadisplay.eventbus.EventBus;
 import me.steffenjacobs.opcuadisplay.management.node.domain.BetterValueRank;
 import me.steffenjacobs.opcuadisplay.management.node.domain.CachedMethodNode;
@@ -280,7 +281,10 @@ public class AttributeEditorViewTableEditor {
 					}
 				};
 
-				if (entry.getValue().getClass() == String.class) {
+				NodeId datatype = ((CachedVariableNode) entry.getCachedNode()).getDataType();
+
+				if (new NodeId(0, 12).equals(datatype)) {
+					// String
 					Consumer<String> setter = new Consumer<String>() {
 						@Override
 						public void accept(String t) {
@@ -288,7 +292,17 @@ public class AttributeEditorViewTableEditor {
 						}
 					};
 					textEditor(table, entry, editableColumn, item, setter, getter);
-				} else if (entry.getValue().getClass() == Double.class) {
+				} else if (new NodeId(0, 10).equals(datatype)) {
+					// float
+					Consumer<String> setter = new Consumer<String>() {
+						@Override
+						public void accept(String t) {
+							((CachedVariableNode) entry.getCachedNode()).setValue(Float.parseFloat(t));
+						}
+					};
+					textEditor(table, entry, editableColumn, item, setter, getter);
+				} else if (new NodeId(0, 11).equals(datatype)) {
+					// double
 					Consumer<String> setter = new Consumer<String>() {
 						@Override
 						public void accept(String t) {
@@ -296,7 +310,9 @@ public class AttributeEditorViewTableEditor {
 						}
 					};
 					textEditor(table, entry, editableColumn, item, setter, getter);
-				} else if (entry.getValue().getClass() == Integer.class) {
+				} else if (new NodeId(0, 27).equals(datatype) || new NodeId(0, 4).equals(datatype)
+						|| new NodeId(0, 6).equals(datatype)) {
+					// integer / Byte/Int16/32
 					Consumer<String> setter = new Consumer<String>() {
 						@Override
 						public void accept(String t) {
@@ -304,7 +320,17 @@ public class AttributeEditorViewTableEditor {
 						}
 					};
 					textEditor(table, entry, editableColumn, item, setter, getter);
-				} else if (entry.getValue().getClass() == Long.class) {
+				} else if (new NodeId(0, 2).equals(datatype)) {
+					// sbyte
+					Consumer<String> setter = new Consumer<String>() {
+						@Override
+						public void accept(String t) {
+							((CachedVariableNode) entry.getCachedNode()).setValue(Byte.parseByte(t));
+						}
+					};
+					textEditor(table, entry, editableColumn, item, setter, getter);
+				} else if (new NodeId(0, 8).equals(datatype)) {
+					// int64
 					Consumer<String> setter = new Consumer<String>() {
 						@Override
 						public void accept(String t) {
@@ -312,7 +338,10 @@ public class AttributeEditorViewTableEditor {
 						}
 					};
 					textEditor(table, entry, editableColumn, item, setter, getter);
-				} else if (entry.getValue().getClass() == UInteger.class) {
+				} else if (new NodeId(0, 28).equals(datatype) || new NodeId(0, 3).equals(datatype)
+						|| new NodeId(0, 5).equals(datatype) || new NodeId(0, 7).equals(datatype)
+						|| new NodeId(0, 9).equals(datatype)) {
+					// UInteger /Byte/UInteger16/32/64
 					Consumer<String> setter = new Consumer<String>() {
 						@Override
 						public void accept(String t) {
@@ -320,7 +349,8 @@ public class AttributeEditorViewTableEditor {
 						}
 					};
 					textEditor(table, entry, editableColumn, item, setter, getter);
-				} else if (entry.getValue().getClass() == Boolean.class) {
+				} else if (new NodeId(0, 1).equals(datatype)) {
+					// boolean
 					Consumer<Boolean> setter = new Consumer<Boolean>() {
 						@Override
 						public void accept(Boolean t) {
@@ -328,7 +358,8 @@ public class AttributeEditorViewTableEditor {
 						}
 					};
 					booleanEditor(table, entry, editableColumn, item, setter);
-				} else if (entry.getValue().getClass() == DateTime.class) {
+				} else if (new NodeId(0, 13).equals(datatype)) {
+					// date time
 					Consumer<String> setter = new Consumer<String>() {
 						@Override
 						public void accept(String t) {
@@ -337,7 +368,7 @@ public class AttributeEditorViewTableEditor {
 							try {
 								((CachedVariableNode) entry.getCachedNode()).setValue(new DateTime(sdf.parse(t)));
 							} catch (ParseException e) {
-								throw new NumberFormatException(
+								Activator.openMessageBox("Error",
 										"Invalid date. Please use format 'YYYY/MM/dd hh/mm/ss/SSS Z'.");
 							}
 						}
