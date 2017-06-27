@@ -4,29 +4,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class SpiralLogic {
-
-	public static void main(String[] args) {
-		int[][] d = new SpiralLogic(3, 3).getData();
-
-		int[][] rd =
-			{
-					{ 1, 2, 3 },
-					{ 4, 5, 6 },
-					{ 7, 8, 9 } };
-
-		for (int i = 0; i < d.length; i++) {
-			for (int j = 0; j < d[i].length; j++) {
-				System.out.print(d[i][j] + " ");
-			}
-			System.out.println();
-		}
-
-		for (int i = 0; i < d.length; i++) {
-			System.out.print(rd[d[i][0]][d[i][1]] + " ");
-		}
-
-	}
-
 	enum Direction {
 		LEFT(new int[]
 		{ -1, 0 }),
