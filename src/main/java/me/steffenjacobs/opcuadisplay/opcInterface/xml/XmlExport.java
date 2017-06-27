@@ -1,14 +1,24 @@
 package me.steffenjacobs.opcuadisplay.opcInterface.xml;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 
 import org.eclipse.milo.opcua.stack.core.types.builtin.LocalizedText;
@@ -29,25 +39,52 @@ import me.steffenjacobs.opcuadisplay.management.node.domain.CachedReferenceTypeN
 import me.steffenjacobs.opcuadisplay.management.node.domain.CachedVariableNode;
 import me.steffenjacobs.opcuadisplay.management.node.domain.CachedVariableTypeNode;
 import me.steffenjacobs.opcuadisplay.management.node.domain.CachedViewNode;
+import me.steffenjacobs.opcuadisplay.management.node.domain.generated.AliasTable;
 import me.steffenjacobs.opcuadisplay.management.node.domain.generated.ListOfReferences;
+import me.steffenjacobs.opcuadisplay.management.node.domain.generated.NodeIdAlias;
 import me.steffenjacobs.opcuadisplay.management.node.domain.generated.Reference;
 import me.steffenjacobs.opcuadisplay.management.node.domain.generated.UADataType;
+import me.steffenjacobs.opcuadisplay.management.node.domain.generated.UAInstance;
 import me.steffenjacobs.opcuadisplay.management.node.domain.generated.UAMethod;
 import me.steffenjacobs.opcuadisplay.management.node.domain.generated.UANode;
 import me.steffenjacobs.opcuadisplay.management.node.domain.generated.UANodeSet;
 import me.steffenjacobs.opcuadisplay.management.node.domain.generated.UAObject;
 import me.steffenjacobs.opcuadisplay.management.node.domain.generated.UAObjectType;
 import me.steffenjacobs.opcuadisplay.management.node.domain.generated.UAReferenceType;
+import me.steffenjacobs.opcuadisplay.management.node.domain.generated.UAType;
 import me.steffenjacobs.opcuadisplay.management.node.domain.generated.UAVariable;
 import me.steffenjacobs.opcuadisplay.management.node.domain.generated.UAVariableType;
 import me.steffenjacobs.opcuadisplay.management.node.domain.generated.UAView;
+
 /** @author Steffen Jacobs */
 public class XmlExport {
 
 	private static XmlExport instance;
 
+	private static List<NodeIdAlias> aliases;
+
 	private XmlExport() {
-		// singleton
+		aliases = new ArrayList<>();
+		NodeIdAlias ali = new NodeIdAlias();
+		ali.setAlias("Organzies");
+		ali.setValue("i=35");
+		NodeIdAlias ali2 = new NodeIdAlias();
+		ali2.setAlias("HasTypeDefinition");
+		ali2.setValue("i=40");
+		NodeIdAlias ali3 = new NodeIdAlias();
+		ali3.setAlias("HasSubtype");
+		ali3.setValue("i=45");
+		NodeIdAlias ali4 = new NodeIdAlias();
+		ali4.setAlias("HasComponent");
+		ali4.setValue("i=47");
+		NodeIdAlias ali5 = new NodeIdAlias();
+		ali5.setAlias("HasProperty");
+		ali5.setValue("i=46");
+		aliases.add(ali);
+		aliases.add(ali2);
+		aliases.add(ali3);
+		aliases.add(ali4);
+		aliases.add(ali5);
 	}
 
 	public static XmlExport getInstance() {
@@ -57,11 +94,170 @@ public class XmlExport {
 		return instance;
 	}
 
-	public void writeToFile(String xmlFile, CachedBaseNode cbn) {
+	public void writeToFile(String xmlFile, CachedBaseNode cbn, boolean baseDataTypesImplicit,
+			boolean freeOpcUaModelerCompatibility) {
 
 		UANodeSet nodeSet = new UANodeSet();
 
 		nodeSet.getUAObjectOrUAVariableOrUAMethod().addAll(parseObjectTree(cbn));
+		
+
+		
+		Map<String, UANode> nodesById = new HashMap<>();
+
+		for (UANode node : nodeSet.getUAObjectOrUAVariableOrUAMethod()) {
+			nodesById.put(node.getNodeId(), node);
+		}
+
+		List<UANode> nodes = nodeSet.getUAObjectOrUAVariableOrUAMethod();
+		
+		// add backward references
+		for (UANode node : nodes) {
+			for (Reference ref : node.getReferences().getReference()) {
+				if (ref.isIsForward()) {
+					UANode nodeRef = nodesById.get(ref.getValue());
+					if (nodeRef != null) {
+						Reference refBw = new Reference();
+						refBw.setIsForward(false);
+						refBw.setReferenceType(ref.getReferenceType());
+						refBw.setValue(node.getNodeId());
+						nodeRef.getReferences().getReference().add(refBw);
+					}
+				}
+			}
+		}
+		
+
+		if (baseDataTypesImplicit) {
+			// load base data types nodeset to remove it from exported node set
+			InputStream is = this.getClass().getClassLoader().getResourceAsStream("base.xml");
+
+			try {
+				JAXBContext context = JAXBContext.newInstance(UANodeSet.class);
+				Unmarshaller um = context.createUnmarshaller();
+				UANodeSet nodeSetBase = (UANodeSet) um.unmarshal(new InputStreamReader(is));
+
+				nodeSet.getUAObjectOrUAVariableOrUAMethod().removeAll(nodeSetBase.getUAObjectOrUAVariableOrUAMethod());
+
+			} catch (JAXBException e) {
+				e.printStackTrace();
+			}
+		}
+
+		if (freeOpcUaModelerCompatibility) {
+
+			for (UANode node : nodeSet.getUAObjectOrUAVariableOrUAMethod()) {
+				// write 0 into minimum sampling interval if != 0
+				if (node instanceof UAVariable) {
+					((UAVariable) node).getArrayDimensions().clear();
+					((UAVariable) node).getArrayDimensions().add("0");
+				}
+
+			}
+
+			// types before instances
+			nodeSet.getUAObjectOrUAVariableOrUAMethod().sort(new Comparator<UANode>() {
+				@Override
+				public int compare(UANode o1, UANode o2) {
+					if (o2 instanceof UAType && o1 instanceof UAType
+							|| o1 instanceof UAInstance && o2 instanceof UAInstance) {
+						return 0;
+					} else if (o1 instanceof UAType) {
+						return -1;
+					} else {
+						return 1;
+					}
+				}
+			});
+
+			// boolean loop = false;
+			// List<Tuple2<UANode, UANode>> swappers = new ArrayList<>();
+			//
+			//
+			// do {
+			// swapped = false;
+			// for (int i = 0; i < nodes.size(); i++) {
+			// UANode node = nodes.get(i);
+			// for (Reference ref : node.getReferences().getReference()) {
+			// UANode refnode = nodesById.get(ref.getValue());
+			// int indexA = nodes.indexOf(node);
+			// if (nodes.indexOf(refnode) > indexA) {
+			// // swap nodes
+			// int indexB = nodes.indexOf(refnode);
+			// //indexB = 5, indexA = 2
+			//
+			// //1 2 A 3 4 B 5 6
+			// nodes.remove(indexB);
+			// //1 2 A 3 4 5 6
+			// nodes.remove(indexA);
+			// //1 2 3 4 5 6
+			// nodes.add(indexA, refnode);
+			// //1 2 B 3 4 5 6
+			// nodes.add(indexB, node);
+			// //1 2 B 3 4 A 5 6
+			// swapped = true;
+			//
+			// Tuple2<UANode, UANode> tuple = new Tuple2<UANode, UANode>(node,
+			// refnode);
+			// if (swappers.contains(tuple)) {
+			// loop = true;
+			// }
+			// swappers.add(tuple);
+			// System.out.println("swapped " + node.getBrowseName() + " with " +
+			// refnode.getBrowseName());
+			// }
+			// }
+			// if (swapped) {
+			// break;
+			// }
+			// }
+			// } while (swapped && !loop);
+			//
+			// if (loop) {
+			// Activator.openMessageBox("Error",
+			// "Cannot export as XML with \"Compatibility with Free OPC UA
+			// Modeler\", because Free OPC UA Modeler does not support cyclic
+			// references.");
+			// }
+
+			boolean swapped = false;
+
+			do {
+				swapped = false;
+				for (int i = 0; i < nodes.size(); i++) {
+					UANode node = nodes.get(i);
+					if (node instanceof UAInstance) {
+						UANode parent = nodesById.get(((UAInstance) node).getParentNodeId());
+						int indexParent = nodes.indexOf(parent);
+						int indexNode = nodes.indexOf(node);
+						if (indexNode < indexParent) {
+							// swap nodes
+							// indexB = 5, indexA = 2
+
+							// 1 2 A 3 4 B 5 6
+							nodes.remove(indexParent);
+							// 1 2 A 3 4 5 6
+							nodes.remove(indexNode);
+							// 1 2 3 4 5 6
+							nodes.add(indexNode, parent);
+							// 1 2 B 3 4 5 6
+							nodes.add(indexParent, node);
+							// 1 2 B 3 4 A 5 6
+							swapped = true;
+						}
+					}
+					if (swapped) {
+						break;
+					}
+				}
+			} while (swapped);
+		}
+
+		// add aliases
+		if (nodeSet.getAliases() == null) {
+			nodeSet.setAliases(new AliasTable());
+		}
+		nodeSet.getAliases().getAlias().addAll(aliases);
 
 		try {
 			// create JAXB context and instantiate marshaller
@@ -76,18 +272,22 @@ public class XmlExport {
 			Activator.openMessageBox("Error exporting XML", "" + e.getLinkedException().getMessage());
 			e.printStackTrace();
 		}
+
+		// cast MinimumSamplingInterval to integer
+		if (freeOpcUaModelerCompatibility) {
+			try {
+				List<String> lines = Files.readAllLines(Paths.get(xmlFile));
+
+				lines.replaceAll(s -> s.replaceAll("(MinimumSamplingInterval=\".*)\\.[0-9]+(\")", "$1$2"));
+
+				Files.write(Paths.get(xmlFile), lines, StandardCharsets.UTF_8);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	private Object convertValue(Object obj) {
-		// if(obj instanceof String[]){
-		// List<String> list = new ArrayList<>();
-		// for(String s : (String[])obj){
-		// list.add(s);
-		// }
-		// ListOfStrings result = new ListOfStrings();
-		// result.getString().addAll(list);
-		// return result;
-		// }
 		if (obj != null) {
 			JAXBElement<String> jaxbElement = new JAXBElement<String>(new QName("root-element"), String.class,
 					obj.toString());
@@ -245,7 +445,8 @@ public class XmlExport {
 				System.out.println(ref.getTypeDefinition() + " - " + ref.getReferenceType());
 			}
 			r.setValue(parseNodeId(ref.getRefNodeId()));
-			r.setIsForward(false);
+			// only forward references are stored in prototype
+			r.setIsForward(true);
 			result.getReference().add(r);
 		}
 
@@ -271,11 +472,11 @@ public class XmlExport {
 		return list.stream().map(x -> parseNode(x)).collect(Collectors.toList());
 	}
 
-	private me.steffenjacobs.opcuadisplay.management.node.domain.generated.LocalizedText parseLocalizedText(LocalizedText lt) {
+	private me.steffenjacobs.opcuadisplay.management.node.domain.generated.LocalizedText parseLocalizedText(
+			LocalizedText lt) {
 		me.steffenjacobs.opcuadisplay.management.node.domain.generated.LocalizedText res = new me.steffenjacobs.opcuadisplay.management.node.domain.generated.LocalizedText();
 		res.setLocale(lt.getLocale());
 		res.setValue(lt.getText());
 		return res;
 	}
-
 }

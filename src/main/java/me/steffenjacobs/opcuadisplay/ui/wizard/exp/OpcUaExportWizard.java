@@ -11,6 +11,7 @@ import me.steffenjacobs.opcuadisplay.ui.wizard.exp.events.ExportWizardFinishEven
 import me.steffenjacobs.opcuadisplay.ui.wizard.exp.events.ExportWizardOpenEvent;
 import me.steffenjacobs.opcuadisplay.ui.wizard.shared.WizardWithUrlAndType;
 import me.steffenjacobs.opcuadisplay.ui.wizard.shared.XmlPage;
+
 /** @author Steffen Jacobs */
 public class OpcUaExportWizard extends Wizard implements IWorkbenchWizard, WizardWithUrlAndType {
 
@@ -38,7 +39,8 @@ public class OpcUaExportWizard extends Wizard implements IWorkbenchWizard, Wizar
 
 	@Override
 	public boolean performFinish() {
-		EventBus.getInstance().fireEvent(new ExportWizardFinishEvent(this.getUrl()));
+		EventBus.getInstance().fireEvent(new ExportWizardFinishEvent(this.getUrl(), xmlPage.isBaseTypesImplicit(),
+				xmlPage.isFreeOpcUaModelerCompatibility()));
 		return true;
 	}
 

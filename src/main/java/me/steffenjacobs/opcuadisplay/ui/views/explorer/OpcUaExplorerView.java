@@ -186,7 +186,8 @@ public class OpcUaExplorerView extends CloseableView {
 				new EventListener<ImportWizardFinishEvent>() {
 					@Override
 					public void onAction(ImportWizardFinishEvent event) {
-						onImportWizardFinish(event.getUrl(), event.isServer(), event.isBaseDataTypesImplicit(), event.isFreeOpcUaModeler());
+						onImportWizardFinish(event.getUrl(), event.isServer(), event.isBaseDataTypesImplicit(),
+								event.isFreeOpcUaModeler());
 					}
 				});
 
@@ -195,7 +196,8 @@ public class OpcUaExplorerView extends CloseableView {
 				new EventListener<ExportWizardFinishEvent>() {
 					@Override
 					public void onAction(ExportWizardFinishEvent event) {
-						onExportWizardFinish(event.getUrl());
+						onExportWizardFinish(event.getUrl(), event.isBaseDataTypesImplicit(),
+								event.isFreeOpcUaModelerCompatibility());
 					}
 				});
 
@@ -317,12 +319,14 @@ public class OpcUaExplorerView extends CloseableView {
 	}
 
 	/** can be called, after the export wizard has finished */
-	public void onExportWizardFinish(String exportUrl) {
+	public void onExportWizardFinish(String exportUrl, boolean baseDataTypesImplicit,
+			boolean freeOpcUaModelerCompatibility) {
 		Job job = new Job("Exporting OPC UA nodes...") {
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
 				try {
-					XmlExport.getInstance().writeToFile(exportUrl, NodeNavigator.getInstance().getRoot());
+					XmlExport.getInstance().writeToFile(exportUrl, NodeNavigator.getInstance().getRoot(),
+							baseDataTypesImplicit, freeOpcUaModelerCompatibility);
 					return Status.OK_STATUS;
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -384,14 +388,15 @@ public class OpcUaExplorerView extends CloseableView {
 	}
 
 	/** can be called, after the import wizard has finished */
-	public void onImportWizardFinish(String importUrl, boolean server, final boolean baseDataTypesImplicit, boolean freeOpcUaModelerCompatibility) {
+	public void onImportWizardFinish(String importUrl, boolean server, final boolean baseDataTypesImplicit,
+			boolean freeOpcUaModelerCompatibility) {
 		if (!server) {
 			Job job = new Job("Importing OPC UA nodes...") {
 				@Override
 				protected IStatus run(IProgressMonitor monitor) {
 					try {
-						NodeNavigator.getInstance()
-								.setRoot(XmlImport.getInstance().parseFile(importUrl, baseDataTypesImplicit, freeOpcUaModelerCompatibility));
+						NodeNavigator.getInstance().setRoot(XmlImport.getInstance().parseFile(importUrl,
+								baseDataTypesImplicit, freeOpcUaModelerCompatibility));
 
 						Display.getDefault().syncExec(new Runnable() {
 							@Override
