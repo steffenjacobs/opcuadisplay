@@ -5,6 +5,8 @@ import java.io.FileReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -13,15 +15,16 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.UnmarshalException;
 import javax.xml.bind.Unmarshaller;
 
 import org.eclipse.milo.opcua.stack.core.UaRuntimeException;
+import org.eclipse.milo.opcua.stack.core.types.builtin.DateTime;
 import org.eclipse.milo.opcua.stack.core.types.builtin.LocalizedText;
 import org.eclipse.milo.opcua.stack.core.types.builtin.NodeId;
 import org.eclipse.milo.opcua.stack.core.types.builtin.QualifiedName;
 import org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.UByte;
 import org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.UInteger;
+import org.w3c.dom.Element;
 
 import me.steffenjacobs.opcuadisplay.Activator;
 import me.steffenjacobs.opcuadisplay.management.node.NodeGenerator;
@@ -50,6 +53,7 @@ import me.steffenjacobs.opcuadisplay.management.node.domain.generated.UAObjectTy
 import me.steffenjacobs.opcuadisplay.management.node.domain.generated.UAReferenceType;
 import me.steffenjacobs.opcuadisplay.management.node.domain.generated.UAVariable;
 import me.steffenjacobs.opcuadisplay.management.node.domain.generated.UAVariableType;
+import me.steffenjacobs.opcuadisplay.management.node.domain.generated.UAVariableType.Value;
 import me.steffenjacobs.opcuadisplay.management.node.domain.generated.UAView;
 
 /** @author Steffen Jacobs */
@@ -233,9 +237,9 @@ public class XmlImport {
 			NodeId nodeId = parseNodeId(namespaceIndex, node.getNodeId());
 			CachedVariableNode cvn = new CachedVariableNode(nodeId);
 
-			cvn.setValue(node.getValue() != null ? node.getValue().getAny() : null);
-
 			cvn.setDataType(parseNodeId(namespaceIndex, node.getDataType()));
+
+			cvn.setValue(convertValue(node.getValue(), cvn.getDataType()));
 
 			cvn.setValueRank(node.getValueRank());
 
@@ -296,8 +300,8 @@ public class XmlImport {
 			UAVariableType node = (UAVariableType) uaNode;
 			NodeId nodeId = parseNodeId(namespaceIndex, node.getNodeId());
 			CachedVariableTypeNode cvn = new CachedVariableTypeNode(nodeId);
-			cvn.setValue(node.getValue());
 			cvn.setDataType(parseNodeId(namespaceIndex, node.getDataType()));
+			cvn.setValue(convertValue(node.getValue(), cvn.getDataType()));
 			cvn.setValueRank(node.getValueRank());
 			UInteger[] arr = node.getArrayDimensions().stream().map(x -> UInteger.valueOf(x)).toArray(UInteger[]::new);
 			cvn.setArrayDimensions(arr);
@@ -348,6 +352,72 @@ public class XmlImport {
 		return cbn;
 	}
 
+	private Object convertValue(Object val, NodeId datatype) {
+		Object dat = null;
+
+		if (val instanceof Value) {
+			Value v = (Value) val;
+			dat = v.getAny();
+		} else if (val instanceof UAVariable.Value) {
+			UAVariable.Value v = (UAVariable.Value) val;
+			dat = v.getAny();
+		}
+		if (dat == null) {
+			return null;
+		}
+
+		String type = null;
+		String value = null;
+
+		if (dat instanceof Element) {
+			Element elem = (Element) dat;
+			type = elem.getLocalName();
+			value = elem.getFirstChild().getTextContent();
+		}
+
+		if (type.equals("root-element") || type == null) {
+			return null;
+		}
+
+		SimpleDateFormat sdf = new SimpleDateFormat("YYYY/MM/dd hh/mm/ss/SSS Z");
+
+		if (type != null) {
+			switch (type) {
+			case "Boolean":
+				return Boolean.parseBoolean(value);
+			case "SByte":
+				return Byte.parseByte(value);
+			case "Byte":
+				return UInteger.valueOf(value);
+			case "Int16":
+				return Integer.parseInt(value);
+			case "UInt16":
+				return UInteger.valueOf(value);
+			case "Int32":
+				return Integer.parseInt(value);
+			case "UInt32":
+				return UInteger.valueOf(value);
+			case "Int64":
+				return Long.parseLong(value);
+			case "UInt64":
+				return UInteger.valueOf(value);
+			case "Float":
+				return Float.parseFloat(value);
+			case "Double":
+				return Double.parseDouble(value);
+			case "String":
+				return value;
+			case "DateTime":
+				try {
+					return new DateTime(sdf.parse(value));
+				} catch (ParseException e) {
+					return null;
+				}
+			}
+		}
+		return null;
+	}
+	
 	/**
 	 * @return the NodeId object from the namespaceIndex and a String <i>str
 	 *         (i=[0-9]*)</i>

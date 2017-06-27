@@ -10,8 +10,10 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.xml.bind.JAXBContext;
@@ -23,6 +25,7 @@ import javax.xml.namespace.QName;
 
 import org.eclipse.milo.opcua.stack.core.types.builtin.LocalizedText;
 import org.eclipse.milo.opcua.stack.core.types.builtin.NodeId;
+import org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.UInteger;
 
 import com.google.common.collect.Lists;
 
@@ -61,10 +64,10 @@ public class XmlExport {
 
 	private static XmlExport instance;
 
-	private static List<NodeIdAlias> aliases;
+	private static Set<NodeIdAlias> aliases;
 
 	private XmlExport() {
-		aliases = new ArrayList<>();
+		aliases = new HashSet<>();
 		NodeIdAlias ali = new NodeIdAlias();
 		ali.setAlias("Organzies");
 		ali.setValue("i=35");
@@ -100,9 +103,7 @@ public class XmlExport {
 		UANodeSet nodeSet = new UANodeSet();
 
 		nodeSet.getUAObjectOrUAVariableOrUAMethod().addAll(parseObjectTree(cbn));
-		
 
-		
 		Map<String, UANode> nodesById = new HashMap<>();
 
 		for (UANode node : nodeSet.getUAObjectOrUAVariableOrUAMethod()) {
@@ -110,7 +111,7 @@ public class XmlExport {
 		}
 
 		List<UANode> nodes = nodeSet.getUAObjectOrUAVariableOrUAMethod();
-		
+
 		// add backward references
 		for (UANode node : nodes) {
 			for (Reference ref : node.getReferences().getReference()) {
@@ -126,7 +127,6 @@ public class XmlExport {
 				}
 			}
 		}
-		
 
 		if (baseDataTypesImplicit) {
 			// load base data types nodeset to remove it from exported node set
@@ -169,56 +169,6 @@ public class XmlExport {
 					}
 				}
 			});
-
-			// boolean loop = false;
-			// List<Tuple2<UANode, UANode>> swappers = new ArrayList<>();
-			//
-			//
-			// do {
-			// swapped = false;
-			// for (int i = 0; i < nodes.size(); i++) {
-			// UANode node = nodes.get(i);
-			// for (Reference ref : node.getReferences().getReference()) {
-			// UANode refnode = nodesById.get(ref.getValue());
-			// int indexA = nodes.indexOf(node);
-			// if (nodes.indexOf(refnode) > indexA) {
-			// // swap nodes
-			// int indexB = nodes.indexOf(refnode);
-			// //indexB = 5, indexA = 2
-			//
-			// //1 2 A 3 4 B 5 6
-			// nodes.remove(indexB);
-			// //1 2 A 3 4 5 6
-			// nodes.remove(indexA);
-			// //1 2 3 4 5 6
-			// nodes.add(indexA, refnode);
-			// //1 2 B 3 4 5 6
-			// nodes.add(indexB, node);
-			// //1 2 B 3 4 A 5 6
-			// swapped = true;
-			//
-			// Tuple2<UANode, UANode> tuple = new Tuple2<UANode, UANode>(node,
-			// refnode);
-			// if (swappers.contains(tuple)) {
-			// loop = true;
-			// }
-			// swappers.add(tuple);
-			// System.out.println("swapped " + node.getBrowseName() + " with " +
-			// refnode.getBrowseName());
-			// }
-			// }
-			// if (swapped) {
-			// break;
-			// }
-			// }
-			// } while (swapped && !loop);
-			//
-			// if (loop) {
-			// Activator.openMessageBox("Error",
-			// "Cannot export as XML with \"Compatibility with Free OPC UA
-			// Modeler\", because Free OPC UA Modeler does not support cyclic
-			// references.");
-			// }
 
 			boolean swapped = false;
 
@@ -273,27 +223,82 @@ public class XmlExport {
 			e.printStackTrace();
 		}
 
-		// cast MinimumSamplingInterval to integer
-		if (freeOpcUaModelerCompatibility) {
-			try {
-				List<String> lines = Files.readAllLines(Paths.get(xmlFile));
+		try {
+			List<String> lines = Files.readAllLines(Paths.get(xmlFile));
 
+			lines.replaceAll(s -> s.replace("<UANodeSet xmlns=\"http://opcfoundation.org/UA/2011/03/UANodeSet.xsd\">",
+					"<UANodeSet xmlns=\"http://opcfoundation.org/UA/2011/03/UANodeSet.xsd\" "
+							+ "xmlns:uax=\"http://opcfoundation.org/UA/2008/02/Types.xsd\" "
+							+ "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
+							+ "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">"));
+
+			if (freeOpcUaModelerCompatibility) {
+				// cast MinimumSamplingInterval to integer
 				lines.replaceAll(s -> s.replaceAll("(MinimumSamplingInterval=\".*)\\.[0-9]+(\")", "$1$2"));
-
-				Files.write(Paths.get(xmlFile), lines, StandardCharsets.UTF_8);
-			} catch (IOException e) {
-				e.printStackTrace();
 			}
+			Files.write(Paths.get(xmlFile), lines, StandardCharsets.UTF_8);
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 
-	private Object convertValue(Object obj) {
+	private Object convertValue(Object obj, NodeId datatype) {
 		if (obj != null) {
-			JAXBElement<String> jaxbElement = new JAXBElement<String>(new QName("root-element"), String.class,
-					obj.toString());
-			return jaxbElement;
+			switch (((UInteger) datatype.getIdentifier()).intValue()) {
+			case 1:
+				aliases.add(new NodeIdAlias("Boolean", "i=1"));
+				return createTag(obj);
+			case 2:
+				aliases.add(new NodeIdAlias("SByte", "i=2"));
+				return createTag(obj);
+			case 3:
+				aliases.add(new NodeIdAlias("Byte", "i=3"));
+				return createTag(obj);
+			case 4:
+				aliases.add(new NodeIdAlias("Int16", "i=4"));
+				return createTag(obj);
+			case 5:
+				aliases.add(new NodeIdAlias("UInt16", "i=5"));
+				return createTag(obj);
+			case 6:
+				aliases.add(new NodeIdAlias("Int32", "i=6"));
+				return createTag(obj);
+			case 7:
+				aliases.add(new NodeIdAlias("UInt32", "i=7"));
+				return createTag(obj);
+			case 8:
+				aliases.add(new NodeIdAlias("Int64", "i=8"));
+				return createTag(obj);
+			case 9:
+				aliases.add(new NodeIdAlias("UInt64", "i=9"));
+				return createTag(obj);
+			case 10:
+				aliases.add(new NodeIdAlias("Float", "i=10"));
+				return createTag(obj);
+			case 11:
+				aliases.add(new NodeIdAlias("Double", "i=11"));
+				return createTag(obj);
+			case 12:
+				aliases.add(new NodeIdAlias("String", "i=12"));
+				return createTag(obj);
+			case 13:
+				aliases.add(new NodeIdAlias("DateTime", "i=13"));
+				return createTag(obj);
+			case 27:
+				return convertValue(obj, new NodeId(0, 6));
+			case 28:
+				return convertValue(obj, new NodeId(0, 7));
+			default:
+				return null;
+			}
 		}
 		return obj;
+	}
+	
+	private JAXBElement<String> createTag(Object obj){
+		String type = obj.getClass().getSimpleName();
+		type = type.equals("Long")?"Int64":type.equals("Integer")?"Int32":type;
+		return new JAXBElement<String>(new QName("uax:" + type), String.class, obj.toString());
 	}
 
 	private UANode parseNode(CachedBaseNode cbn) {
@@ -329,7 +334,7 @@ public class XmlExport {
 			UAVariable uav = new UAVariable();
 
 			UAVariable.Value val = new UAVariable.Value();
-			val.setAny(convertValue(node.getValue()));
+			val.setAny(convertValue(node.getValue(), node.getDataType()));
 			uav.setValue(val);
 
 			uav.setDataType(parseNodeId(node.getDataType()));
@@ -393,7 +398,7 @@ public class XmlExport {
 			UAVariableType uav = new UAVariableType();
 
 			UAVariableType.Value val = new UAVariableType.Value();
-			val.setAny(convertValue(node.getValue()));
+			val.setAny(convertValue(node.getValue(), node.getDataType()));
 			uav.setValue(val);
 
 			uav.setDataType(parseNodeId(node.getDataType()));
