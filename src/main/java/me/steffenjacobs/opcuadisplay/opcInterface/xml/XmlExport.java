@@ -415,7 +415,7 @@ public class XmlExport {
 		uaNode.setNodeId(parseNodeId(cbn.getNodeId()));
 
 		// set browse name
-		uaNode.setBrowseName(cbn.getBrowseName().getName());
+		uaNode.setBrowseName(cbn.getBrowseName().toParseableString());
 
 		// set description
 		uaNode.getDescription().add(parseLocalizedText(cbn.getDescription()));

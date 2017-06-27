@@ -13,6 +13,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.UnmarshalException;
 import javax.xml.bind.Unmarshaller;
 
 import org.eclipse.milo.opcua.stack.core.UaRuntimeException;
@@ -98,7 +99,6 @@ public class XmlImport {
 			return rootFolder;
 		} catch (JAXBException e) {
 			Activator.openMessageBox("Error importing XML", e.getLocalizedMessage());
-			e.printStackTrace();
 		}
 
 		return null;
@@ -109,8 +109,7 @@ public class XmlImport {
 		try {
 			return parseFile(new FileReader(xmlFile), baseDataTypesImplicit, freeOpcUaModelerCompatibility);
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Activator.openMessageBox("Error", e.getLocalizedMessage());
 		}
 		return null;
 	}
@@ -234,7 +233,7 @@ public class XmlImport {
 			NodeId nodeId = parseNodeId(namespaceIndex, node.getNodeId());
 			CachedVariableNode cvn = new CachedVariableNode(nodeId);
 
-			cvn.setValue(node.getValue().getAny());
+			cvn.setValue(node.getValue() != null ? node.getValue().getAny() : null);
 
 			cvn.setDataType(parseNodeId(namespaceIndex, node.getDataType()));
 
@@ -320,7 +319,7 @@ public class XmlImport {
 		}
 
 		// set browse name
-		cbn.setBrowseName(new QualifiedName(namespaceIndex, uaNode.getBrowseName()));
+		cbn.setBrowseName(QualifiedName.parse(uaNode.getBrowseName()));
 
 		// set description
 		List<me.steffenjacobs.opcuadisplay.management.node.domain.generated.LocalizedText> list = uaNode
@@ -372,10 +371,12 @@ public class XmlImport {
 	private List<CachedReference> parseReferencesStep1(ListOfReferences refs) {
 		List<CachedReference> list = new CopyOnWriteArrayList<CachedReference>();
 		for (Reference ref : refs.getReference()) {
-			CachedReference cr = new CachedReference(ref.getReferenceType(), new QualifiedName(0, "null-name"), "null",
-					NodeId.parse(ref.getValue()));
-			list.add(cr);
-			referencesForStep2.add(new Tuple2<Reference, CachedReference>(ref, cr));
+			if (ref.isIsForward()) {
+				CachedReference cr = new CachedReference(ref.getReferenceType(), new QualifiedName(0, "null-name"),
+						"null", NodeId.parse(ref.getValue()));
+				list.add(cr);
+				referencesForStep2.add(new Tuple2<Reference, CachedReference>(ref, cr));
+			}
 		}
 		return list;
 	}
