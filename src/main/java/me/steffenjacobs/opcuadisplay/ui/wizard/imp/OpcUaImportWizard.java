@@ -21,11 +21,14 @@ public class OpcUaImportWizard extends Wizard implements IWorkbenchWizard, Wizar
 
 	public boolean importType;
 	public String importUrl;
+	
+	private final boolean merge;
 
-	public OpcUaImportWizard() {
+	public OpcUaImportWizard(boolean merge) {
 		super();
 		setNeedsProgressMonitor(true);
-		EventBus.getInstance().fireEvent(new ImportWizardOpenEvent());
+		EventBus.getInstance().fireEvent(new ImportWizardOpenEvent(merge));
+		this.merge = merge;
 	}
 
 	@Override
@@ -37,23 +40,27 @@ public class OpcUaImportWizard extends Wizard implements IWorkbenchWizard, Wizar
 	public void addPages() {
 		selectionPage = new ImportTypeSelectionPage();
 		xmlPage = new XmlPage("Import model from XML file", "Please enter URI to an XML file to import the model from.",
-				true);
+				true, merge);
 		serverPage = new ImportFromServerPage();
-		super.addPage(selectionPage);
+		if (!merge) {
+			super.addPage(selectionPage);
+		}
 		super.addPage(xmlPage);
-		super.addPage(serverPage);
+		if (!merge) {
+			super.addPage(serverPage);
+		}
 	}
 
 	@Override
 	public boolean performFinish() {
 		EventBus.getInstance().fireEvent(new ImportWizardFinishEvent(this.getUrl(), this.isType(),
-				xmlPage.isBaseTypesImplicit(), xmlPage.isFreeOpcUaModelerCompatibility()));
+				xmlPage.isBaseTypesImplicit(), xmlPage.isFreeOpcUaModelerCompatibility(), this.merge));
 		return true;
 	}
 
 	@Override
 	public boolean performCancel() {
-		EventBus.getInstance().fireEvent(new ImportWizardCancelEvent());
+		EventBus.getInstance().fireEvent(new ImportWizardCancelEvent(merge));
 		return super.performCancel();
 	}
 

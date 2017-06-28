@@ -36,7 +36,6 @@ import me.steffenjacobs.opcuadisplay.eventbus.EventBus.EventListener;
 import me.steffenjacobs.opcuadisplay.management.node.NodeGenerator;
 import me.steffenjacobs.opcuadisplay.management.node.NodeNavigator;
 import me.steffenjacobs.opcuadisplay.management.node.domain.CachedBaseNode;
-import me.steffenjacobs.opcuadisplay.management.node.domain.CachedObjectNode;
 import me.steffenjacobs.opcuadisplay.opcInterface.xml.XmlExport;
 import me.steffenjacobs.opcuadisplay.opcInterface.xml.XmlImport;
 import me.steffenjacobs.opcuadisplay.ui.Images;
@@ -82,7 +81,7 @@ public class OpcUaExplorerView extends CloseableView {
 
 	private TreeViewer viewer;
 	private Action doubleClickAction, selectionChangedAction;
-	private Action openImportWizard, openExportWizard, newProjectWizard;
+	private Action openImportWizard, openExportWizard, newProjectWizard, openMergeImportWizard;
 	private Action collapseAllAction, expandAllAction;
 	private Action addVariable, addMethod, addObject, addProperty, addObjectType, addVariableType, addDataType;
 	private Action removeAction;
@@ -168,7 +167,7 @@ public class OpcUaExplorerView extends CloseableView {
 				new EventListener<ImportWizardOpenEvent>() {
 					@Override
 					public void onAction(ImportWizardOpenEvent event) {
-						onWizardOpen();
+						onWizardOpen(event.isMergeWizard());
 					}
 				});
 
@@ -176,7 +175,7 @@ public class OpcUaExplorerView extends CloseableView {
 				new EventListener<ImportWizardCancelEvent>() {
 					@Override
 					public void onAction(ImportWizardCancelEvent event) {
-						onWizardCancel();
+						onWizardCancel(event.isMergeWizard());
 					}
 				});
 
@@ -185,7 +184,7 @@ public class OpcUaExplorerView extends CloseableView {
 					@Override
 					public void onAction(ImportWizardFinishEvent event) {
 						onImportWizardFinish(event.getUrl(), event.isServer(), event.isBaseDataTypesImplicit(),
-								event.isFreeOpcUaModeler());
+								event.isFreeOpcUaModeler(), event.isMerge());
 					}
 				});
 
@@ -239,6 +238,7 @@ public class OpcUaExplorerView extends CloseableView {
 		manager.add(newProjectWizard);
 		manager.add(openImportWizard);
 		manager.add(openExportWizard);
+		manager.add(openMergeImportWizard);
 		manager.add(new Separator());
 		manager.add(collapseAllAction);
 		manager.add(expandAllAction);
@@ -277,6 +277,7 @@ public class OpcUaExplorerView extends CloseableView {
 		manager.add(newProjectWizard);
 		manager.add(openImportWizard);
 		manager.add(openExportWizard);
+		manager.add(openMergeImportWizard);
 		manager.add(new Separator());
 		manager.add(collapseAllAction);
 		manager.add(expandAllAction);
@@ -303,15 +304,19 @@ public class OpcUaExplorerView extends CloseableView {
 	}
 
 	/** can be called, when the import wizard is started */
-	public void onWizardOpen() {
+	public void onWizardOpen(boolean merge) {
+		if (!merge) {
 			NodeNavigator.getInstance().cacheRoot();
 			NodeNavigator.getInstance().setRoot(CachedBaseNode.getDummyLoading());
+		}
 		viewer.refresh();
 	}
 
 	/** can be called, when the import wizard had been canceled */
-	public void onWizardCancel() {
+	public void onWizardCancel(boolean merge) {
+		if (!merge) {
 			NodeNavigator.getInstance().uncacheRoot();
+		}
 		viewer.refresh();
 		expandToDefaultState();
 	}
@@ -387,14 +392,14 @@ public class OpcUaExplorerView extends CloseableView {
 
 	/** can be called, after the import wizard has finished */
 	public void onImportWizardFinish(String importUrl, boolean server, final boolean baseDataTypesImplicit,
-			boolean freeOpcUaModelerCompatibility) {
+			boolean freeOpcUaModelerCompatibility, boolean merge) {
 		if (!server) {
 			Job job = new Job("Importing OPC UA nodes...") {
 				@Override
 				protected IStatus run(IProgressMonitor monitor) {
 					try {
 						NodeNavigator.getInstance().setRoot(XmlImport.getInstance().parseFile(importUrl,
-								baseDataTypesImplicit, freeOpcUaModelerCompatibility));
+								baseDataTypesImplicit, freeOpcUaModelerCompatibility, merge));
 
 						Display.getDefault().syncExec(new Runnable() {
 							@Override
@@ -439,7 +444,7 @@ public class OpcUaExplorerView extends CloseableView {
 		if (obj instanceof CachedBaseNode) {
 			if (((CachedBaseNode) obj).isDummy()) {
 				// open import wizard
-				new WizardDialog(new Shell(), new OpcUaImportWizard()).open();
+				new WizardDialog(new Shell(), new OpcUaImportWizard(false)).open();
 			} else {
 				EventBus.getInstance().fireEvent(new SelectedNodeChangedEvent((CachedBaseNode) obj));
 				viewer.setExpandedState(obj, !viewer.getExpandedState(obj));
@@ -552,7 +557,7 @@ public class OpcUaExplorerView extends CloseableView {
 		// open import wizard
 		openImportWizard = new Action() {
 			public void run() {
-				new WizardDialog(new Shell(), new OpcUaImportWizard()).open();
+				new WizardDialog(new Shell(), new OpcUaImportWizard(false)).open();
 			}
 		};
 		openImportWizard.setText("Import OPC UA Model...");
@@ -568,6 +573,16 @@ public class OpcUaExplorerView extends CloseableView {
 		openExportWizard.setText("Export OPC UA Model...");
 		openExportWizard.setToolTipText("Export OPC UA Model...");
 		openExportWizard.setImageDescriptor(Activator.getImageDescriptor(Images.IMG_EXPORT.getIdentifier()));
+
+		// open import wizard
+		openMergeImportWizard = new Action() {
+			public void run() {
+				new WizardDialog(new Shell(), new OpcUaImportWizard(true)).open();
+			}
+		};
+		openMergeImportWizard.setText("Merge OPC UA Model...");
+		openMergeImportWizard.setToolTipText("Merge OPC UA Model...");
+		openMergeImportWizard.setImageDescriptor(Activator.getImageDescriptor(Images.IMG_IMPORT.getIdentifier()));
 
 		// double click action
 		doubleClickAction = new Action() {

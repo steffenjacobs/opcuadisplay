@@ -271,12 +271,12 @@ public class NodeGenerator {
 
 	public void generateBaseTypes() {
 		InputStream is = this.getClass().getClassLoader().getResourceAsStream("base.xml");
-		NodeNavigator.getInstance().setRoot(XmlImport.getInstance().parseFile(is, false, false));
+		NodeNavigator.getInstance().setRoot(XmlImport.getInstance().parseFile(is, false, false, false));
 	}
 
 	public void generateFolders() {
 		InputStream is = this.getClass().getClassLoader().getResourceAsStream("folders.xml");
-		NodeNavigator.getInstance().setRoot(XmlImport.getInstance().parseFile(is, false, false));
+		NodeNavigator.getInstance().setRoot(XmlImport.getInstance().parseFile(is, false, false, false));
 	}
 
 	public CachedBaseNode mergeInsertNode(CachedBaseNode child, CachedBaseNode parent) {

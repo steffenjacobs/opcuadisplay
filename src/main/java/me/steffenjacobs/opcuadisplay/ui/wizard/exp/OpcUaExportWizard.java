@@ -33,7 +33,7 @@ public class OpcUaExportWizard extends Wizard implements IWorkbenchWizard, Wizar
 	@Override
 	public void addPages() {
 		xmlPage = new XmlPage("Export model to XML file", "Please enter URI to an XML file to export the model to.",
-				false);
+				false, false);
 		super.addPage(xmlPage);
 	}
 

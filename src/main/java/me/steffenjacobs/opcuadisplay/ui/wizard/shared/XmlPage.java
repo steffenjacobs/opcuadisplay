@@ -25,14 +25,15 @@ public class XmlPage extends WizardPage {
 	private Text textUrl;
 	private Button checkboxBaseTypesImplicit, checkboxFreeOpcUaModelerCompatibility;
 	private Composite container;
-	private boolean isImport;
+	private final boolean isImport, merge;
 
 	/** type: true = import, false = export */
-	public XmlPage(String caption, String description, boolean type) {
+	public XmlPage(String caption, String description, boolean type, boolean merge) {
 		super(caption);
 		setTitle(caption);
 		setDescription(description);
 		this.isImport = type;
+		this.merge = merge;
 	}
 
 	@Override
@@ -97,38 +98,41 @@ public class XmlPage extends WizardPage {
 		textUrl.setFocus();
 		textUrl.setSelection(0, textUrl.getText().length());
 
-		checkboxBaseTypesImplicit = new Button(container, SWT.CHECK);
-		
-		checkboxBaseTypesImplicit.setLayoutData(gd);
+		if (!merge) {
+			checkboxBaseTypesImplicit = new Button(container, SWT.CHECK);
 
-		checkboxBaseTypesImplicit.setText("Base Types implicit");
-		
-		Composite spc = new Composite(container, SWT.NONE);
-		spc.setLayoutData(gd);
+			checkboxBaseTypesImplicit.setLayoutData(gd);
 
-		checkboxFreeOpcUaModelerCompatibility = new Button(container, SWT.CHECK);
-		checkboxFreeOpcUaModelerCompatibility.setLayoutData(gd);
+			checkboxBaseTypesImplicit.setText("Base Types implicit");
 
-		checkboxFreeOpcUaModelerCompatibility.setText("Free OPC UA Modeler Compatibility");
-		checkboxFreeOpcUaModelerCompatibility.setSelection(false);
-		
-		checkboxFreeOpcUaModelerCompatibility.addSelectionListener(new SelectionAdapter() {			
-			@Override
-			public void widgetSelected(SelectionEvent arg0) {
-				if(checkboxFreeOpcUaModelerCompatibility.getSelection()){
-					checkboxBaseTypesImplicit.setSelection(true);
+			Composite spc = new Composite(container, SWT.NONE);
+			spc.setLayoutData(gd);
+
+			checkboxFreeOpcUaModelerCompatibility = new Button(container, SWT.CHECK);
+			checkboxFreeOpcUaModelerCompatibility.setLayoutData(gd);
+
+			checkboxFreeOpcUaModelerCompatibility.setText("Free OPC UA Modeler Compatibility");
+			checkboxFreeOpcUaModelerCompatibility.setSelection(false);
+
+			checkboxFreeOpcUaModelerCompatibility.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(SelectionEvent arg0) {
+					if (checkboxFreeOpcUaModelerCompatibility.getSelection()) {
+						checkboxBaseTypesImplicit.setSelection(true);
+					}
 				}
-			}
-		});
-		
-		checkboxBaseTypesImplicit.addSelectionListener(new SelectionAdapter() {			
-			@Override
-			public void widgetSelected(SelectionEvent arg0) {
-				if(!checkboxBaseTypesImplicit.getSelection()){
-					checkboxFreeOpcUaModelerCompatibility.setSelection(false);
+			});
+
+			checkboxBaseTypesImplicit.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(SelectionEvent arg0) {
+					if (!checkboxBaseTypesImplicit.getSelection()) {
+						checkboxFreeOpcUaModelerCompatibility.setSelection(false);
+					}
 				}
-			}
-		});
+			});
+
+		}
 
 		// required to avoid an error in the system
 		setControl(container);
@@ -166,10 +170,16 @@ public class XmlPage extends WizardPage {
 	}
 
 	public boolean isBaseTypesImplicit() {
+		if(checkboxBaseTypesImplicit==null){
+			return false;
+		}
 		return checkboxBaseTypesImplicit.getSelection();
 	}
-	
-	public boolean isFreeOpcUaModelerCompatibility(){
+
+	public boolean isFreeOpcUaModelerCompatibility() {
+		if(checkboxFreeOpcUaModelerCompatibility==null){
+			return false;
+		}
 		return checkboxFreeOpcUaModelerCompatibility.getSelection();
 	}
 }

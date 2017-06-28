@@ -80,7 +80,7 @@ public class XmlImport {
 	}
 
 	public CachedObjectNode parseFile(Reader xmlReader, boolean baseDataTypesImplicit,
-			boolean freeOpcUaModelerCompatibility) {
+			boolean freeOpcUaModelerCompatibility, boolean merge) {
 		try {
 			// create JAXB context and instantiate marshaller
 			JAXBContext context = JAXBContext.newInstance(UANodeSet.class);
@@ -98,7 +98,8 @@ public class XmlImport {
 			CopyOnWriteArrayList<UANode> nodes = new CopyOnWriteArrayList<>();
 			nodes.addAll(nodeSet.getUAObjectOrUAVariableOrUAMethod());
 
-			CachedObjectNode rootFolder = buildFullTree(nodes, baseDataTypesImplicit, freeOpcUaModelerCompatibility);
+			CachedObjectNode rootFolder = buildFullTree(nodes, baseDataTypesImplicit, freeOpcUaModelerCompatibility,
+					merge);
 
 			return rootFolder;
 		} catch (JAXBException e) {
@@ -109,9 +110,9 @@ public class XmlImport {
 	}
 
 	public CachedObjectNode parseFile(String xmlFile, boolean baseDataTypesImplicit,
-			boolean freeOpcUaModelerCompatibility) {
+			boolean freeOpcUaModelerCompatibility, boolean merge) {
 		try {
-			return parseFile(new FileReader(xmlFile), baseDataTypesImplicit, freeOpcUaModelerCompatibility);
+			return parseFile(new FileReader(xmlFile), baseDataTypesImplicit, freeOpcUaModelerCompatibility, merge);
 		} catch (FileNotFoundException e) {
 			Activator.openMessageBoxError("Error", e.getLocalizedMessage());
 		}
@@ -119,14 +120,14 @@ public class XmlImport {
 	}
 
 	public CachedObjectNode parseFile(InputStream is, boolean baseDataTypesImplicit,
-			boolean freeOpcUaModelerCompatibility) {
-		return parseFile(new InputStreamReader(is), baseDataTypesImplicit, freeOpcUaModelerCompatibility);
+			boolean freeOpcUaModelerCompatibility, boolean merge) {
+		return parseFile(new InputStreamReader(is), baseDataTypesImplicit, freeOpcUaModelerCompatibility, merge);
 	}
 
 	private CachedObjectNode buildFullTree(List<UANode> nodes, boolean baseDataTypesImplicit,
-			boolean freeOpcUaModelerCompatibility) {
+			boolean freeOpcUaModelerCompatibility, boolean merge) {
 		CachedObjectNode root;
-		if (baseDataTypesImplicit) {
+		if (baseDataTypesImplicit && !merge) {
 			NodeGenerator.getInstance().generateBaseTypes();
 			root = NodeNavigator.getInstance().getRoot();
 			NodeNavigator.getInstance().iterateNodes(root, new NodeManipulator() {
@@ -136,9 +137,18 @@ public class XmlImport {
 					loadedNodes.put(cbn.getNodeId(), cbn);
 				}
 			});
-		} else {
+		} else if (!merge) {
 			root = NodeGenerator.getInstance().generateRoot();
 			loadedNodes.put(root.getNodeId(), root);
+		} else {
+			root = NodeNavigator.getInstance().getRoot();
+			NodeNavigator.getInstance().iterateNodes(root, new NodeManipulator() {
+
+				@Override
+				public void manipulate(CachedBaseNode cbn) {
+					loadedNodes.put(cbn.getNodeId(), cbn);
+				}
+			});
 		}
 
 		buildReferenceBased(root, nodes);
@@ -417,7 +427,7 @@ public class XmlImport {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * @return the NodeId object from the namespaceIndex and a String <i>str
 	 *         (i=[0-9]*)</i>

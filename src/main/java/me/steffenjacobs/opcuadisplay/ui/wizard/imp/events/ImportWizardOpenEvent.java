@@ -6,8 +6,15 @@ import me.steffenjacobs.opcuadisplay.eventbus.EventBus.EventArgs;
 public class ImportWizardOpenEvent extends Event {
 
 	public static String IDENTIFIER = "importWizardOpen";
+	
+	private final boolean mergeWizard;
 
-	public ImportWizardOpenEvent() {
+	public ImportWizardOpenEvent(boolean mergeWizard) {
 		super(IDENTIFIER, EventArgs.NONE);
+		this.mergeWizard = mergeWizard;
+	}
+	
+	public boolean isMergeWizard() {
+		return mergeWizard;
 	}
 }
