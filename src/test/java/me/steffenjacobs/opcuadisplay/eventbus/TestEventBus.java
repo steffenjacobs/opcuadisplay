@@ -1,4 +1,4 @@
-package me.steffenjacobs.opcuadisplay.shared.util;
+package me.steffenjacobs.opcuadisplay.eventbus;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
