@@ -94,10 +94,18 @@ public class Activator extends AbstractUIPlugin {
 		registry.put(strName, desc);
 	}
 
-	public static void openMessageBox(final String title, final String message) {
+	public static void openMessageBoxError(final String title, final String message) {
+		openMessageBox(title, message, SWT.ICON_ERROR);
+	}
+
+	public static void openMessageBoxWarning(final String title, final String message) {
+		openMessageBox(title, message, SWT.ICON_WARNING);
+	}
+
+	private static void openMessageBox(final String title, final String message, int icon) {
 		Display.getDefault().syncExec(new Runnable() {
 			public void run() {
-				MessageBox box = new MessageBox(new Shell(), SWT.ICON_ERROR);
+				MessageBox box = new MessageBox(new Shell(), icon);
 				box.setText(title);
 				box.setMessage(message);
 				box.open();

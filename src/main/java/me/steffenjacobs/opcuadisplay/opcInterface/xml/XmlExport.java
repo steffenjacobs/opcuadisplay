@@ -219,7 +219,7 @@ public class XmlExport {
 			// Write to File
 			m.marshal(nodeSet, new File(xmlFile));
 		} catch (JAXBException e) {
-			Activator.openMessageBox("Error exporting XML", "" + e.getLinkedException().getMessage());
+			Activator.openMessageBoxError("Error exporting XML", "" + e.getLinkedException().getMessage());
 			e.printStackTrace();
 		}
 

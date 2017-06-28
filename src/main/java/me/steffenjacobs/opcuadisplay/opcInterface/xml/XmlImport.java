@@ -102,7 +102,7 @@ public class XmlImport {
 
 			return rootFolder;
 		} catch (JAXBException e) {
-			Activator.openMessageBox("Error importing XML", e.getLocalizedMessage());
+			Activator.openMessageBoxError("Error importing XML", e.getLocalizedMessage());
 		}
 
 		return null;
@@ -113,7 +113,7 @@ public class XmlImport {
 		try {
 			return parseFile(new FileReader(xmlFile), baseDataTypesImplicit, freeOpcUaModelerCompatibility);
 		} catch (FileNotFoundException e) {
-			Activator.openMessageBox("Error", e.getLocalizedMessage());
+			Activator.openMessageBoxError("Error", e.getLocalizedMessage());
 		}
 		return null;
 	}

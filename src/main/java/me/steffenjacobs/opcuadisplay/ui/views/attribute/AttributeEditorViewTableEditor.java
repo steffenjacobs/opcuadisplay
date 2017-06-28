@@ -368,7 +368,7 @@ public class AttributeEditorViewTableEditor {
 							try {
 								((CachedVariableNode) entry.getCachedNode()).setValue(new DateTime(sdf.parse(t)));
 							} catch (ParseException e) {
-								Activator.openMessageBox("Error",
+								Activator.openMessageBoxError("Error",
 										"Invalid date. Please use format 'YYYY/MM/dd hh/mm/ss/SSS Z'.");
 							}
 						}

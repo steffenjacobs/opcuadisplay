@@ -439,9 +439,9 @@ public class OPCUaClient {
 			endpoints = UaTcpStackClient.getEndpoints(url).get();
 		} catch (Exception excep) {
 			if (excep.getMessage().startsWith("UaException: status=Bad_TcpEndpointUrlInvalid")) {
-				Activator.openMessageBox("OPC UA Display", "Invalid hostname: " + url);
+				Activator.openMessageBoxError("OPC UA Display", "Invalid hostname: " + url);
 			} else {
-				Activator.openMessageBox("OPC UA Display", excep.getLocalizedMessage());
+				Activator.openMessageBoxError("OPC UA Display", excep.getLocalizedMessage());
 			}
 			return null;
 		}
