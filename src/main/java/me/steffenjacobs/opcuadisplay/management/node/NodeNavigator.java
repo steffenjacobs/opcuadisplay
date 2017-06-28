@@ -40,7 +40,7 @@ public class NodeNavigator {
 
 	private CachedBaseNode selectedNode;
 
-	private CachedObjectNode root;
+	private CachedObjectNode root, cachedRoot;
 
 	private Map<NodeId, CachedBaseNode> nodeCache;
 	private boolean cacheValid = false;
@@ -305,5 +305,13 @@ public class NodeNavigator {
 		if (cacheValid) {
 			nodeCache.put(child.getNodeId(), child);
 		}
+	}
+	
+	public void cacheRoot(){
+		this.cachedRoot = this.root;
+	}
+	
+	public void uncacheRoot(){
+		this.root = this.cachedRoot;
 	}
 }

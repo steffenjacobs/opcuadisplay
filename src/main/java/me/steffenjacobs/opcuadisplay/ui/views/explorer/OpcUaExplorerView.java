@@ -88,8 +88,6 @@ public class OpcUaExplorerView extends CloseableView {
 	private Action removeAction;
 	private OpcUaConnector connector;
 
-	private CachedObjectNode cachedRoot;
-
 	@Override
 	public String getIdentifier() {
 		return ID;
@@ -306,14 +304,14 @@ public class OpcUaExplorerView extends CloseableView {
 
 	/** can be called, when the import wizard is started */
 	public void onWizardOpen() {
-		cachedRoot = NodeNavigator.getInstance().getRoot();
-		NodeNavigator.getInstance().setRoot(CachedBaseNode.getDummyLoading());
+			NodeNavigator.getInstance().cacheRoot();
+			NodeNavigator.getInstance().setRoot(CachedBaseNode.getDummyLoading());
 		viewer.refresh();
 	}
 
 	/** can be called, when the import wizard had been canceled */
 	public void onWizardCancel() {
-		NodeNavigator.getInstance().setRoot(cachedRoot);
+			NodeNavigator.getInstance().uncacheRoot();
 		viewer.refresh();
 		expandToDefaultState();
 	}
