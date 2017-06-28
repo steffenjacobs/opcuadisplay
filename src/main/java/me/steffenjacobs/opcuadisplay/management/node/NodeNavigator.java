@@ -1,7 +1,9 @@
 package me.steffenjacobs.opcuadisplay.management.node;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Stack;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -9,6 +11,7 @@ import java.util.stream.Collectors;
 
 import org.eclipse.milo.opcua.stack.core.Identifiers;
 import org.eclipse.milo.opcua.stack.core.types.builtin.LocalizedText;
+import org.eclipse.milo.opcua.stack.core.types.builtin.NodeId;
 import org.eclipse.milo.opcua.stack.core.types.builtin.QualifiedName;
 import org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.UInteger;
 import org.eclipse.milo.opcua.stack.core.types.enumerated.IdType;
@@ -38,6 +41,9 @@ public class NodeNavigator {
 	private CachedBaseNode selectedNode;
 
 	private CachedObjectNode root;
+
+	private Map<NodeId, CachedBaseNode> nodeCache;
+	private boolean cacheValid = false;
 
 	// does not work for multiple clients simultaniously!
 	private AtomicInteger highestNodeId = new AtomicInteger(-1);
@@ -98,6 +104,7 @@ public class NodeNavigator {
 
 	public void setRoot(CachedObjectNode newRoot) {
 		this.root = newRoot;
+		cacheValid = false;
 	}
 
 	// does not work for multiple clients simultaniously!
@@ -274,5 +281,29 @@ public class NodeNavigator {
 
 	public CachedBaseNode getSelectedNode() {
 		return this.selectedNode;
+	}
+
+	public CachedBaseNode getNodeFromId(NodeId id) {
+		if (!cacheValid) {
+			nodeCache = new HashMap<>();
+
+			iterateNodes(root, new NodeManipulator() {
+
+				@Override
+				public void manipulate(CachedBaseNode cbn) {
+					nodeCache.put(cbn.getNodeId(), cbn);
+				}
+			});
+			cacheValid = true;
+		}
+
+		return nodeCache.get(id);
+
+	}
+
+	public void addNodeToCache(CachedBaseNode child) {
+		if (cacheValid) {
+			nodeCache.put(child.getNodeId(), child);
+		}
 	}
 }
