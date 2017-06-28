@@ -197,5 +197,18 @@ public class TestNodeNavigator {
 
 		expected.forEach(n -> assertTrue(nodes.contains(n)));
 	}
-
+	
+	@Test
+	public void testRootCaching(){
+		NodeGenerator.getInstance().generateFolders();
+		CachedBaseNode root = NodeNavigator.getInstance().getRoot();
+		NodeNavigator.getInstance().cacheRoot();
+		
+		CachedObjectNode cbn = new CachedObjectNode(new NodeId(0,0)); 
+		NodeNavigator.getInstance().setRoot(cbn);
+		assertSame(cbn,NodeNavigator.getInstance().getRoot());
+		
+		NodeNavigator.getInstance().uncacheRoot();
+		assertSame(root, NodeNavigator.getInstance().getRoot());
+	}
 }
