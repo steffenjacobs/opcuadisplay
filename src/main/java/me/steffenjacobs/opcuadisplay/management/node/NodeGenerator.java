@@ -16,6 +16,7 @@ import org.eclipse.milo.opcua.stack.core.types.enumerated.NodeClass;
 
 import com.google.common.collect.Lists;
 
+import me.steffenjacobs.opcuadisplay.Activator;
 import me.steffenjacobs.opcuadisplay.eventbus.EventBus;
 import me.steffenjacobs.opcuadisplay.management.node.NodeNavigator.NodeManipulator;
 import me.steffenjacobs.opcuadisplay.management.node.domain.CachedBaseNode;
@@ -71,6 +72,48 @@ public class NodeGenerator {
 			createAndInsertVariableType(namespaceIndex, name, nodeId, (CachedVariableTypeNode) type, parent);
 		default:
 		}
+
+		// warning when adding a child to object type
+		if (parent.getNodeClass() == NodeClass.ObjectType) {
+
+			Activator.openMessageBoxWarning("Warning",
+					"'" + name + "' was added to an ObjectType and will therefore be "
+							+ "added to all instances that are of this type.");
+
+			NodeNavigator.getInstance().iterateNodes(NodeNavigator.getInstance().getRoot(), new NodeManipulator() {
+
+				@Override
+				public void manipulate(CachedBaseNode cbn) {
+					CachedReference ref = NodeNavigator.getInstance().getTypeDefinition(cbn).orElse(null);
+					if (ref != null && ref.getRefNodeId().equals(parent.getNodeId())) {
+						// add if not already exist
+						if (containsNoChildOfName(cbn, name)) {
+							createAndInsert(addType, namespaceIndex, name,
+									NodeNavigator.getInstance().generateNewNodeId(), type, cbn);
+						}
+					}
+				}
+			});
+		}
+
+		// warning when adding a child to an object that has a type definition
+		if (parent.getNodeClass() == NodeClass.Object) {
+			CachedReference ref = NodeNavigator.getInstance().getTypeDefinition(parent).orElse(null);
+
+			if (ref != null) {
+				CachedBaseNode typeDefNode = NodeNavigator.getInstance().getNodeFromId(ref.getRefNodeId());
+				if (typeDefNode != null && containsNoChildOfName(typeDefNode, name)) {
+					Activator.openMessageBoxWarning("Warning",
+							"'" + name + "' was added to an Object that had a type definition assigned to it. "
+									+ "It therefore no longer fully complies to this definition.");
+				}
+			}
+		}
+	}
+
+	private boolean containsNoChildOfName(CachedBaseNode cbn, String name) {
+		return Lists.newArrayList(cbn.getChildren()).stream().filter(c -> c.getDisplayName().getText().equals(name))
+				.count() == 0;
 	}
 
 	private void createAndInsertVariableType(int namespaceIndex, String name, int nodeId, CachedVariableTypeNode type,
@@ -255,7 +298,7 @@ public class NodeGenerator {
 
 	public void insertNode(CachedBaseNode child, CachedBaseNode parent, boolean suppressEvent) {
 		NodeNavigator.getInstance().increaseHighestNodeIdIfNecessarySafe(child);
-
+		NodeNavigator.getInstance().addNodeToCache(child);
 		parent.addChild(child);
 		child.setParent(parent);
 		CachedReference ref = getAssociatedReference(child, parent);
@@ -317,6 +360,29 @@ public class NodeGenerator {
 			});
 			break;
 		default:
+		}
+
+		// warning when removing a child from object type
+		CachedBaseNode parent = node.getParent();
+		String name = node.getDisplayName().getText();
+		if (parent != null && parent.getNodeClass() == NodeClass.ObjectType) {
+			Activator.openMessageBoxWarning("Warning", "'" + name + "' was removed from an ObjectType. "
+					+ "Therefore, all instances of this type might no longer fully comply to this definition.");
+		}
+
+		// warning when removing a child from an object that has a type
+		// definition
+		if (parent.getNodeClass() == NodeClass.Object) {
+			CachedReference ref = NodeNavigator.getInstance().getTypeDefinition(parent).orElse(null);
+
+			if (ref != null) {
+				CachedBaseNode typeDefNode = NodeNavigator.getInstance().getNodeFromId(ref.getRefNodeId());
+				if (typeDefNode != null && !containsNoChildOfName(typeDefNode, name)) {
+					Activator.openMessageBoxWarning("Warning",
+							"'" + name + "' was removed from an Object that had a type definition assigned to it. "
+									+ "It therefore no longer fully complies to this definition.");
+				}
+			}
 		}
 
 		EventBus.getInstance().fireEvent(new ChangeSelectedNodeEvent(node.getParent(), true));
