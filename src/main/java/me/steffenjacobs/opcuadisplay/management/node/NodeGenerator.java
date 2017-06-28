@@ -97,12 +97,14 @@ public class NodeGenerator {
 		}
 
 		// warning when adding a child to an object that has a type definition
+		// != FolderType
 		if (parent.getNodeClass() == NodeClass.Object) {
 			CachedReference ref = NodeNavigator.getInstance().getTypeDefinition(parent).orElse(null);
 
 			if (ref != null) {
 				CachedBaseNode typeDefNode = NodeNavigator.getInstance().getNodeFromId(ref.getRefNodeId());
-				if (typeDefNode != null && containsNoChildOfName(typeDefNode, name)) {
+				if (typeDefNode != null && !typeDefNode.getNodeId().equals(new NodeId(0, 61))
+						&& containsNoChildOfName(typeDefNode, name)) {
 					Activator.openMessageBoxWarning("Warning",
 							"'" + name + "' was added to an Object that had a type definition assigned to it. "
 									+ "It therefore no longer fully complies to this definition.");
