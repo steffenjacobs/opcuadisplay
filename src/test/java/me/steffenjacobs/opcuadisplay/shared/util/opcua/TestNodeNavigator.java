@@ -211,4 +211,16 @@ public class TestNodeNavigator {
 		NodeNavigator.getInstance().uncacheRoot();
 		assertSame(root, NodeNavigator.getInstance().getRoot());
 	}
+	
+	@Test
+	public void testCache(){
+		NodeGenerator.getInstance().generateBaseTypes();
+		NodeNavigator.getInstance().iterateNodes(NodeNavigator.getInstance().getRoot(), new NodeManipulator() {
+			
+			@Override
+			public void manipulate(CachedBaseNode cbn) {
+				assertEquals(cbn, NodeNavigator.getInstance().getNodeFromId(cbn.getNodeId()));
+			}
+		});
+	}
 }
