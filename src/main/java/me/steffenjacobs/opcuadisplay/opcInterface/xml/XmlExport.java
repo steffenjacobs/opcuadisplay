@@ -246,43 +246,43 @@ public class XmlExport {
 		if (obj != null) {
 			switch (((UInteger) datatype.getIdentifier()).intValue()) {
 			case 1:
-				aliases.add(new NodeIdAlias("Boolean", "i=1"));
+				aliases.add(new NodeIdAlias("i=1", "Boolean"));
 				return createTag(obj);
 			case 2:
-				aliases.add(new NodeIdAlias("SByte", "i=2"));
+				aliases.add(new NodeIdAlias("i=2", "SByte"));
 				return createTag(obj);
 			case 3:
-				aliases.add(new NodeIdAlias("Byte", "i=3"));
+				aliases.add(new NodeIdAlias("i=3", "Byte"));
 				return createTag(obj);
 			case 4:
-				aliases.add(new NodeIdAlias("Int16", "i=4"));
+				aliases.add(new NodeIdAlias("i=4", "Int16"));
 				return createTag(obj);
 			case 5:
-				aliases.add(new NodeIdAlias("UInt16", "i=5"));
+				aliases.add(new NodeIdAlias("i=5", "UInt16"));
 				return createTag(obj);
 			case 6:
-				aliases.add(new NodeIdAlias("Int32", "i=6"));
+				aliases.add(new NodeIdAlias("i=6", "Int32"));
 				return createTag(obj);
 			case 7:
-				aliases.add(new NodeIdAlias("UInt32", "i=7"));
+				aliases.add(new NodeIdAlias("i=7", "UInt32"));
 				return createTag(obj);
 			case 8:
-				aliases.add(new NodeIdAlias("Int64", "i=8"));
+				aliases.add(new NodeIdAlias("i=8", "Int64"));
 				return createTag(obj);
 			case 9:
-				aliases.add(new NodeIdAlias("UInt64", "i=9"));
+				aliases.add(new NodeIdAlias("i=9", "UInt64"));
 				return createTag(obj);
 			case 10:
-				aliases.add(new NodeIdAlias("Float", "i=10"));
+				aliases.add(new NodeIdAlias("i=10", "Float"));
 				return createTag(obj);
 			case 11:
-				aliases.add(new NodeIdAlias("Double", "i=11"));
+				aliases.add(new NodeIdAlias("i=11", "Double"));
 				return createTag(obj);
 			case 12:
-				aliases.add(new NodeIdAlias("String", "i=12"));
+				aliases.add(new NodeIdAlias("i=12", "String"));
 				return createTag(obj);
 			case 13:
-				aliases.add(new NodeIdAlias("DateTime", "i=13"));
+				aliases.add(new NodeIdAlias("i=13", "DateTime"));
 				return createTag(obj);
 			case 27:
 				return convertValue(obj, new NodeId(0, 6));
