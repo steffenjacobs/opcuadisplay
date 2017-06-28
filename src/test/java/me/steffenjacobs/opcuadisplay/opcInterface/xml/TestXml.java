@@ -17,13 +17,14 @@ import javax.xml.validation.Validator;
 import org.junit.Test;
 import org.xml.sax.SAXException;
 
+import me.steffenjacobs.opcuadisplay.management.node.NodeGenerator;
 import me.steffenjacobs.opcuadisplay.management.node.NodeNavigator;
 import me.steffenjacobs.opcuadisplay.management.node.domain.CachedBaseNode;
 
 public class TestXml {
-
+	
 	@Test
-	public void integrationTest() throws SAXException, IOException {
+	public void testImport(){
 		InputStream is = this.getClass().getClassLoader().getResourceAsStream("base.xml");
 		CachedBaseNode loaded = XmlImport.getInstance().parseFile(is, false, false, false);
 
@@ -36,10 +37,15 @@ public class TestXml {
 		assertNotNull(NodeNavigator.getInstance().navigateByName("Root/Types/DataTypes", loaded));
 		assertNotNull(NodeNavigator.getInstance().navigateByName("Root/Types/ReferenceTypes", loaded));
 		assertNotNull(NodeNavigator.getInstance().navigateByName("Root/Types/EventTypes", loaded));
+	}
+
+	@Test
+	public void testExport() throws SAXException, IOException {
+		NodeGenerator.getInstance().generateBaseTypes();
 
 		long now = System.currentTimeMillis();
-		String filename = "test_" + now + ".xml";
-		XmlExport.getInstance().writeToFile(filename, loaded, false, false);
+		String filename = "testXml_" + now + ".xml";
+		XmlExport.getInstance().writeToFile(filename, NodeNavigator.getInstance().getRoot(), false, false);
 
 		SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 		Schema schema = factory
