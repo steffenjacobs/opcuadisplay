@@ -102,7 +102,6 @@ public class XmlPage extends WizardPage {
 		checkboxBaseTypesImplicit.setLayoutData(gd);
 
 		checkboxBaseTypesImplicit.setText("Base Types implicit");
-		checkboxBaseTypesImplicit.setSelection(true);
 		
 		Composite spc = new Composite(container, SWT.NONE);
 		spc.setLayoutData(gd);
