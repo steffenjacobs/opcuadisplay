@@ -17,7 +17,6 @@ import java.security.Key;
 import java.security.KeyPair;
 import java.security.KeyStore;
 import java.security.PrivateKey;
-import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 /** @author Steffen Jacobs */
 public class KeyStoreLoader {
@@ -26,10 +25,8 @@ public class KeyStoreLoader {
     private static final String SERVER_ALIAS = "server-ai";
     private static final char[] PASSWORD = "password".toCharArray();
 
-    private X509Certificate clientCertificate;
-    private KeyPair clientKeyPair;
-    private X509Certificate serverCertificate;
-    private KeyPair serverKeyPair;
+    private X509Certificate clientCertificate, serverCertificate;
+    private KeyPair clientKeyPair, serverKeyPair;
 
     public KeyStoreLoader load() throws Exception {
         KeyStore keyStore = KeyStore.getInstance("PKCS12");
@@ -38,17 +35,14 @@ public class KeyStoreLoader {
         Key clientPrivateKey = keyStore.getKey(CLIENT_ALIAS, PASSWORD);
         if (clientPrivateKey instanceof PrivateKey) {
             clientCertificate = (X509Certificate) keyStore.getCertificate(CLIENT_ALIAS);
-            PublicKey clientPublicKey = clientCertificate.getPublicKey();
-            clientKeyPair = new KeyPair(clientPublicKey, (PrivateKey) clientPrivateKey);
+            clientKeyPair = new KeyPair(clientCertificate.getPublicKey(), (PrivateKey) clientPrivateKey);
         }
 
         Key serverPrivateKey = keyStore.getKey(SERVER_ALIAS, PASSWORD);
         if (serverPrivateKey instanceof PrivateKey) {
             serverCertificate = (X509Certificate) keyStore.getCertificate(SERVER_ALIAS);
-            PublicKey serverPublicKey = serverCertificate.getPublicKey();
-            serverKeyPair = new KeyPair(serverPublicKey, (PrivateKey) serverPrivateKey);
+            serverKeyPair = new KeyPair(serverCertificate.getPublicKey(), (PrivateKey) serverPrivateKey);
         }
-
         return this;
     }
 
@@ -67,5 +61,4 @@ public class KeyStoreLoader {
     public KeyPair getServerKeyPair() {
         return serverKeyPair;
     }
-
 }

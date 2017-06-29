@@ -162,6 +162,7 @@ public class OPCUaClient {
 		return root;
 	}
 
+	/** retrieves the nodes and updates the monitor after the nodes arrived */
 	private void retrieveNodesMonitored(final CachedBaseNode parent, OpcUaClient client, boolean recursive,
 			IProgressMonitor monitor, int value) {
 		retrieveNodes(parent, client, recursive);
