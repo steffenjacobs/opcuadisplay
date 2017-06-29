@@ -8,7 +8,13 @@ import me.steffenjacobs.opcuadisplay.management.node.domain.CachedObjectTypeNode
 import me.steffenjacobs.opcuadisplay.management.node.domain.CachedVariableNode;
 import me.steffenjacobs.opcuadisplay.management.node.domain.CachedVariableTypeNode;
 import me.steffenjacobs.opcuadisplay.management.node.domain.CachedViewNode;
-/** @author Steffen Jacobs */
+
+/**
+ * This class contains all the functionality to merge existing node structures
+ * together.
+ * 
+ * @author Steffen Jacobs
+ */
 public class NodeMerger {
 	private static NodeMerger instance;
 
