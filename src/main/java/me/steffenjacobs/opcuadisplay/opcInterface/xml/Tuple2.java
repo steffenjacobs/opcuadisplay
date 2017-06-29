@@ -1,5 +1,11 @@
 package me.steffenjacobs.opcuadisplay.opcInterface.xml;
-/** @author Steffen Jacobs */
+
+/**
+ * Simple 2-Tuple with generic values X and Y and equals()-/hashcode()-methods
+ * based on the values
+ * 
+ * @author Steffen Jacobs
+ */
 public class Tuple2<X, Y> {
 
 	private final X x;
@@ -48,6 +54,5 @@ public class Tuple2<X, Y> {
 			return false;
 		return true;
 	}
-	
-	
+
 }
