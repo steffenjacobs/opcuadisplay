@@ -15,14 +15,24 @@ import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.gef.ConnectionEditPart;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontData;
+import org.eclipse.swt.widgets.Display;
 
 import me.steffenjacobs.opcuadisplay.eventbus.EventBus;
 import me.steffenjacobs.opcuadisplay.management.node.NodeNavigator;
 import me.steffenjacobs.opcuadisplay.ui.views.explorer.events.ChangeSelectedNodeEvent;
 import me.steffenjacobs.opcuadisplay.ui.views.starschema.ColorSet;
 import me.steffenjacobs.opcuadisplay.ui.views.starschema.model.NodeModel;
+import me.steffenjacobs.opcuadisplay.ui.views.starschema.model.StarSchemaSettings;
 
 public class NodeEditPart extends AbstractGraphicalEditPart {
+
+	private final StarSchemaSettings settings;
+
+	public NodeEditPart(StarSchemaSettings settings) {
+		this.settings = settings;
+	}
 
 	@Override
 	protected IFigure createFigure() {
@@ -37,7 +47,7 @@ public class NodeEditPart extends AbstractGraphicalEditPart {
 			rectangle.setBorder(new LineBorder(ColorSet.WHITE.getColor()));
 			rectangle.setCornerDimensions(new Dimension(0, 0));
 		} else {
-			rectangle.setCornerDimensions(new Dimension(20, 20));
+			rectangle.setCornerDimensions(new Dimension((int)(settings.getBoxSize()/6.5), (int)(settings.getBoxSize()/6.5)));
 
 			// add listeners
 			addListeners(m, rectangle);
@@ -122,9 +132,17 @@ public class NodeEditPart extends AbstractGraphicalEditPart {
 		NodeModel node = (NodeModel) getModel();
 
 		// draw rectangle with text
-		Rectangle bounds = new Rectangle(150, 150, 150, 150);
+		Rectangle bounds = new Rectangle(settings.getBoxSize(), settings.getBoxSize(), settings.getBoxSize(),
+				settings.getBoxSize());
 		getFigure().setBounds(bounds);
 		Label label = new Label(node.getLabel());
+
+		
+		FontData fontData = new FontData();
+		fontData.setHeight(settings.getFontSize());
+		fontData.setName("Segoe UI");
+		label.setFont(new Font(Display.getDefault(), fontData));
+		
 		label.setTextAlignment(PositionConstants.CENTER);
 		label.setBounds(bounds.crop(IFigure.NO_INSETS));
 		getFigure().add(label);

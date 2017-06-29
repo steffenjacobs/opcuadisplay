@@ -13,14 +13,17 @@ import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
 import me.steffenjacobs.opcuadisplay.ui.views.starschema.SpiralLogic;
 import me.steffenjacobs.opcuadisplay.ui.views.starschema.model.Model;
 import me.steffenjacobs.opcuadisplay.ui.views.starschema.model.NodeModel;
+import me.steffenjacobs.opcuadisplay.ui.views.starschema.model.StarSchemaSettings;
 
 public class ModelEditPart extends AbstractGraphicalEditPart {
 
 	private final SpiralLogic logic;
+	private final StarSchemaSettings settings;
 	private Figure f;
 
-	public ModelEditPart(SpiralLogic logic) {
+	public ModelEditPart(SpiralLogic logic, StarSchemaSettings settings) {
 		this.logic = logic;
+		this.settings = settings;
 	}
 
 	@Override
@@ -32,8 +35,8 @@ public class ModelEditPart extends AbstractGraphicalEditPart {
 		// Create a layout for the graphical screen
 		GridLayout gridLayout = new GridLayout();
 		gridLayout.numColumns = logic.getLength();
-		gridLayout.horizontalSpacing = 50;
-		gridLayout.verticalSpacing = 50;
+		gridLayout.horizontalSpacing = settings.getBoxSize()/3;
+		gridLayout.verticalSpacing = settings.getBoxSize()/3;
 		gridLayout.marginHeight = 25;
 		gridLayout.marginWidth = 25;
 		f.setLayoutManager(gridLayout);

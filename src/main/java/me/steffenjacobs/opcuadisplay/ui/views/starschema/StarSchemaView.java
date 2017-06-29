@@ -16,13 +16,18 @@ import me.steffenjacobs.opcuadisplay.ui.views.CloseableView;
 import me.steffenjacobs.opcuadisplay.ui.views.explorer.events.ChangeSelectedNodeEvent;
 import me.steffenjacobs.opcuadisplay.ui.views.explorer.events.SelectedNodeChangedEvent;
 import me.steffenjacobs.opcuadisplay.ui.views.starschema.control.GraphicalPartFactory;
+import me.steffenjacobs.opcuadisplay.ui.views.starschema.events.StarschemaSettingsChangedEvent;
 import me.steffenjacobs.opcuadisplay.ui.views.starschema.model.Model;
 import me.steffenjacobs.opcuadisplay.ui.views.starschema.model.ModelCreator;
+import me.steffenjacobs.opcuadisplay.ui.views.starschema.model.StarSchemaSettings;
 
 public class StarSchemaView extends CloseableView {
 	public static final String ID = "me.steffenjacobs.opcuadisplay.ui.views.starschema.StarSchemaView";
 
 	private ScrollingGraphicalViewer viewer = new ScrollingGraphicalViewer();
+
+	private Model currentModel = null;
+	private StarSchemaSettings settings = new StarSchemaSettings(11, 150, false);
 
 	/**
 	 * This is a callback that will allow us to create the viewer and initialize
@@ -47,7 +52,7 @@ public class StarSchemaView extends CloseableView {
 
 	private void fillLocalToolBar(IToolBarManager manager) {
 
-		// collapse all action
+		// jump to parent
 		Action jumpToParentNode = new Action() {
 			public void run() {
 				if (NodeNavigator.getInstance().getSelectedNode() != null
@@ -62,6 +67,36 @@ public class StarSchemaView extends CloseableView {
 		jumpToParentNode.setImageDescriptor(Activator.getImageDescriptor(Images.StarSchemaView.UP.getIdentifier()));
 
 		manager.add(jumpToParentNode);
+
+		// zoom in
+		Action zoomIn = new Action() {
+			public void run() {
+				EventBus.getInstance()
+				.fireEvent(new StarschemaSettingsChangedEvent(new StarSchemaSettings(settings.getFontSize() + 1,
+						(int) (settings.getBoxSize() * 1.2), false)));
+			}
+		};
+		zoomIn.setText("+");
+		zoomIn.setToolTipText("Zoom in");
+		zoomIn.setImageDescriptor(Activator.getImageDescriptor(Images.StarSchemaView.ZOOM_IN.getIdentifier()));
+
+		manager.add(zoomIn);
+
+		// zoom out
+		Action zoomOut = new Action() {
+			public void run() {
+				if(settings.getFontSize()>2){
+				EventBus.getInstance()
+						.fireEvent(new StarschemaSettingsChangedEvent(new StarSchemaSettings(settings.getFontSize() - 1,
+								(int) (settings.getBoxSize() * 0.833), false)));
+				}
+			}
+		};
+		zoomOut.setText("-");
+		zoomOut.setToolTipText("Zoom out");
+		zoomOut.setImageDescriptor(Activator.getImageDescriptor(Images.StarSchemaView.ZOOM_OUT.getIdentifier()));
+
+		manager.add(zoomOut);
 	}
 
 	private void addListeners() {
@@ -71,14 +106,28 @@ public class StarSchemaView extends CloseableView {
 					@Override
 					public void onAction(SelectedNodeChangedEvent event) {
 						if (event.getNode() != null && !event.getNode().isDummy()) {
-							Model model = ModelCreator.getInstance().createModel(event.getNode());
+							currentModel = ModelCreator.getInstance().createModel(event.getNode());
 
-							viewer.setEditPartFactory(
-									new GraphicalPartFactory(new SpiralLogic(model.getNodes().size())));
+							viewer.setEditPartFactory(new GraphicalPartFactory(
+									new SpiralLogic(currentModel.getNodes().size()), settings));
 
-							viewer.setContents(model);
+							viewer.setContents(currentModel);
 							viewer.flush();
 						}
+					}
+				});
+
+		EventBus.getInstance().addListener(this, StarschemaSettingsChangedEvent.IDENTIFIER,
+				new EventListener<StarschemaSettingsChangedEvent>() {
+
+					@Override
+					public void onAction(StarschemaSettingsChangedEvent event) {
+						settings = event.getSettings();
+						viewer.setEditPartFactory(
+								new GraphicalPartFactory(new SpiralLogic(currentModel.getNodes().size()), settings));
+
+						viewer.setContents(currentModel);
+						viewer.flush();
 					}
 				});
 	}

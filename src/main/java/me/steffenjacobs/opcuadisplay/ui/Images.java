@@ -1,6 +1,7 @@
 package me.steffenjacobs.opcuadisplay.ui;
 
 import me.steffenjacobs.opcuadisplay.Activator;
+
 /** @author Steffen Jacobs */
 public enum Images {
 	IMG_COLLAPSE_ALL("src/main/resources/icons/collapseall.png", "collapseall"),
@@ -91,7 +92,9 @@ public enum Images {
 	}
 
 	public static enum StarSchemaView {
-		UP("src/main/resources/icons/view/starschema/up.gif", "up");
+		UP("src/main/resources/icons/view/starschema/up.gif", "up"),
+		ZOOM_IN("src/main/resources/icons/view/starschema/zoomIn.png", "zoomIn"),
+		ZOOM_OUT("src/main/resources/icons/view/starschema/zoomOut.png", "zoomOut");
 
 		private final String path, identifier;
 
