@@ -25,7 +25,12 @@ import me.steffenjacobs.opcuadisplay.management.node.domain.CachedObjectNode;
 import me.steffenjacobs.opcuadisplay.management.node.domain.CachedReference;
 import me.steffenjacobs.opcuadisplay.ui.views.explorer.events.SelectedNodeChangedEvent;
 
-/** @author Steffen Jacobs */
+/**
+ * Transforms the node tree without generating new nodes, handles the root node
+ * and can be queried for nodes or the node id.
+ * 
+ * @author Steffen Jacobs
+ */
 public class NodeNavigator {
 
 	public static interface NodeManipulator {
@@ -102,12 +107,17 @@ public class NodeNavigator {
 		return node;
 	}
 
+	/** sets the root node to <i>newRoot</i> */
 	public void setRoot(CachedObjectNode newRoot) {
 		this.root = newRoot;
 		cacheValid = false;
 	}
 
-	// does not work for multiple clients simultaniously!
+	/**
+	 * increases the highest node id if necessary based on the node id of
+	 * <i>cn</i> <br>
+	 * Attention: does not work for multiple clients simultaneously!
+	 */
 	public void increaseHighestNodeIdIfNecessarySafe(CachedBaseNode cn) {
 
 		if (cn == null || cn.getNodeId() == null || cn.getNodeId().getIdentifier() == null
@@ -126,15 +136,20 @@ public class NodeNavigator {
 		highestNodeId.getAndUpdate(x -> x = x > nodeId ? x : nodeId);
 	}
 
-	// does not work for multiple clients simultaniously!
+	/**
+	 * generated a new node id<br>
+	 * Attention: does not work for multiple clients simultaneously!
+	 */
 	public int generateNewNodeId() {
 		return highestNodeId.incrementAndGet();
 	}
 
+	/** resets the highest node id to -1 */
 	public void resetHighestNodeId() {
 		highestNodeId.set(-1);
 	}
 
+	/** @return the highest node id without incrementing */
 	public int getHighestNodeId() {
 		return highestNodeId.get();
 	}
@@ -172,6 +187,7 @@ public class NodeNavigator {
 		return false;
 	}
 
+	/** @return the path from the Root node to <i>node</i> as a String */
 	public String pathAsString(CachedBaseNode node) {
 		StringBuilder sb = new StringBuilder();
 
@@ -184,6 +200,7 @@ public class NodeNavigator {
 		return sb.toString();
 	}
 
+	/** @return all nodes on the path from the Root node to <i>node</i> */
 	public List<CachedBaseNode> getPath(CachedBaseNode node) {
 		Stack<CachedBaseNode> path = new Stack<>();
 		if (node == null) {
@@ -204,15 +221,21 @@ public class NodeNavigator {
 		return path;
 	}
 
+	/** @return true: if <i>cn</i> has a type definition linked to FolderType */
 	public boolean isFolder(CachedBaseNode cn) {
 		return cn.getReferences().stream().filter(ref -> ref.getReferenceType().equals("HasTypeDefinition")
 				&& ref.getBrowseName().getName().equals("FolderType")).count() > 0;
 	}
 
+	/** @return true: if <i>cn</i> has a reference to PropertyType */
 	public boolean isProperty(CachedBaseNode cn) {
 		return cn.getReferences().contains(CachedReference.PROPERTY_TYPE);
 	}
 
+	/**
+	 * @return true: if <i>cbn</i> is a 'DataType', 'ObjectType', 'VariableType'
+	 *         or ReferenceType'
+	 */
 	public boolean isType(CachedBaseNode cbn) {
 		switch (cbn.getNodeClass()) {
 		case DataType:
@@ -230,6 +253,7 @@ public class NodeNavigator {
 		}
 	}
 
+	/** @return true: if <i>referenceType</i> is a hierarchical reference */
 	public boolean isHierarchicalReference(String referenceType) {
 
 		for (String s : HIERARCHICAL_REFERENCES) {
@@ -240,6 +264,7 @@ public class NodeNavigator {
 		return false;
 	}
 
+	/** executes <i>nm</i> for all nodes beneath <i>parent</i> */
 	public void iterateNodes(CachedBaseNode parent, NodeManipulator nm) {
 		nm.manipulate(parent);
 		for (CachedBaseNode cbn : parent.getChildren()) {
@@ -262,6 +287,7 @@ public class NodeNavigator {
 		return result;
 	}
 
+	/** @return all sub types of <i>node</i> */
 	public List<CachedBaseNode> aggregateSubTypes(CachedBaseNode node) {
 		List<CachedBaseNode> result = new ArrayList<>();
 		result.add(node);
@@ -274,15 +300,18 @@ public class NodeNavigator {
 		return result;
 	}
 
+	/** @return the type definition of <i>refNode</i> */
 	public Optional<CachedReference> getTypeDefinition(CachedBaseNode refNode) {
 		return refNode.getReferences().stream().filter(ref -> ref.getReferenceType().equals("HasTypeDefinition"))
 				.findAny();
 	}
 
+	/** @return the currently selected node */
 	public CachedBaseNode getSelectedNode() {
 		return this.selectedNode;
 	}
 
+	/** @return the CachedBaseNode associated with the NodeId <i>id</i> */
 	public CachedBaseNode getNodeFromId(NodeId id) {
 		if (!cacheValid) {
 			nodeCache = new HashMap<>();
@@ -301,17 +330,20 @@ public class NodeNavigator {
 
 	}
 
+	/** adds <i>child</i> to the cache */
 	public void addNodeToCache(CachedBaseNode child) {
 		if (cacheValid) {
 			nodeCache.put(child.getNodeId(), child);
 		}
 	}
-	
-	public void cacheRoot(){
+
+	/** stores the root */
+	public void cacheRoot() {
 		this.cachedRoot = this.root;
 	}
-	
-	public void uncacheRoot(){
+
+	/** loads the root from storage */
+	public void uncacheRoot() {
 		this.root = this.cachedRoot;
 	}
 }
