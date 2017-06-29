@@ -66,6 +66,7 @@ public class XmlExport {
 
 	private static Set<NodeIdAlias> aliases;
 
+	/** constructor creates the basic aliases */
 	private XmlExport() {
 		aliases = new HashSet<>();
 		NodeIdAlias ali = new NodeIdAlias();
@@ -97,6 +98,16 @@ public class XmlExport {
 		return instance;
 	}
 
+	/**
+	 * persists the node tree <i>cbn</i> into the file <i>xmlFile</i>
+	 * 
+	 * @param baseDataTypesImplicit
+	 *            true if base data types are implicit and should not be stored
+	 *            in the XML file
+	 * @param freeOpcUaModelerCompatibility
+	 *            true, if compatibility with the free opc ua modeler should be
+	 *            ensured
+	 */
 	public void writeToFile(String xmlFile, CachedBaseNode cbn, boolean baseDataTypesImplicit,
 			boolean freeOpcUaModelerCompatibility) {
 
@@ -242,6 +253,12 @@ public class XmlExport {
 		}
 	}
 
+	/**
+	 * converts the value to a tag and adds the associated alias to the aliases
+	 * set
+	 * 
+	 * @return the tag associated with the value inside <i>obj</i>
+	 */
 	private Object convertValue(Object obj, NodeId datatype) {
 		if (obj != null) {
 			switch (((UInteger) datatype.getIdentifier()).intValue()) {
@@ -294,13 +311,15 @@ public class XmlExport {
 		}
 		return obj;
 	}
-	
-	private JAXBElement<String> createTag(Object obj){
+
+	/** @return the Tag associated with <i>obj</i> */
+	private JAXBElement<String> createTag(Object obj) {
 		String type = obj.getClass().getSimpleName();
-		type = type.equals("Long")?"Int64":type.equals("Integer")?"Int32":type;
+		type = type.equals("Long") ? "Int64" : type.equals("Integer") ? "Int32" : type;
 		return new JAXBElement<String>(new QName("uax:" + type), String.class, obj.toString());
 	}
 
+	/** @return the converted UANode based on the CachedBaseNode <i>cbn</i> */
 	private UANode parseNode(CachedBaseNode cbn) {
 		UANode uaNode = null;
 
@@ -411,7 +430,6 @@ public class XmlExport {
 
 			uaNode = uav;
 		}
-		// TODO reference types
 
 		// set node id
 		if (uaNode == null) {
@@ -440,6 +458,7 @@ public class XmlExport {
 		return uaNode;
 	}
 
+	/** @return the converted ListOfReferences based on <i>references</i> */
 	private ListOfReferences parseReferences(List<CachedReference> references) {
 		ListOfReferences result = new ListOfReferences();
 
@@ -458,10 +477,14 @@ public class XmlExport {
 		return result;
 	}
 
+	/** @return the converted NodeId based on <i>id</i> */
 	private String parseNodeId(NodeId id) {
 		return "i=" + id.getIdentifier().toString();
 	}
 
+	/**
+	 * @return the entire object tree of <i>cbn</i> as a flat list of UANodes.
+	 */
 	private List<UANode> parseObjectTree(CachedBaseNode cbn) {
 
 		final List<CachedBaseNode> list = new ArrayList<>();
@@ -477,6 +500,7 @@ public class XmlExport {
 		return list.stream().map(x -> parseNode(x)).collect(Collectors.toList());
 	}
 
+	/** convert the localized texts */
 	private me.steffenjacobs.opcuadisplay.management.node.domain.generated.LocalizedText parseLocalizedText(
 			LocalizedText lt) {
 		me.steffenjacobs.opcuadisplay.management.node.domain.generated.LocalizedText res = new me.steffenjacobs.opcuadisplay.management.node.domain.generated.LocalizedText();
