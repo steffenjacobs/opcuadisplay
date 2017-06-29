@@ -12,13 +12,19 @@ import org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.UInteger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
-/** @author Steffen Jacobs */
+
+/**
+ * Value parser for the OPC UA Reference View
+ * 
+ * @author Steffen Jacobs
+ */
 public class ReferenceValueParser {
 
 	private static final Pattern patternLocale = Pattern.compile("loc=(.*);text=(.*)");
 
 	private static final SimpleDateFormat sdf = new SimpleDateFormat("YYYY/MM/dd HH/mm/ss/SSS Z");
 
+	/** converts the LocalizedText */
 	public static LocalizedText parseLocalizedText(String s) {
 		Matcher m = patternLocale.matcher(s);
 		m.find();
@@ -32,6 +38,7 @@ public class ReferenceValueParser {
 		}
 	}
 
+	/** converts the value to a string best effort */
 	public static String asString(Object value) {
 		if (value == null) {
 			return "";
