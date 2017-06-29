@@ -6,8 +6,26 @@ import org.eclipse.swt.widgets.Shell;
 import me.steffenjacobs.opcuadisplay.management.node.NodeGenerator;
 import me.steffenjacobs.opcuadisplay.management.node.domain.CachedBaseNode;
 import me.steffenjacobs.opcuadisplay.ui.views.explorer.domain.MethodArgument;
-/** @author Steffen Jacobs */
+
+/**
+ * Dialog factory for the add-dialogs
+ * 
+ * @author Steffen Jacobs
+ */
 public class DialogFactory {
+
+	private static DialogFactory instance;
+
+	private DialogFactory() {
+		// singleton
+	}
+
+	public static DialogFactory getInstance() {
+		if (instance == null) {
+			instance = new DialogFactory();
+		}
+		return instance;
+	}
 
 	/** Type of nodes, a specific node-creation-dialog can create */
 	public static enum AddDialogType {
@@ -51,19 +69,6 @@ public class DialogFactory {
 
 	}
 
-	private static DialogFactory instance;
-
-	private DialogFactory() {
-		// singleton
-	}
-
-	public static DialogFactory getInstance() {
-		if (instance == null) {
-			instance = new DialogFactory();
-		}
-		return instance;
-	}
-
 	/**
 	 * @return a node creation dialog for the given AddDialogType <i>type</i>.
 	 *         The node will then added as a child to <selectedParent>
@@ -87,7 +92,8 @@ public class DialogFactory {
 				@Override
 				public void onOkMethod(int namespace, String name, int nodeId, MethodArgument[] inputArgs,
 						MethodArgument[] outputArgs) {
-					NodeGenerator.getInstance().createAndInsertMethod(namespace, name, nodeId, selectedParent, inputArgs, outputArgs);
+					NodeGenerator.getInstance().createAndInsertMethod(namespace, name, nodeId, selectedParent,
+							inputArgs, outputArgs);
 				}
 			});
 

@@ -92,7 +92,7 @@ public class OpcUaExplorerView extends CloseableView {
 		return ID;
 	}
 
-	private void hookDoubleClickAction() {
+	private void registerActionListeners() {
 		viewer.addSelectionChangedListener(new ISelectionChangedListener() {
 
 			@Override
@@ -127,7 +127,7 @@ public class OpcUaExplorerView extends CloseableView {
 		getSite().setSelectionProvider(viewer);
 		makeActions();
 		hookContextMenu();
-		hookDoubleClickAction();
+		registerActionListeners();
 		contributeToActionBars();
 		registerListeners();
 	}
@@ -246,7 +246,6 @@ public class OpcUaExplorerView extends CloseableView {
 
 	/** adds the available edit options */
 	private void addAvailableEditOptions(IMenuManager manager, CachedBaseNode selectedNode) {
-		// TODO: maybe copy & paste
 		if (ConstraintChecker.getIntsance().isRemovalAllowed(selectedNode)) {
 			manager.add(removeAction);
 		}
@@ -457,7 +456,7 @@ public class OpcUaExplorerView extends CloseableView {
 				(CachedBaseNode) (((IStructuredSelection) viewer.getSelection()).getFirstElement())).open();
 	}
 
-	private void makeEditActions() {
+	private void createEditActions() {
 		// remove node action
 		removeAction = new Action() {
 			public void run() {
@@ -542,7 +541,7 @@ public class OpcUaExplorerView extends CloseableView {
 	}
 
 	private void makeActions() {
-		makeEditActions();
+		createEditActions();
 
 		// new project wizards
 		newProjectWizard = new Action() {

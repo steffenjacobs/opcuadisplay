@@ -3,7 +3,12 @@ package me.steffenjacobs.opcuadisplay.ui.views.explorer.events;
 import me.steffenjacobs.opcuadisplay.eventbus.EventBus.Event;
 import me.steffenjacobs.opcuadisplay.eventbus.EventBus.EventArgs;
 import me.steffenjacobs.opcuadisplay.management.node.domain.CachedBaseNode;
-/** @author Steffen Jacobs */
+
+/**
+ * is called when the root had been updated
+ * 
+ * @author Steffen Jacobs
+ */
 public class RootUpdatedEvent extends Event {
 
 	public static String IDENTIFIER = "rootUpdatedEvent";

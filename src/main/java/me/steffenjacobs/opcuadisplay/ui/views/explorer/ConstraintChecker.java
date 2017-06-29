@@ -5,7 +5,12 @@ import org.eclipse.milo.opcua.stack.core.types.enumerated.NodeClass;
 
 import me.steffenjacobs.opcuadisplay.management.node.NodeNavigator;
 import me.steffenjacobs.opcuadisplay.management.node.domain.CachedBaseNode;
-/** @author Steffen Jacobs */
+
+/**
+ * checks the constraints to make the user not create invalid node structures
+ * 
+ * @author Steffen Jacobs
+ */
 public class ConstraintChecker {
 
 	private static ConstraintChecker instance;
@@ -24,8 +29,9 @@ public class ConstraintChecker {
 	// node cannot be root folder, a folder directly under the root or a folder
 	// directly under the Types folder
 	public boolean isRemovalAllowed(CachedBaseNode node) {
-		return !NodeNavigator.getInstance().getRoot().equals(node) && !NodeNavigator.getInstance().getRoot().equals(node.getParent())
-				&& node.getParent() != null && !Identifiers.TypesFolder.equals(node.getParent().getNodeId());
+		return !NodeNavigator.getInstance().getRoot().equals(node)
+				&& !NodeNavigator.getInstance().getRoot().equals(node.getParent()) && node.getParent() != null
+				&& !Identifiers.TypesFolder.equals(node.getParent().getNodeId());
 	}
 
 	// node cannot be root node or directly in types folder or a variable
@@ -42,7 +48,7 @@ public class ConstraintChecker {
 	//
 	public boolean isAddPropertyAllowed(CachedBaseNode node) {
 		return isAddObjectAllowed(node);
-		
+
 	}
 
 	// node cannot be root node or directly in types folder or a variable

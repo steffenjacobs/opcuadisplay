@@ -8,7 +8,12 @@ import me.steffenjacobs.opcuadisplay.Activator;
 import me.steffenjacobs.opcuadisplay.management.node.NodeNavigator;
 import me.steffenjacobs.opcuadisplay.management.node.domain.CachedBaseNode;
 import me.steffenjacobs.opcuadisplay.ui.Images;
-/** @author Steffen Jacobs */
+
+/**
+ * Label provider for the node class
+ * 
+ * @author Steffen Jacobs
+ */
 public class NodeClassLabelProvider extends LabelProvider {
 
 	@Override

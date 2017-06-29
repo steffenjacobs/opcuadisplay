@@ -27,7 +27,12 @@ import me.steffenjacobs.opcuadisplay.ui.views.explorer.NodeClassLabelProvider;
 import me.steffenjacobs.opcuadisplay.ui.views.explorer.SimpleOpcUaTreeProvider;
 import me.steffenjacobs.opcuadisplay.ui.views.explorer.dialogs.DialogFactory.DialogListener;
 import me.steffenjacobs.opcuadisplay.ui.views.explorer.domain.MethodArgument;
-/** @author Steffen Jacobs */
+
+/**
+ * Dialog to add a method
+ * 
+ * @author Steffen Jacobs
+ */
 public class MethodAddDialog extends SimpleAddDialog {
 
 	private final HashMap<String, MethodArgument> inputArgs = new HashMap<>(), outputArgs = new HashMap<>();
@@ -67,16 +72,19 @@ public class MethodAddDialog extends SimpleAddDialog {
 		return area;
 	}
 
+	/** create a vertical separator */
 	private void createVerticalSeperator(Composite parent) {
 		Label separator = new Label(parent, SWT.VERTICAL | SWT.SEPARATOR);
 		separator.setLayoutData(new GridData(GridData.FILL_VERTICAL));
 	}
 
+	/** create a horizontal separator */
 	private void createHorizontalSeperator(Composite parent) {
 		Label separator = new Label(parent, SWT.HORIZONTAL | SWT.SEPARATOR);
 		separator.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 	}
 
+	/** create the panel for the method arguments */
 	private void createArgumentsPanel(Composite parent, String caption, final HashMap<String, MethodArgument> map) {
 		Composite comp = new Composite(parent, SWT.NONE);
 
@@ -177,7 +185,7 @@ public class MethodAddDialog extends SimpleAddDialog {
 		});
 	}
 
-	/**@return a TreeViewer with /Types/DataTypes/BaseDataType as a root*/
+	/** @return a TreeViewer with /Types/DataTypes/BaseDataType as a root */
 	private TreeViewer createTreeViewer(Composite container) {
 
 		TreeViewer viewer = new TreeViewer(container, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
