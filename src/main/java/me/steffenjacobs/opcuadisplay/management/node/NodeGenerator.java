@@ -33,7 +33,11 @@ import me.steffenjacobs.opcuadisplay.ui.views.explorer.dialogs.DialogFactory.Add
 import me.steffenjacobs.opcuadisplay.ui.views.explorer.domain.MethodArgument;
 import me.steffenjacobs.opcuadisplay.ui.views.explorer.events.ChangeSelectedNodeEvent;
 
-/** @author Steffen Jacobs */
+/**
+ * This class is for generating nodes or entire node structures.
+ * 
+ * @author Steffen Jacobs
+ */
 public class NodeGenerator {
 
 	private static NodeGenerator instance;
@@ -113,27 +117,51 @@ public class NodeGenerator {
 		}
 	}
 
+	/**
+	 * @return true if <i>cbn</i> does not contain a child with the display name
+	 *         <i>name</i>
+	 */
 	private boolean containsNoChildOfName(CachedBaseNode cbn, String name) {
 		return Lists.newArrayList(cbn.getChildren()).stream().filter(c -> c.getDisplayName().getText().equals(name))
 				.count() == 0;
 	}
 
+	/**
+	 * creates a CachedVariableType node with the name <i>name</i>, the NodeID
+	 * <i>nodeId</i>, the type <i>type</i> and inserts it at the parent node
+	 * <i>parent</i>
+	 */
 	private void createAndInsertVariableType(int namespaceIndex, String name, int nodeId, CachedVariableTypeNode type,
 			CachedBaseNode parent) {
 		CachedVariableTypeNode node = CachedVariableTypeNode.create(namespaceIndex, name, nodeId, type);
 		insertNode(node, parent, false);
 	}
 
+	/**
+	 * creates an ObjectType node with the name <i>name</i>, the NodeID
+	 * <i>nodeId</i> and inserts it at the parent node <i>parent</i>
+	 */
 	private void createAndInsertObjectType(int namespaceIndex, String name, int nodeId, CachedBaseNode parent) {
 		CachedObjectTypeNode node = CachedObjectTypeNode.create(namespaceIndex, name, nodeId);
 		insertNode(node, parent, false);
 	}
 
+	/**
+	 * creates a DataType node with the name <i>name</i>, the NodeID
+	 * <i>nodeId</i> and inserts it at the parent node <i>parent</i>
+	 */
 	private void createAndInsertDataType(int namespaceIndex, String name, int nodeId, CachedBaseNode parent) {
 		CachedDataTypeNode node = CachedDataTypeNode.create(namespaceIndex, name, nodeId);
 		insertNode(node, parent, false);
 	}
 
+	/**
+	 * creates an Method node with the name <i>text</i>, the NodeID
+	 * <i>nodeId</i>, the input arguments <i>inputArgs</i> and output arguments
+	 * <i>outputArgs</i> and inserts it at the parent node <i>parent</i>
+	 * 
+	 * @return the created method node
+	 */
 	public CachedMethodNode createAndInsertMethod(int nameSpaceIndex, String text, int nodeId, CachedBaseNode parent,
 			MethodArgument[] inputArgs, MethodArgument[] outputArgs) {
 		CachedMethodNode cmn = CachedMethodNode.create(nameSpaceIndex, text, nodeId, inputArgs, outputArgs);
@@ -142,6 +170,13 @@ public class NodeGenerator {
 		return cmn;
 	}
 
+	/**
+	 * creates a Object node with the name <i>text</i>, the NodeID
+	 * <i>nodeId</i>, the type <i>type</i> and inserts it at the parent node
+	 * <i>parent</i>
+	 * 
+	 * @return the created object node
+	 */
 	private CachedObjectNode createAndInsertObject(int nameSpaceIndex, String text, int nodeId,
 			CachedObjectTypeNode type, CachedBaseNode parent) {
 		CachedObjectNode con = CachedObjectNode.create(nameSpaceIndex, text, nodeId, type);
@@ -150,6 +185,13 @@ public class NodeGenerator {
 		return con;
 	}
 
+	/**
+	 * creates a CachedVariable node with the name <i>name</i>, the NodeID
+	 * <i>nodeId</i>, the type <i>type</i> and inserts it at the parent node
+	 * <i>parent</i>
+	 * 
+	 * @return the created variable node
+	 */
 	private CachedVariableNode createAndInsertVariable(int namespaceIndex, String name, int nodeId,
 			CachedDataTypeNode type, CachedBaseNode parent) {
 		CachedVariableNode cvn = CachedVariableNode.create(namespaceIndex, name, nodeId, type);
@@ -173,6 +215,13 @@ public class NodeGenerator {
 		return cvn;
 	}
 
+	/**
+	 * creates a CachedVariable property node with the name <i>name</i>, the
+	 * NodeID <i>nodeId</i>, the type <i>type</i> and inserts it at the parent
+	 * node <i>parent</i>
+	 * 
+	 * @return the created variable (property) node
+	 */
 	public CachedVariableNode createAndInsertProperty(int namespaceIndex, String name, int nodeId,
 			CachedDataTypeNode type, CachedBaseNode parent) {
 		CachedVariableNode cvn = CachedVariableNode.create(namespaceIndex, name, nodeId, type);
@@ -196,11 +245,20 @@ public class NodeGenerator {
 		return cvn;
 	}
 
+	/***
+	 * @return the type definition CachedReference node associated with
+	 *         <i>node</i>
+	 */
 	private CachedReference getTypeDefinition(CachedBaseNode node) {
 		return Lists.newArrayList(node.getReferences()).stream()
 				.filter(r -> "HasTypeDefinition".equals(r.getReferenceType())).findFirst().orElse(null);
 	}
 
+	/**
+	 * @return the 'Organizes', 'HasSubtype', 'HasComponent' or 'HasProperty'
+	 *         reference between a parent node <i>parent</i> and a child node
+	 *         <i>child</i>
+	 */
 	private CachedReference getAssociatedReference(CachedBaseNode child, CachedBaseNode parent) {
 		if (NodeNavigator.getInstance().isFolder(parent)) {
 			CachedReference typeDefinition = getTypeDefinition(child);
@@ -238,6 +296,12 @@ public class NodeGenerator {
 		return null;
 	}
 
+	/**
+	 * generates a new root node with the correct references to the not
+	 * generated folders 'Objects', 'Types' and 'Views'
+	 * 
+	 * @return the generated root
+	 */
 	public CachedObjectNode generateRoot() {
 		CachedObjectNode root = new CachedObjectNode(Identifiers.RootFolder);
 
@@ -269,16 +333,22 @@ public class NodeGenerator {
 		return root;
 	}
 
+	/** generates a new root and all base types */
 	public void generateBaseTypes() {
 		InputStream is = this.getClass().getClassLoader().getResourceAsStream("base.xml");
 		NodeNavigator.getInstance().setRoot(XmlImport.getInstance().parseFile(is, false, false, false));
 	}
 
+	/** generates a new root node with the basic folder structure */
 	public void generateFolders() {
 		InputStream is = this.getClass().getClassLoader().getResourceAsStream("folders.xml");
 		NodeNavigator.getInstance().setRoot(XmlImport.getInstance().parseFile(is, false, false, false));
 	}
 
+	/***
+	 * merges a node <i>child</i> into another existing node structure
+	 * <i>parent</i>
+	 */
 	public CachedBaseNode mergeInsertNode(CachedBaseNode child, CachedBaseNode parent) {
 		NodeNavigator.getInstance().increaseHighestNodeIdIfNecessarySafe(child);
 		List<CachedBaseNode> children = Lists.newArrayList(parent.getChildren());
@@ -298,6 +368,12 @@ public class NodeGenerator {
 		}
 	}
 
+	/**
+	 * insert a node <i>child</i> into an existing node <i>parent</i>
+	 * 
+	 * @param suppressEvent
+	 *            true: suppresses the ChangeSelectedNodeEvent
+	 */
 	public void insertNode(CachedBaseNode child, CachedBaseNode parent, boolean suppressEvent) {
 		NodeNavigator.getInstance().increaseHighestNodeIdIfNecessarySafe(child);
 		NodeNavigator.getInstance().addNodeToCache(child);
