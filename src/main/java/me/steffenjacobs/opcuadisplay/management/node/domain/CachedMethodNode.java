@@ -79,8 +79,6 @@ public class CachedMethodNode extends CachedBaseNode {
 			cvn.setChildren(new ArrayList<>());
 		}
 
-		// TODO: set arguments to value-property
-
 		NodeNavigator.getInstance().increaseHighestNodeIdIfNecessarySafe(cmn);
 
 		// rewire references & duplicate children recursive

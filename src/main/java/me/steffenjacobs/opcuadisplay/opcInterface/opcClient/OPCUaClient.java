@@ -364,15 +364,11 @@ public class OPCUaClient {
 	private CachedBaseNode retrieveNodes(final CachedBaseNode parent, OpcUaClient client, final boolean recursive) {
 
 		try {
-			// TODO: retrieve root, if necessary
-
 			List<Node> lst = client.getAddressSpace().browse(parent.getNodeId()).get();
 
 			if (NodeNavigator.getInstance().isInTypesFolder(parent)) {
 				List<CachedBaseNode> lstRef = browseReferencesRecursive(parent, client, recursive);
 				lstRef.forEach(n -> {
-					// TODO fix references of XML Schema and Binary Schema nodes
-					// when deduplicating
 					addChildToNode(parent, n);
 				});
 
