@@ -54,11 +54,8 @@ public class NodeEditPart extends AbstractGraphicalEditPart {
 		}
 		return rectangle;
 	}
-
-	/**
-	 * - adding a mouse-click listener to respond to clicking<br>
-	 * - adding a mouse-move listener to handle mouse-enter and mouse-exit
-	 */
+	
+	/**add mouse listeners*/
 	private void addListeners(final NodeModel m, final IFigure rectangle) {
 		rectangle.addMouseListener(new MouseListener() {
 

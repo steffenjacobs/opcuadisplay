@@ -8,10 +8,11 @@ import me.steffenjacobs.opcuadisplay.ui.views.starschema.model.Model;
 import me.steffenjacobs.opcuadisplay.ui.views.starschema.model.NodeModel;
 import me.steffenjacobs.opcuadisplay.ui.views.starschema.model.StarSchemaSettings;
 
+/** create the visualization of the models */
 public class GraphicalPartFactory implements EditPartFactory {
 
 	private SpiralLogic logic;
-	
+
 	final StarSchemaSettings settings;
 
 	public GraphicalPartFactory(SpiralLogic logic, StarSchemaSettings settings) {

@@ -15,6 +15,7 @@ import me.steffenjacobs.opcuadisplay.ui.views.starschema.model.Model;
 import me.steffenjacobs.opcuadisplay.ui.views.starschema.model.NodeModel;
 import me.steffenjacobs.opcuadisplay.ui.views.starschema.model.StarSchemaSettings;
 
+/** create the figures for the visualization of the models */
 public class ModelEditPart extends AbstractGraphicalEditPart {
 
 	private final SpiralLogic logic;
@@ -32,11 +33,10 @@ public class ModelEditPart extends AbstractGraphicalEditPart {
 		f.setLayoutManager(new FreeformLayout());
 
 		f.setBorder(new MarginBorder(1));
-		// Create a layout for the graphical screen
 		GridLayout gridLayout = new GridLayout();
 		gridLayout.numColumns = logic.getLength();
-		gridLayout.horizontalSpacing = settings.getBoxSize()/3;
-		gridLayout.verticalSpacing = settings.getBoxSize()/3;
+		gridLayout.horizontalSpacing = settings.getBoxSize() / 3;
+		gridLayout.verticalSpacing = settings.getBoxSize() / 3;
 		gridLayout.marginHeight = 25;
 		gridLayout.marginWidth = 25;
 		f.setLayoutManager(gridLayout);

@@ -3,6 +3,10 @@ package me.steffenjacobs.opcuadisplay.ui.views.starschema;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * This class contains the logic for creating the star schema and arrange the
+ * nodes
+ */
 public class SpiralLogic {
 	enum Direction {
 		LEFT(new int[]

@@ -29,10 +29,6 @@ public class StarSchemaView extends CloseableView {
 	private Model currentModel = null;
 	private StarSchemaSettings settings = new StarSchemaSettings(11, 150, false);
 
-	/**
-	 * This is a callback that will allow us to create the viewer and initialize
-	 * it.
-	 */
 	@Override
 	public void createPartControl(Composite parent) {
 
@@ -72,8 +68,8 @@ public class StarSchemaView extends CloseableView {
 		Action zoomIn = new Action() {
 			public void run() {
 				EventBus.getInstance()
-				.fireEvent(new StarschemaSettingsChangedEvent(new StarSchemaSettings(settings.getFontSize() + 1,
-						(int) (settings.getBoxSize() * 1.2), false)));
+						.fireEvent(new StarschemaSettingsChangedEvent(new StarSchemaSettings(settings.getFontSize() + 1,
+								(int) (settings.getBoxSize() * 1.2), false)));
 			}
 		};
 		zoomIn.setText("+");
@@ -85,10 +81,9 @@ public class StarSchemaView extends CloseableView {
 		// zoom out
 		Action zoomOut = new Action() {
 			public void run() {
-				if(settings.getFontSize()>2){
-				EventBus.getInstance()
-						.fireEvent(new StarschemaSettingsChangedEvent(new StarSchemaSettings(settings.getFontSize() - 1,
-								(int) (settings.getBoxSize() * 0.833), false)));
+				if (settings.getFontSize() > 2) {
+					EventBus.getInstance().fireEvent(new StarschemaSettingsChangedEvent(new StarSchemaSettings(
+							settings.getFontSize() - 1, (int) (settings.getBoxSize() * 0.833), false)));
 				}
 			}
 		};
@@ -132,9 +127,6 @@ public class StarSchemaView extends CloseableView {
 				});
 	}
 
-	/**
-	 * Passing the focus request to the viewer's control.
-	 */
 	public void setFocus() {
 		viewer.getControl().setFocus();
 	}

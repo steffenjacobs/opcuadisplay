@@ -4,7 +4,7 @@ import org.eclipse.ui.part.ViewPart;
 
 import me.steffenjacobs.opcuadisplay.eventbus.EventBus;
 
-/** automatically unregisters listeners when view got closed 
+/** Automatically unregisters listeners when view got closed 
  * 
  * @author Steffen Jacobs*/
 public abstract class CloseableView extends ViewPart {
