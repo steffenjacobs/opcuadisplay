@@ -79,6 +79,15 @@ public class XmlImport {
 		return instance;
 	}
 
+	/**
+	 * @param baseDataTypesImplicit
+	 *            true, if the base data types are not stored in the XML file or
+	 *            not
+	 * @param freeOpcUaModelerCompatibility
+	 *            true, if the XMl file is compatible with the free opc ua
+	 *            modeler
+	 * @return a node structure read from the <i>xmlReader</i>
+	 */
 	public CachedObjectNode parseFile(Reader xmlReader, boolean baseDataTypesImplicit,
 			boolean freeOpcUaModelerCompatibility, boolean merge) {
 		try {
@@ -109,6 +118,15 @@ public class XmlImport {
 		return null;
 	}
 
+	/**
+	 * @param baseDataTypesImplicit
+	 *            true, if the base data types are not stored in the XML file or
+	 *            not
+	 * @param freeOpcUaModelerCompatibility
+	 *            true, if the XMl file is compatible with the free opc ua
+	 *            modeler
+	 * @return a node structure read from the <i>xmlReader</i>
+	 */
 	public CachedObjectNode parseFile(String xmlFile, boolean baseDataTypesImplicit,
 			boolean freeOpcUaModelerCompatibility, boolean merge) {
 		try {
@@ -119,11 +137,32 @@ public class XmlImport {
 		return null;
 	}
 
+	/**
+	 * @param baseDataTypesImplicit
+	 *            true, if the base data types are not stored in the XML file or
+	 *            not
+	 * @param freeOpcUaModelerCompatibility
+	 *            true, if the XMl file is compatible with the free opc ua
+	 *            modeler
+	 * @return a node structure read from the <i>xmlReader</i>
+	 */
 	public CachedObjectNode parseFile(InputStream is, boolean baseDataTypesImplicit,
 			boolean freeOpcUaModelerCompatibility, boolean merge) {
 		return parseFile(new InputStreamReader(is), baseDataTypesImplicit, freeOpcUaModelerCompatibility, merge);
 	}
 
+	/**
+	 * @param baseDataTypesImplicit
+	 *            true, if the base data types are not stored in the XML file or
+	 *            not
+	 * @param freeOpcUaModelerCompatibility
+	 *            true, if the XMl file is compatible with the free opc ua
+	 *            modeler
+	 * @param merge
+	 *            true, if the loaded node structure should be merged into the
+	 *            existing project /** @return the node tree read from the list
+	 *            of nodes <i>nodes</i>
+	 */
 	private CachedObjectNode buildFullTree(List<UANode> nodes, boolean baseDataTypesImplicit,
 			boolean freeOpcUaModelerCompatibility, boolean merge) {
 		CachedObjectNode root;
@@ -229,6 +268,7 @@ public class XmlImport {
 		return list.stream().filter(x -> parseNodeId(0, x.getNodeId()).equals(nodeId)).findAny().orElse(null);
 	}
 
+	/** @return the CachedBaseNode from the UANode <i>uaNode</i> */
 	private CachedBaseNode parseNode(int namespaceIndex, UANode uaNode) {
 
 		CachedBaseNode cbn = null;
@@ -362,6 +402,11 @@ public class XmlImport {
 		return cbn;
 	}
 
+	/**
+	 * converts tag to a value set
+	 * 
+	 * @return the value inside the tag <i>val</i>
+	 */
 	private Object convertValue(Object val, NodeId datatype) {
 		Object dat = null;
 
@@ -487,6 +532,7 @@ public class XmlImport {
 		});
 	}
 
+	/** converts the LocalizedText */
 	private LocalizedText parseLocalizedText(
 			me.steffenjacobs.opcuadisplay.management.node.domain.generated.LocalizedText lt) {
 		return new LocalizedText(lt.getLocale(), lt.getValue());
