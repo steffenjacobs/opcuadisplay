@@ -19,7 +19,12 @@ import me.steffenjacobs.opcuadisplay.ui.views.CloseableView;
 import me.steffenjacobs.opcuadisplay.ui.views.attribute.domain.NodeEntryFactory;
 import me.steffenjacobs.opcuadisplay.ui.views.attribute.domain.NodeEntryFactory.NodeEntry;
 import me.steffenjacobs.opcuadisplay.ui.views.explorer.events.SelectedNodeChangedEvent;
-/** @author Steffen Jacobs */
+
+/**
+ * The OPC UA Attribute View
+ * 
+ * @author Steffen Jacobs
+ */
 public class AttributeEditorView extends CloseableView {
 
 	public static final String ID = "me.steffenjacobs.opcuadisplay.ui.views.attribute.AttributeEditorView";
@@ -45,6 +50,7 @@ public class AttributeEditorView extends CloseableView {
 		registerListeners();
 	}
 
+	/** register the listeners */
 	private void registerListeners() {
 		EventBus.getInstance().addListener(this, SelectedNodeChangedEvent.IDENTIFIER,
 				new EventListener<SelectedNodeChangedEvent>() {
@@ -58,6 +64,7 @@ public class AttributeEditorView extends CloseableView {
 				});
 	}
 
+	/** create the viewer with the table */
 	private void createViewer(Composite parent) {
 		viewer = new TableViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.BORDER);
 		createColumns(parent, viewer);
@@ -86,7 +93,7 @@ public class AttributeEditorView extends CloseableView {
 		return viewer;
 	}
 
-	// create the columns for the table
+	/** create the columns for the table */
 	private void createColumns(final Composite parent, final TableViewer viewer) {
 		String[] titles =
 			{ "Attribute Name", "Value", "Data Type" };
@@ -125,6 +132,7 @@ public class AttributeEditorView extends CloseableView {
 		});
 	}
 
+	/** create a column for the table viewer */
 	private TableViewerColumn createTableViewerColumn(String title, int bound, final int colNumber) {
 		final TableViewerColumn viewerColumn = new TableViewerColumn(viewer, SWT.NONE);
 		final TableColumn column = viewerColumn.getColumn();

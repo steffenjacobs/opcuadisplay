@@ -21,9 +21,14 @@ import me.steffenjacobs.opcuadisplay.management.node.domain.CachedVariableNode;
 import me.steffenjacobs.opcuadisplay.management.node.domain.CachedVariableTypeNode;
 import me.steffenjacobs.opcuadisplay.management.node.domain.CachedViewNode;
 
-/** @author Steffen Jacobs */
+/**
+ * Factory for the NodeEntry instances in the AttributeEditor
+ * 
+ * @author Steffen Jacobs
+ */
 public class NodeEntryFactory {
 
+	/** @return the NodeEntries for <i>node</i> */
 	public static Iterable<NodeEntry<?>> fromNode(CachedBaseNode node) {
 		if (node instanceof CachedDataTypeNode) {
 			return fromNode((CachedDataTypeNode) node);
@@ -46,6 +51,7 @@ public class NodeEntryFactory {
 		}
 	}
 
+	/** @return the NodeEntries for <i>node</i> */
 	private static Iterable<NodeEntry<?>> fromBaseNode(CachedBaseNode node) {
 		ArrayList<NodeEntry<?>> list = new ArrayList<>();
 		if (node == null || node.isDummy()) {
@@ -63,6 +69,7 @@ public class NodeEntryFactory {
 		return list;
 	}
 
+	/** @return the NodeEntries for <i>node</i> */
 	public static Iterable<NodeEntry<?>> fromNode(CachedDataTypeNode node) {
 		ArrayList<NodeEntry<?>> list = (ArrayList<NodeEntry<?>>) fromBaseNode((CachedBaseNode) node);
 
@@ -71,6 +78,7 @@ public class NodeEntryFactory {
 		return list;
 	}
 
+	/** @return the NodeEntries for <i>node</i> */
 	public static Iterable<NodeEntry<?>> fromNode(CachedMethodNode node) {
 		ArrayList<NodeEntry<?>> list = (ArrayList<NodeEntry<?>>) fromBaseNode((CachedBaseNode) node);
 
@@ -80,6 +88,7 @@ public class NodeEntryFactory {
 		return list;
 	}
 
+	/** @return the NodeEntries for <i>node</i> */
 	public static Iterable<NodeEntry<?>> fromNode(CachedObjectNode node) {
 		ArrayList<NodeEntry<?>> list = (ArrayList<NodeEntry<?>>) fromBaseNode((CachedBaseNode) node);
 
@@ -88,6 +97,7 @@ public class NodeEntryFactory {
 		return list;
 	}
 
+	/** @return the NodeEntries for <i>node</i> */
 	public static Iterable<NodeEntry<?>> fromNode(CachedObjectTypeNode node) {
 		ArrayList<NodeEntry<?>> list = (ArrayList<NodeEntry<?>>) fromBaseNode((CachedBaseNode) node);
 
@@ -96,6 +106,7 @@ public class NodeEntryFactory {
 		return list;
 	}
 
+	/** @return the NodeEntries for <i>node</i> */
 	public static Iterable<NodeEntry<?>> fromNode(CachedReferenceTypeNode node) {
 		ArrayList<NodeEntry<?>> list = (ArrayList<NodeEntry<?>>) fromBaseNode((CachedBaseNode) node);
 
@@ -106,6 +117,7 @@ public class NodeEntryFactory {
 		return list;
 	}
 
+	/** @return the NodeEntries for <i>node</i> */
 	public static Iterable<NodeEntry<?>> fromNode(CachedVariableNode node) {
 		ArrayList<NodeEntry<?>> list = (ArrayList<NodeEntry<?>>) fromBaseNode((CachedBaseNode) node);
 
@@ -121,6 +133,7 @@ public class NodeEntryFactory {
 		return list;
 	}
 
+	/** @return the NodeEntries for <i>node</i> */
 	public static Iterable<NodeEntry<?>> fromNode(CachedVariableTypeNode node) {
 		ArrayList<NodeEntry<?>> list = (ArrayList<NodeEntry<?>>) fromBaseNode((CachedBaseNode) node);
 
@@ -133,6 +146,7 @@ public class NodeEntryFactory {
 		return list;
 	}
 
+	/** @return the NodeEntries for <i>node</i> */
 	public static Iterable<NodeEntry<?>> fromNode(CachedViewNode node) {
 		ArrayList<NodeEntry<?>> list = (ArrayList<NodeEntry<?>>) fromBaseNode((CachedBaseNode) node);
 
@@ -142,6 +156,12 @@ public class NodeEntryFactory {
 		return list;
 	}
 
+	/**
+	 * The NodeEntry class.<br>
+	 * Each node entry contains an attribute name <i>text</i>, a Data Type
+	 * <i>typeName</i> and a Value <i>value</i>. Additionally, the parent node
+	 * <i>parentNode</i> is stored with each entry.
+	 */
 	public static class NodeEntry<T> {
 
 		private final String text;

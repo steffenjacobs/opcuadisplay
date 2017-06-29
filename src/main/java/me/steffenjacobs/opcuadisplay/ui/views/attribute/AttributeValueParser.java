@@ -12,13 +12,19 @@ import org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.UInteger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
-/** @author Steffen Jacobs */
+
+/**
+ * The Attribute value parser associated with the OPC UA Attribute View
+ * 
+ * @author Steffen Jacobs
+ */
 public class AttributeValueParser {
 
 	private static final Pattern patternLocale = Pattern.compile("loc=(.*);text=(.*)");
 
 	private static final SimpleDateFormat sdf = new SimpleDateFormat("YYYY/MM/dd HH/mm/ss/SSS Z");
 
+	/** create a localized text from an input String <i>s</i> */
 	public static LocalizedText parseLocalizedText(String s) {
 		Matcher m = patternLocale.matcher(s);
 		m.find();
@@ -32,6 +38,7 @@ public class AttributeValueParser {
 		}
 	}
 
+	/** converts the Object <i>value</i> best effort for the basic data types */
 	public static String asString(Object value) {
 		if (value == null) {
 			return "";
@@ -79,30 +86,4 @@ public class AttributeValueParser {
 
 		return value.toString();
 	}
-	//
-	// @SuppressWarnings("unchecked")
-	// public static <T> T fromString(Class<T> clazz, String s) {
-	// if (clazz == QualifiedName.class) {
-	// return (T) QualifiedName.parse(s);
-	// } else if (clazz == NodeId.class) {
-	// return (T) NodeId.parse(s);
-	// } else if (clazz == LocalizedText.class) {
-	// Matcher m = patternLocale.matcher(s);
-	// m.find();
-	// try {
-	// return (T) new LocalizedText(m.group(1), m.group(2));
-	// } catch (IllegalStateException e) {
-	// MessageBox messageBox = new MessageBox(new Shell(), SWT.ICON_ERROR);
-	// messageBox.setMessage("Bad input
-	// format.\n\nFormat:'loc=__;text=______'");
-	// messageBox.open();
-	// throw e;
-	// }
-	// } else {
-	// // TODO
-	// return null;
-	// }
-	//
-	// // TODO: handle bad input
-	// }
 }

@@ -40,7 +40,11 @@ import me.steffenjacobs.opcuadisplay.ui.widgets.DropDownCheckedListBox;
 import me.steffenjacobs.opcuadisplay.ui.widgets.GenericComboBox;
 import me.steffenjacobs.opcuadisplay.ui.widgets.GenericComboBox.Renderer;
 
-/** @author Steffen Jacobs */
+/**
+ * The table editor associated with the OPC UA Attribute View
+ * 
+ * @author Steffen Jacobs
+ */
 public class AttributeEditorViewTableEditor {
 	private TableEditor editor;
 
@@ -389,6 +393,7 @@ public class AttributeEditorViewTableEditor {
 		}
 	}
 
+	/** editor for editing strings */
 	private void textEditor(Table table, NodeEntry<Object> entry, int editableColumn, TableItem item,
 			Consumer<String> setter, Supplier<Object> getter) {
 		Text newEditor = new Text(table, SWT.NONE);
@@ -420,6 +425,7 @@ public class AttributeEditorViewTableEditor {
 		editor.setEditor(newEditor, item, editableColumn);
 	}
 
+	/** editor for editing the node class */
 	private void nodeclassEditor(Table table, NodeEntry<Object> entry, int editableColumn, TableItem item) {
 		GenericComboBox<NodeClass> newEditor = new GenericComboBox<NodeClass>(table, SWT.NONE,
 				new Renderer<NodeClass>() {
@@ -450,6 +456,7 @@ public class AttributeEditorViewTableEditor {
 		editor.setEditor(newEditor, item, editableColumn);
 	}
 
+	/** editor for editing boolean variables */
 	private void booleanEditor(Table table, NodeEntry<Object> entry, int editableColumn, TableItem item,
 			Consumer<Boolean> setter) {
 		GenericComboBox<Boolean> newEditor = new GenericComboBox<Boolean>(table, SWT.NONE, new Renderer<Boolean>() {
@@ -482,6 +489,7 @@ public class AttributeEditorViewTableEditor {
 
 	}
 
+	/** editor for editing UInteger values */
 	private void uintegerEditor(Table table, NodeEntry<Object> entry, int editableColumn, TableItem item,
 			Consumer<UInteger> setter) {
 		final DropDownCheckedListBox newEditor = new DropDownCheckedListBox(table)
@@ -507,6 +515,7 @@ public class AttributeEditorViewTableEditor {
 		editor.setEditor(newEditor, item, editableColumn);
 	}
 
+	/** editor for editing the value rank */
 	private void valueRankEditor(Table table, NodeEntry<Object> entry, int editableColumn, TableItem item) {
 		GenericComboBox<BetterValueRank> newEditor = new GenericComboBox<BetterValueRank>(table, SWT.NONE,
 				new Renderer<BetterValueRank>() {
