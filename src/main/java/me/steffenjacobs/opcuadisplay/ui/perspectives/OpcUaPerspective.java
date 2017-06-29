@@ -11,10 +11,13 @@ import me.steffenjacobs.opcuadisplay.ui.views.reference.ReferenceView;
 import me.steffenjacobs.opcuadisplay.ui.views.starschema.StarSchemaView;
 
 /**
+ * The OPC UA Perspective
+ * 
  * @author Steffen Jacobs
  */
 public class OpcUaPerspective implements IPerspectiveFactory {
 
+	/** creates the initial layout of the OPC UA Perspective */
 	public void createInitialLayout(IPageLayout factory) {
 
 		// add left view
@@ -32,7 +35,7 @@ public class OpcUaPerspective implements IPerspectiveFactory {
 		// add right view
 		IFolderLayout right = factory.createFolder("right", IPageLayout.RIGHT, 0.5f, factory.getEditorArea());
 		right.addView(ReferenceView.ID);
-		
+
 		// add center view
 		IFolderLayout center = factory.createFolder("top", IPageLayout.TOP, 1f, factory.getEditorArea());
 		center.addView(StarSchemaView.ID);
