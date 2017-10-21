@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -66,7 +68,8 @@ public class OPCUaClient {
 
 	private static final Logger logger = LoggerFactory.getLogger(OPCUaClient.class);
 
-	private final HashMap<NodeId, String> typeNamesCache = new HashMap<>();
+	private final Map<NodeId, String> typeNamesCache = new HashMap<>();
+	private final Map<NodeId, CachedBaseNode> nodeCache = new ConcurrentHashMap<>();
 
 	/**
 	 * @return all nodes from an opc server specified in <i>url</i> linked to
@@ -95,8 +98,7 @@ public class OPCUaClient {
 
 		monitor.beginTask("Downloading Models...", 100);
 		// receive sub folders of root
-		final CachedObjectNode root = (CachedObjectNode) retrieveNodes(NodeGenerator.getInstance().generateRoot(),
-				client, false);
+		final CachedObjectNode root = (CachedObjectNode) retrieveNodes(NodeGenerator.getInstance().generateRoot(), client, false);
 
 		toList(root.getChildren()).forEach(root_xxx -> {
 
@@ -151,8 +153,7 @@ public class OPCUaClient {
 
 		exec.shutdown();
 		exec.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-		logger.info("download complete (" + (System.currentTimeMillis() - start) + "ms). Highest Node Id: "
-				+ NodeNavigator.getInstance().getHighestNodeId());
+		logger.info("download complete (" + (System.currentTimeMillis() - start) + "ms). Highest Node Id: " + NodeNavigator.getInstance().getHighestNodeId());
 
 		// disconnect
 		client.disconnect();
@@ -163,8 +164,7 @@ public class OPCUaClient {
 	}
 
 	/** retrieves the nodes and updates the monitor after the nodes arrived */
-	private void retrieveNodesMonitored(final CachedBaseNode parent, OpcUaClient client, boolean recursive,
-			IProgressMonitor monitor, int value) {
+	private void retrieveNodesMonitored(final CachedBaseNode parent, OpcUaClient client, boolean recursive, IProgressMonitor monitor, int value) {
 		retrieveNodes(parent, client, recursive);
 		monitor.worked(value);
 	}
@@ -173,11 +173,9 @@ public class OPCUaClient {
 	private List<CachedReference> browseAllReferences(CachedBaseNode node, OpcUaClient client) {
 		List<CachedReference> ref = new ArrayList<>();
 		try {
-			BrowseDescription browse = new BrowseDescription(node.getNodeId(), BrowseDirection.Forward,
-					Identifiers.References, true,
-					uint(NodeClass.Object.getValue() | NodeClass.DataType.getValue() | NodeClass.ObjectType.getValue()
-							| NodeClass.VariableType.getValue() | NodeClass.ReferenceType.getValue()
-							| NodeClass.Method.getValue() | NodeClass.Variable.getValue()),
+			BrowseDescription browse = new BrowseDescription(node.getNodeId(), BrowseDirection.Forward, Identifiers.References, true,
+					uint(NodeClass.Object.getValue() | NodeClass.DataType.getValue() | NodeClass.ObjectType.getValue() | NodeClass.VariableType.getValue()
+							| NodeClass.ReferenceType.getValue() | NodeClass.Method.getValue() | NodeClass.Variable.getValue()),
 
 					uint(BrowseResultMask.All.getValue()));
 
@@ -186,9 +184,8 @@ public class OPCUaClient {
 			toList(browseResult.getReferences()).forEach(rd -> {
 
 				// pack the reference inside CachedReference
-				CachedReference cr = new CachedReference(getNameOfNode(rd.getReferenceTypeId(), client),
-						rd.getBrowseName(), getNameOfNode(rd.getTypeDefinition().local().orElse(null), client),
-						rd.getNodeId().local().get());
+				CachedReference cr = new CachedReference(getNameOfNode(rd.getReferenceTypeId(), client), rd.getBrowseName(),
+						getNameOfNode(rd.getTypeDefinition().local().orElse(null), client), rd.getNodeId().local().get());
 				ref.add(cr);
 
 			});
@@ -231,14 +228,12 @@ public class OPCUaClient {
 	 * browses the references recursive, by taking the referenced nodeid,
 	 * retrieving the associated node and adding it to the parent recursively
 	 */
-	private List<CachedBaseNode> browseReferencesRecursive(CachedBaseNode node, OpcUaClient client, boolean recursive) {
+	private List<CachedBaseNode> browseReferencesRecursive(final CachedBaseNode node, OpcUaClient client, boolean recursive) {
 		List<CachedBaseNode> ref = new ArrayList<>();
 		try {
-			BrowseDescription browse = new BrowseDescription(node.getNodeId(), BrowseDirection.Forward,
-					Identifiers.References, true,
-					uint(NodeClass.Object.getValue() | NodeClass.DataType.getValue() | NodeClass.ObjectType.getValue()
-							| NodeClass.VariableType.getValue() | NodeClass.ReferenceType.getValue()
-							| NodeClass.Method.getValue() | NodeClass.Variable.getValue()),
+			BrowseDescription browse = new BrowseDescription(node.getNodeId(), BrowseDirection.Forward, Identifiers.References, true,
+					uint(NodeClass.Object.getValue() | NodeClass.DataType.getValue() | NodeClass.ObjectType.getValue() | NodeClass.VariableType.getValue()
+							| NodeClass.ReferenceType.getValue() | NodeClass.Method.getValue() | NodeClass.Variable.getValue()),
 
 					uint(BrowseResultMask.All.getValue()));
 
@@ -246,15 +241,30 @@ public class OPCUaClient {
 
 			final List<CachedReference> refs = new ArrayList<>();
 			toList(browseResult.getReferences()).forEach(rd -> {
+				
 				// retrieve the node details from the reference
 				NodeId nodeId = rd.getNodeId().local().orElse(null);
-
 				CachedBaseNode cbn = retrieveNodeDetails(nodeId, client);
+
+				//determine, if recursion should be continued
+				boolean continueRecursion = recursive;
+				if (nodeCache.containsKey(nodeId)) {
+					for (CachedBaseNode n : NodeNavigator.getInstance().getPath(nodeCache.get(nodeId))) {
+						if (n.getNodeId().equals(nodeId)) {
+							cbn = n;
+							continueRecursion = false;
+							break;
+						}
+					}
+				} else {
+					nodeCache.put(nodeId, cbn);
+				}
 
 				if (cbn != null) {
 					// this is probably a type
-					if (recursive) {
-						browseReferencesRecursive(cbn, client, recursive).forEach(nd -> addChildToNode(cbn, nd));
+					if (continueRecursion) {
+						final CachedBaseNode fcbn = cbn;
+						browseReferencesRecursive(cbn, client, continueRecursion).forEach(nd -> addChildToNode(fcbn, nd));
 					}
 					ref.add(cbn);
 				} else {
@@ -278,12 +288,18 @@ public class OPCUaClient {
 
 					ref.add(nn);
 					nn.setReferences(browseAllReferences(nn, client));
-					retrieveNodes(nn, client, recursive);
+
+					//add cbn again to the node cache because previously, a null value had been added
+					nodeCache.put(nodeId, cbn);
+
+					// recursion
+					if (continueRecursion) {
+						retrieveNodes(nn, client, recursive);
+					}
 				}
 
 				// add references
-				refs.add(new CachedReference(getNameOfNode(rd.getReferenceTypeId(), client), rd.getBrowseName(),
-						getNameOfNode(rd.getTypeDefinition().local().orElse(null), client),
+				refs.add(new CachedReference(getNameOfNode(rd.getReferenceTypeId(), client), rd.getBrowseName(), getNameOfNode(rd.getTypeDefinition().local().orElse(null), client),
 						rd.getNodeId().local().get()));
 			});
 
@@ -372,8 +388,7 @@ public class OPCUaClient {
 					addChildToNode(parent, n);
 				});
 
-				List<QualifiedName> names = lstRef.stream().map(CachedBaseNode::getBrowseName)
-						.collect(Collectors.toList());
+				List<QualifiedName> names = lstRef.stream().map(CachedBaseNode::getBrowseName).collect(Collectors.toList());
 
 				// deduplicating
 				lst = lst.stream().filter(n -> {
@@ -406,6 +421,7 @@ public class OPCUaClient {
 
 					// retrieve children
 					if (recursive) {
+						nodeCache.put(cn.getNodeId(), cn);
 						retrieveNodes(cn, client, recursive);
 					}
 
@@ -443,8 +459,7 @@ public class OPCUaClient {
 			return null;
 		}
 
-		EndpointDescription endpoint = Arrays.stream(endpoints)
-				.filter(e -> e.getSecurityPolicyUri().equals(securityPolicy.getSecurityPolicyUri())).findFirst()
+		EndpointDescription endpoint = Arrays.stream(endpoints).filter(e -> e.getSecurityPolicyUri().equals(securityPolicy.getSecurityPolicyUri())).findFirst()
 				.orElseThrow(() -> new Exception("no desired endpoints returned"));
 
 		logger.info("Using endpoint: {} [{}]", endpoint.getEndpointUrl(), securityPolicy);
@@ -454,10 +469,8 @@ public class OPCUaClient {
 		loader.load();
 
 		// create config
-		OpcUaClientConfig opcConfig = OpcUaClientConfig.builder()
-				.setApplicationName(LocalizedText.english("eclipse milo opc-ua client"))
-				.setApplicationUri("urn:eclipse:milo:examples:client").setCertificate(loader.getClientCertificate())
-				.setKeyPair(loader.getClientKeyPair()).setEndpoint(endpoint)
+		OpcUaClientConfig opcConfig = OpcUaClientConfig.builder().setApplicationName(LocalizedText.english("eclipse milo opc-ua client"))
+				.setApplicationUri("urn:eclipse:milo:examples:client").setCertificate(loader.getClientCertificate()).setKeyPair(loader.getClientKeyPair()).setEndpoint(endpoint)
 				.setIdentityProvider(new AnonymousProvider()).setRequestTimeout(Unsigned.uint(5000)).build();
 
 		return new OpcUaClient(opcConfig);
