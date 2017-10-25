@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: OPC UA Display
 Bundle-SymbolicName: me.steffenjacobs.opcuadisplay;singleton:=true
-Bundle-Version: 1.0
+Bundle-Version: 1.0.1
 Bundle-Activator: me.steffenjacobs.opcuadisplay.Activator
 Require-Bundle: org.eclipse.core.runtime,
  org.slf4j.api,
