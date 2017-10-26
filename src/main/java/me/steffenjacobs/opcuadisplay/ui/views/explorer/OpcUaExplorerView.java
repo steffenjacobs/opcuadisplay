@@ -194,7 +194,7 @@ public class OpcUaExplorerView extends CloseableView {
 					@Override
 					public void onAction(ExportWizardFinishEvent event) {
 						onExportWizardFinish(event.getUrl(), event.isBaseDataTypesImplicit(),
-								event.isFreeOpcUaModelerCompatibility());
+								event.isFreeOpcUaModelerCompatibility(), event.getNameSpaceId());
 					}
 				});
 
@@ -322,13 +322,19 @@ public class OpcUaExplorerView extends CloseableView {
 
 	/** can be called, after the export wizard has finished */
 	public void onExportWizardFinish(String exportUrl, boolean baseDataTypesImplicit,
-			boolean freeOpcUaModelerCompatibility) {
+			boolean freeOpcUaModelerCompatibility, String namespaceId) {
 		Job job = new Job("Exporting OPC UA nodes...") {
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
 				try {
+					if(baseDataTypesImplicit){
+						XmlExport.getInstance().writeToFile(exportUrl, NodeNavigator.getInstance().getRoot(),
+								baseDataTypesImplicit, freeOpcUaModelerCompatibility, namespaceId);						
+					}
+					else{
 					XmlExport.getInstance().writeToFile(exportUrl, NodeNavigator.getInstance().getRoot(),
 							baseDataTypesImplicit, freeOpcUaModelerCompatibility);
+					}
 					return Status.OK_STATUS;
 				} catch (Exception e) {
 					e.printStackTrace();
