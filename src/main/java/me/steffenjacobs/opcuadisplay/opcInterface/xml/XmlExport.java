@@ -107,9 +107,26 @@ public class XmlExport {
 	 * @param freeOpcUaModelerCompatibility
 	 *            true, if compatibility with the free opc ua modeler should be
 	 *            ensured
+	 * @param namespaceId
+	 *            the ID of the namespace for the modified nodes
 	 */
-	public void writeToFile(String xmlFile, CachedBaseNode cbn, boolean baseDataTypesImplicit,
-			boolean freeOpcUaModelerCompatibility) {
+	public void writeToFile(String xmlFile, CachedBaseNode cbn, boolean baseDataTypesImplicit, boolean freeOpcUaModelerCompatibility) {
+		writeToFile(xmlFile, cbn, baseDataTypesImplicit, freeOpcUaModelerCompatibility, "0");
+	}
+
+	/**
+	 * persists the node tree <i>cbn</i> into the file <i>xmlFile</i>
+	 * 
+	 * @param baseDataTypesImplicit
+	 *            true if base data types are implicit and should not be stored
+	 *            in the XML file
+	 * @param freeOpcUaModelerCompatibility
+	 *            true, if compatibility with the free opc ua modeler should be
+	 *            ensured
+	 * @param namespaceId
+	 *            the ID of the namespace for the modified nodes
+	 */
+	public void writeToFile(String xmlFile, CachedBaseNode cbn, boolean baseDataTypesImplicit, boolean freeOpcUaModelerCompatibility, String namespaceId) {
 
 		UANodeSet nodeSet = new UANodeSet();
 
@@ -170,8 +187,7 @@ public class XmlExport {
 			nodeSet.getUAObjectOrUAVariableOrUAMethod().sort(new Comparator<UANode>() {
 				@Override
 				public int compare(UANode o1, UANode o2) {
-					if (o2 instanceof UAType && o1 instanceof UAType
-							|| o1 instanceof UAInstance && o2 instanceof UAInstance) {
+					if (o2 instanceof UAType && o1 instanceof UAType || o1 instanceof UAInstance && o2 instanceof UAInstance) {
 						return 0;
 					} else if (o1 instanceof UAType) {
 						return -1;
@@ -214,6 +230,15 @@ public class XmlExport {
 			} while (swapped);
 		}
 
+		// set custom namespaceID to exported nodes
+		if (baseDataTypesImplicit) {
+			nodeSet.getUAObjectOrUAVariableOrUAMethod().forEach(n -> {
+				if (!n.getNodeId().contains("ns")) {
+					n.setNodeId("ns=" + namespaceId + ";" + n.getNodeId());
+				}
+			});
+		}
+
 		// add aliases
 		if (nodeSet.getAliases() == null) {
 			nodeSet.setAliases(new AliasTable());
@@ -238,10 +263,8 @@ public class XmlExport {
 			List<String> lines = Files.readAllLines(Paths.get(xmlFile));
 
 			lines.replaceAll(s -> s.replace("<UANodeSet xmlns=\"http://opcfoundation.org/UA/2011/03/UANodeSet.xsd\">",
-					"<UANodeSet xmlns=\"http://opcfoundation.org/UA/2011/03/UANodeSet.xsd\" "
-							+ "xmlns:uax=\"http://opcfoundation.org/UA/2008/02/Types.xsd\" "
-							+ "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
-							+ "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">"));
+					"<UANodeSet xmlns=\"http://opcfoundation.org/UA/2011/03/UANodeSet.xsd\" " + "xmlns:uax=\"http://opcfoundation.org/UA/2008/02/Types.xsd\" "
+							+ "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" " + "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">"));
 
 			if (freeOpcUaModelerCompatibility) {
 				// cast MinimumSamplingInterval to integer
@@ -342,8 +365,7 @@ public class XmlExport {
 			// event notifier
 			uao.setEventNotifier(node.getEventNotifier() != null ? node.getEventNotifier().shortValue() : 0);
 
-			uao.setParentNodeId(node.getParent() != null && node.getParent().getNodeId() != null
-					? parseNodeId(node.getParent().getNodeId()) : null);
+			uao.setParentNodeId(node.getParent() != null && node.getParent().getNodeId() != null ? parseNodeId(node.getParent().getNodeId()) : null);
 
 			uaNode = uao;
 		}
@@ -359,16 +381,14 @@ public class XmlExport {
 			uav.setDataType(parseNodeId(node.getDataType()));
 			uav.setValueRank(node.getValueRank());
 
-			uav.getArrayDimensions().addAll(Lists.newArrayList(node.getArrayDimensions()).stream()
-					.map(x -> x.toString()).collect(Collectors.toList()));
+			uav.getArrayDimensions().addAll(Lists.newArrayList(node.getArrayDimensions()).stream().map(x -> x.toString()).collect(Collectors.toList()));
 
 			uav.setAccessLevel(node.getAccessLevel().shortValue());
 			uav.setUserAccessLevel(node.getUserAccessLevel().shortValue());
 			uav.setMinimumSamplingInterval(node.getMinimumSamplingInterval());
 			uav.setHistorizing(node.isHistorizing());
 
-			uav.setParentNodeId(node.getParent() != null && node.getParent().getNodeId() != null
-					? parseNodeId(node.getParent().getNodeId()) : null);
+			uav.setParentNodeId(node.getParent() != null && node.getParent().getNodeId() != null ? parseNodeId(node.getParent().getNodeId()) : null);
 
 			uaNode = uav;
 		}
@@ -380,8 +400,7 @@ public class XmlExport {
 			uam.setExecutable(node.isExecutable());
 			uam.setUserExecutable(node.isUserExecutable());
 
-			uam.setParentNodeId(node.getParent() != null && node.getParent().getNodeId() != null
-					? parseNodeId(node.getParent().getNodeId()) : null);
+			uam.setParentNodeId(node.getParent() != null && node.getParent().getNodeId() != null ? parseNodeId(node.getParent().getNodeId()) : null);
 
 			uaNode = uam;
 		}
@@ -423,8 +442,7 @@ public class XmlExport {
 			uav.setDataType(parseNodeId(node.getDataType()));
 			uav.setValueRank(node.getValueRank());
 
-			uav.getArrayDimensions().addAll(Lists.newArrayList(node.getArrayDimensions()).stream()
-					.map(x -> x.toString()).collect(Collectors.toList()));
+			uav.getArrayDimensions().addAll(Lists.newArrayList(node.getArrayDimensions()).stream().map(x -> x.toString()).collect(Collectors.toList()));
 
 			uav.setIsAbstract(node.isAbstract());
 
@@ -501,8 +519,7 @@ public class XmlExport {
 	}
 
 	/** convert the localized texts */
-	private me.steffenjacobs.opcuadisplay.management.node.domain.generated.LocalizedText parseLocalizedText(
-			LocalizedText lt) {
+	private me.steffenjacobs.opcuadisplay.management.node.domain.generated.LocalizedText parseLocalizedText(LocalizedText lt) {
 		me.steffenjacobs.opcuadisplay.management.node.domain.generated.LocalizedText res = new me.steffenjacobs.opcuadisplay.management.node.domain.generated.LocalizedText();
 		res.setLocale(lt.getLocale());
 		res.setValue(lt.getText());
