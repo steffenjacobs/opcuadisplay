@@ -109,8 +109,7 @@ public class OpcUaExplorerView extends CloseableView {
 	}
 
 	/**
-	 * This is a callback that will allow us to create the viewer and initialize
-	 * it.
+	 * This is a callback that will allow us to create the viewer and initialize it.
 	 */
 	@Override
 	public void createPartControl(Composite parent) {
@@ -135,22 +134,20 @@ public class OpcUaExplorerView extends CloseableView {
 	private void registerListeners() {
 
 		// listener for attribute modification
-		EventBus.getInstance().addListener(this, AttributeModifiedEvent.IDENTIFIER,
-				new EventListener<EventBus.Event>() {
-					@Override
-					public void onAction(Event event) {
-						viewer.refresh();
-					}
-				});
+		EventBus.getInstance().addListener(this, AttributeModifiedEvent.IDENTIFIER, new EventListener<EventBus.Event>() {
+			@Override
+			public void onAction(Event event) {
+				viewer.refresh();
+			}
+		});
 
 		// listener when the selection in the tree viewer should change
-		EventBus.getInstance().addListener(this, ChangeSelectedNodeEvent.IDENTIFIER,
-				new EventListener<ChangeSelectedNodeEvent>() {
-					@Override
-					public void onAction(ChangeSelectedNodeEvent event) {
-						onChangeSelectedNode(event);
-					}
-				});
+		EventBus.getInstance().addListener(this, ChangeSelectedNodeEvent.IDENTIFIER, new EventListener<ChangeSelectedNodeEvent>() {
+			@Override
+			public void onAction(ChangeSelectedNodeEvent event) {
+				onChangeSelectedNode(event);
+			}
+		});
 
 		// listener for import finished
 		EventBus.getInstance().addListener(this, RootUpdatedEvent.IDENTIFIER, new EventListener<RootUpdatedEvent>() {
@@ -163,49 +160,42 @@ public class OpcUaExplorerView extends CloseableView {
 		});
 
 		// listeners for import wizard
-		EventBus.getInstance().addListener(this, ImportWizardOpenEvent.IDENTIFIER,
-				new EventListener<ImportWizardOpenEvent>() {
-					@Override
-					public void onAction(ImportWizardOpenEvent event) {
-						onWizardOpen(event.isMergeWizard());
-					}
-				});
+		EventBus.getInstance().addListener(this, ImportWizardOpenEvent.IDENTIFIER, new EventListener<ImportWizardOpenEvent>() {
+			@Override
+			public void onAction(ImportWizardOpenEvent event) {
+				onWizardOpen(event.isMergeWizard());
+			}
+		});
 
-		EventBus.getInstance().addListener(this, ImportWizardCancelEvent.IDENTIFIER,
-				new EventListener<ImportWizardCancelEvent>() {
-					@Override
-					public void onAction(ImportWizardCancelEvent event) {
-						onWizardCancel(event.isMergeWizard());
-					}
-				});
+		EventBus.getInstance().addListener(this, ImportWizardCancelEvent.IDENTIFIER, new EventListener<ImportWizardCancelEvent>() {
+			@Override
+			public void onAction(ImportWizardCancelEvent event) {
+				onWizardCancel(event.isMergeWizard());
+			}
+		});
 
-		EventBus.getInstance().addListener(this, ImportWizardFinishEvent.IDENTIFIER,
-				new EventListener<ImportWizardFinishEvent>() {
-					@Override
-					public void onAction(ImportWizardFinishEvent event) {
-						onImportWizardFinish(event.getUrl(), event.isServer(), event.isBaseDataTypesImplicit(),
-								event.isFreeOpcUaModeler(), event.isMerge());
-					}
-				});
+		EventBus.getInstance().addListener(this, ImportWizardFinishEvent.IDENTIFIER, new EventListener<ImportWizardFinishEvent>() {
+			@Override
+			public void onAction(ImportWizardFinishEvent event) {
+				onImportWizardFinish(event.getUrl(), event.isServer(), event.isBaseDataTypesImplicit(), event.isFreeOpcUaModeler(), event.isMerge());
+			}
+		});
 
 		// listener for export wizard
-		EventBus.getInstance().addListener(this, ExportWizardFinishEvent.IDENTIFIER,
-				new EventListener<ExportWizardFinishEvent>() {
-					@Override
-					public void onAction(ExportWizardFinishEvent event) {
-						onExportWizardFinish(event.getUrl(), event.isBaseDataTypesImplicit(),
-								event.isFreeOpcUaModelerCompatibility(), event.getNameSpaceId());
-					}
-				});
+		EventBus.getInstance().addListener(this, ExportWizardFinishEvent.IDENTIFIER, new EventListener<ExportWizardFinishEvent>() {
+			@Override
+			public void onAction(ExportWizardFinishEvent event) {
+				onExportWizardFinish(event.getUrl(), event.isBaseDataTypesImplicit(), event.isFreeOpcUaModelerCompatibility());
+			}
+		});
 
 		// listener for create-new wizard
-		EventBus.getInstance().addListener(this, NewProjectWizardFinishEvent.IDENTIFIER,
-				new EventListener<NewProjectWizardFinishEvent>() {
-					@Override
-					public void onAction(NewProjectWizardFinishEvent event) {
-						onNewProjectWizardFinish(event.isGenerateFolders(), event.isGenerateBaseTypes());
-					}
-				});
+		EventBus.getInstance().addListener(this, NewProjectWizardFinishEvent.IDENTIFIER, new EventListener<NewProjectWizardFinishEvent>() {
+			@Override
+			public void onAction(NewProjectWizardFinishEvent event) {
+				onNewProjectWizardFinish(event.isGenerateFolders(), event.isGenerateBaseTypes());
+			}
+		});
 	}
 
 	public void onChangeSelectedNode(ChangeSelectedNodeEvent event) {
@@ -321,20 +311,12 @@ public class OpcUaExplorerView extends CloseableView {
 	}
 
 	/** can be called, after the export wizard has finished */
-	public void onExportWizardFinish(String exportUrl, boolean baseDataTypesImplicit,
-			boolean freeOpcUaModelerCompatibility, String namespaceId) {
+	public void onExportWizardFinish(String exportUrl, boolean baseDataTypesImplicit, boolean freeOpcUaModelerCompatibility) {
 		Job job = new Job("Exporting OPC UA nodes...") {
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
 				try {
-					if(baseDataTypesImplicit){
-						XmlExport.getInstance().writeToFile(exportUrl, NodeNavigator.getInstance().getRoot(),
-								baseDataTypesImplicit, freeOpcUaModelerCompatibility, namespaceId);						
-					}
-					else{
-					XmlExport.getInstance().writeToFile(exportUrl, NodeNavigator.getInstance().getRoot(),
-							baseDataTypesImplicit, freeOpcUaModelerCompatibility);
-					}
+					XmlExport.getInstance().writeToFile(exportUrl, NodeNavigator.getInstance().getRoot(), baseDataTypesImplicit, freeOpcUaModelerCompatibility);
 					return Status.OK_STATUS;
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -373,8 +355,7 @@ public class OpcUaExplorerView extends CloseableView {
 					Display.getDefault().syncExec(new Runnable() {
 						@Override
 						public void run() {
-							EventBus.getInstance()
-									.fireEvent(new RootUpdatedEvent(NodeNavigator.getInstance().getRoot()));
+							EventBus.getInstance().fireEvent(new RootUpdatedEvent(NodeNavigator.getInstance().getRoot()));
 						}
 					});
 					return Status.OK_STATUS;
@@ -396,21 +377,18 @@ public class OpcUaExplorerView extends CloseableView {
 	}
 
 	/** can be called, after the import wizard has finished */
-	public void onImportWizardFinish(String importUrl, boolean server, final boolean baseDataTypesImplicit,
-			boolean freeOpcUaModelerCompatibility, boolean merge) {
+	public void onImportWizardFinish(String importUrl, boolean server, final boolean baseDataTypesImplicit, boolean freeOpcUaModelerCompatibility, boolean merge) {
 		if (!server) {
 			Job job = new Job("Importing OPC UA nodes...") {
 				@Override
 				protected IStatus run(IProgressMonitor monitor) {
 					try {
-						NodeNavigator.getInstance().setRoot(XmlImport.getInstance().parseFile(importUrl,
-								baseDataTypesImplicit, freeOpcUaModelerCompatibility, merge));
+						NodeNavigator.getInstance().setRoot(XmlImport.getInstance().parseFile(importUrl, baseDataTypesImplicit, freeOpcUaModelerCompatibility, merge));
 
 						Display.getDefault().syncExec(new Runnable() {
 							@Override
 							public void run() {
-								EventBus.getInstance()
-										.fireEvent(new RootUpdatedEvent(NodeNavigator.getInstance().getRoot()));
+								EventBus.getInstance().fireEvent(new RootUpdatedEvent(NodeNavigator.getInstance().getRoot()));
 							}
 						});
 						return Status.OK_STATUS;
@@ -458,16 +436,14 @@ public class OpcUaExplorerView extends CloseableView {
 	}
 
 	private void openAddDialog(AddDialogType type) {
-		DialogFactory.getInstance().createAddDialog(type,
-				(CachedBaseNode) (((IStructuredSelection) viewer.getSelection()).getFirstElement())).open();
+		DialogFactory.getInstance().createAddDialog(type, (CachedBaseNode) (((IStructuredSelection) viewer.getSelection()).getFirstElement())).open();
 	}
 
 	private void createEditActions() {
 		// remove node action
 		removeAction = new Action() {
 			public void run() {
-				NodeGenerator.getInstance()
-						.removeNode((CachedBaseNode) ((IStructuredSelection) viewer.getSelection()).getFirstElement());
+				NodeGenerator.getInstance().removeNode((CachedBaseNode) ((IStructuredSelection) viewer.getSelection()).getFirstElement());
 			}
 		};
 		removeAction.setText("Delete Node");
@@ -532,8 +508,7 @@ public class OpcUaExplorerView extends CloseableView {
 		};
 		addVariableType.setText("Add VariableType");
 		addVariableType.setToolTipText("Add VariableType");
-		addVariableType
-				.setImageDescriptor(Activator.getImageDescriptor(Images.ExplorerView.VARIABLE_TYPE.getIdentifier()));
+		addVariableType.setImageDescriptor(Activator.getImageDescriptor(Images.ExplorerView.VARIABLE_TYPE.getIdentifier()));
 
 		// add DataType action
 		addDataType = new Action() {

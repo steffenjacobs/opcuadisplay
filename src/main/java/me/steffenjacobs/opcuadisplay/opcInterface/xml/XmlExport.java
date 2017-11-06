@@ -71,19 +71,19 @@ public class XmlExport {
 		aliases = new HashSet<>();
 		NodeIdAlias ali = new NodeIdAlias();
 		ali.setAlias("Organzies");
-		ali.setValue("i=35");
+		ali.setValue("ns=0;i=35");
 		NodeIdAlias ali2 = new NodeIdAlias();
 		ali2.setAlias("HasTypeDefinition");
-		ali2.setValue("i=40");
+		ali2.setValue("ns=0;i=40");
 		NodeIdAlias ali3 = new NodeIdAlias();
 		ali3.setAlias("HasSubtype");
-		ali3.setValue("i=45");
+		ali3.setValue("ns=0;i=45");
 		NodeIdAlias ali4 = new NodeIdAlias();
 		ali4.setAlias("HasComponent");
-		ali4.setValue("i=47");
+		ali4.setValue("ns=0;i=47");
 		NodeIdAlias ali5 = new NodeIdAlias();
 		ali5.setAlias("HasProperty");
-		ali5.setValue("i=46");
+		ali5.setValue("ns=0;i=46");
 		aliases.add(ali);
 		aliases.add(ali2);
 		aliases.add(ali3);
@@ -102,32 +102,14 @@ public class XmlExport {
 	 * persists the node tree <i>cbn</i> into the file <i>xmlFile</i>
 	 * 
 	 * @param baseDataTypesImplicit
-	 *            true if base data types are implicit and should not be stored
-	 *            in the XML file
+	 *            true if base data types are implicit and should not be stored in
+	 *            the XML file
 	 * @param freeOpcUaModelerCompatibility
 	 *            true, if compatibility with the free opc ua modeler should be
 	 *            ensured
-	 * @param namespaceId
-	 *            the ID of the namespace for the modified nodes
 	 */
 	public void writeToFile(String xmlFile, CachedBaseNode cbn, boolean baseDataTypesImplicit, boolean freeOpcUaModelerCompatibility) {
-		writeToFile(xmlFile, cbn, baseDataTypesImplicit, freeOpcUaModelerCompatibility, "0");
-	}
-
-	/**
-	 * persists the node tree <i>cbn</i> into the file <i>xmlFile</i>
-	 * 
-	 * @param baseDataTypesImplicit
-	 *            true if base data types are implicit and should not be stored
-	 *            in the XML file
-	 * @param freeOpcUaModelerCompatibility
-	 *            true, if compatibility with the free opc ua modeler should be
-	 *            ensured
-	 * @param namespaceId
-	 *            the ID of the namespace for the modified nodes
-	 */
-	public void writeToFile(String xmlFile, CachedBaseNode cbn, boolean baseDataTypesImplicit, boolean freeOpcUaModelerCompatibility, String namespaceId) {
-
+		
 		UANodeSet nodeSet = new UANodeSet();
 
 		nodeSet.getUAObjectOrUAVariableOrUAMethod().addAll(parseObjectTree(cbn));
@@ -164,6 +146,12 @@ public class XmlExport {
 				JAXBContext context = JAXBContext.newInstance(UANodeSet.class);
 				Unmarshaller um = context.createUnmarshaller();
 				UANodeSet nodeSetBase = (UANodeSet) um.unmarshal(new InputStreamReader(is));
+				
+				for(UANode n : nodeSetBase.getUAObjectOrUAVariableOrUAMethod()) {
+					if(!n.getNodeId().contains("ns=")) {
+						n.setNodeId("ns=0;" + n.getNodeId());
+					}
+				}
 
 				nodeSet.getUAObjectOrUAVariableOrUAMethod().removeAll(nodeSetBase.getUAObjectOrUAVariableOrUAMethod());
 
@@ -230,15 +218,6 @@ public class XmlExport {
 			} while (swapped);
 		}
 
-		// set custom namespaceID to exported nodes
-		if (baseDataTypesImplicit) {
-			nodeSet.getUAObjectOrUAVariableOrUAMethod().forEach(n -> {
-				if (!n.getNodeId().contains("ns")) {
-					n.setNodeId("ns=" + namespaceId + ";" + n.getNodeId());
-				}
-			});
-		}
-
 		// add aliases
 		if (nodeSet.getAliases() == null) {
 			nodeSet.setAliases(new AliasTable());
@@ -262,9 +241,8 @@ public class XmlExport {
 		try {
 			List<String> lines = Files.readAllLines(Paths.get(xmlFile));
 
-			lines.replaceAll(s -> s.replace("<UANodeSet xmlns=\"http://opcfoundation.org/UA/2011/03/UANodeSet.xsd\">",
-					"<UANodeSet xmlns=\"http://opcfoundation.org/UA/2011/03/UANodeSet.xsd\" " + "xmlns:uax=\"http://opcfoundation.org/UA/2008/02/Types.xsd\" "
-							+ "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" " + "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">"));
+			lines.replaceAll(s -> s.replace("<UANodeSet xmlns=\"http://opcfoundation.org/UA/2011/03/UANodeSet.xsd\">", "<UANodeSet xmlns=\"http://opcfoundation.org/UA/2011/03/UANodeSet.xsd\" "
+					+ "xmlns:uax=\"http://opcfoundation.org/UA/2008/02/Types.xsd\" " + "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" " + "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">"));
 
 			if (freeOpcUaModelerCompatibility) {
 				// cast MinimumSamplingInterval to integer
@@ -277,8 +255,7 @@ public class XmlExport {
 	}
 
 	/**
-	 * converts the value to a tag and adds the associated alias to the aliases
-	 * set
+	 * converts the value to a tag and adds the associated alias to the aliases set
 	 * 
 	 * @return the tag associated with the value inside <i>obj</i>
 	 */
@@ -286,43 +263,43 @@ public class XmlExport {
 		if (obj != null) {
 			switch (((UInteger) datatype.getIdentifier()).intValue()) {
 			case 1:
-				aliases.add(new NodeIdAlias("i=1", "Boolean"));
+				aliases.add(new NodeIdAlias("ns=0;i=1", "Boolean"));
 				return createTag(obj);
 			case 2:
-				aliases.add(new NodeIdAlias("i=2", "SByte"));
+				aliases.add(new NodeIdAlias("ns=0;i=2", "SByte"));
 				return createTag(obj);
 			case 3:
-				aliases.add(new NodeIdAlias("i=3", "Byte"));
+				aliases.add(new NodeIdAlias("ns=0;i=3", "Byte"));
 				return createTag(obj);
 			case 4:
-				aliases.add(new NodeIdAlias("i=4", "Int16"));
+				aliases.add(new NodeIdAlias("ns=0;i=4", "Int16"));
 				return createTag(obj);
 			case 5:
-				aliases.add(new NodeIdAlias("i=5", "UInt16"));
+				aliases.add(new NodeIdAlias("ns=0;i=5", "UInt16"));
 				return createTag(obj);
 			case 6:
-				aliases.add(new NodeIdAlias("i=6", "Int32"));
+				aliases.add(new NodeIdAlias("ns=0;i=6", "Int32"));
 				return createTag(obj);
 			case 7:
-				aliases.add(new NodeIdAlias("i=7", "UInt32"));
+				aliases.add(new NodeIdAlias("ns=0;i=7", "UInt32"));
 				return createTag(obj);
 			case 8:
-				aliases.add(new NodeIdAlias("i=8", "Int64"));
+				aliases.add(new NodeIdAlias("ns=0;i=8", "Int64"));
 				return createTag(obj);
 			case 9:
-				aliases.add(new NodeIdAlias("i=9", "UInt64"));
+				aliases.add(new NodeIdAlias("ns=0;i=9", "UInt64"));
 				return createTag(obj);
 			case 10:
-				aliases.add(new NodeIdAlias("i=10", "Float"));
+				aliases.add(new NodeIdAlias("ns=0;i=10", "Float"));
 				return createTag(obj);
 			case 11:
-				aliases.add(new NodeIdAlias("i=11", "Double"));
+				aliases.add(new NodeIdAlias("ns=0;i=11", "Double"));
 				return createTag(obj);
 			case 12:
-				aliases.add(new NodeIdAlias("i=12", "String"));
+				aliases.add(new NodeIdAlias("ns=0;i=12", "String"));
 				return createTag(obj);
 			case 13:
-				aliases.add(new NodeIdAlias("i=13", "DateTime"));
+				aliases.add(new NodeIdAlias("ns=0;i=13", "DateTime"));
 				return createTag(obj);
 			case 27:
 				return convertValue(obj, new NodeId(0, 6));
@@ -497,7 +474,7 @@ public class XmlExport {
 
 	/** @return the converted NodeId based on <i>id</i> */
 	private String parseNodeId(NodeId id) {
-		return "i=" + id.getIdentifier().toString();
+		return "ns=" + id.getNamespaceIndex() + ";i=" + id.getIdentifier().toString();
 	}
 
 	/**
