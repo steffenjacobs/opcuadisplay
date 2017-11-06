@@ -81,11 +81,9 @@ public class XmlImport {
 
 	/**
 	 * @param baseDataTypesImplicit
-	 *            true, if the base data types are not stored in the XML file or
-	 *            not
+	 *            true, if the base data types are not stored in the XML file or not
 	 * @param freeOpcUaModelerCompatibility
-	 *            true, if the XMl file is compatible with the free opc ua
-	 *            modeler
+	 *            true, if the XMl file is compatible with the free opc ua modeler
 	 * @return a node structure read from the <i>xmlReader</i>
 	 */
 	public CachedObjectNode parseFile(Reader xmlReader, boolean baseDataTypesImplicit, boolean freeOpcUaModelerCompatibility, boolean merge) {
@@ -106,6 +104,12 @@ public class XmlImport {
 			CopyOnWriteArrayList<UANode> nodes = new CopyOnWriteArrayList<>();
 			nodes.addAll(nodeSet.getUAObjectOrUAVariableOrUAMethod());
 
+			for (UANode n : nodes) {
+				if (!n.getNodeId().contains("ns=")) {
+					n.setNodeId("ns=0;" + n.getNodeId());
+				}
+			}
+
 			CachedObjectNode rootFolder = buildFullTree(nodes, baseDataTypesImplicit, freeOpcUaModelerCompatibility, merge);
 
 			return rootFolder;
@@ -118,11 +122,9 @@ public class XmlImport {
 
 	/**
 	 * @param baseDataTypesImplicit
-	 *            true, if the base data types are not stored in the XML file or
-	 *            not
+	 *            true, if the base data types are not stored in the XML file or not
 	 * @param freeOpcUaModelerCompatibility
-	 *            true, if the XMl file is compatible with the free opc ua
-	 *            modeler
+	 *            true, if the XMl file is compatible with the free opc ua modeler
 	 * @return a node structure read from the <i>xmlReader</i>
 	 */
 	public CachedObjectNode parseFile(String xmlFile, boolean baseDataTypesImplicit, boolean freeOpcUaModelerCompatibility, boolean merge) {
@@ -136,11 +138,9 @@ public class XmlImport {
 
 	/**
 	 * @param baseDataTypesImplicit
-	 *            true, if the base data types are not stored in the XML file or
-	 *            not
+	 *            true, if the base data types are not stored in the XML file or not
 	 * @param freeOpcUaModelerCompatibility
-	 *            true, if the XMl file is compatible with the free opc ua
-	 *            modeler
+	 *            true, if the XMl file is compatible with the free opc ua modeler
 	 * @return a node structure read from the <i>xmlReader</i>
 	 */
 	public CachedObjectNode parseFile(InputStream is, boolean baseDataTypesImplicit, boolean freeOpcUaModelerCompatibility, boolean merge) {
@@ -149,15 +149,13 @@ public class XmlImport {
 
 	/**
 	 * @param baseDataTypesImplicit
-	 *            true, if the base data types are not stored in the XML file or
-	 *            not
+	 *            true, if the base data types are not stored in the XML file or not
 	 * @param freeOpcUaModelerCompatibility
-	 *            true, if the XMl file is compatible with the free opc ua
-	 *            modeler
+	 *            true, if the XMl file is compatible with the free opc ua modeler
 	 * @param merge
 	 *            true, if the loaded node structure should be merged into the
-	 *            existing project /** @return the node tree read from the list
-	 *            of nodes <i>nodes</i>
+	 *            existing project /** @return the node tree read from the list of
+	 *            nodes <i>nodes</i>
 	 */
 	private CachedObjectNode buildFullTree(List<UANode> nodes, boolean baseDataTypesImplicit, boolean freeOpcUaModelerCompatibility, boolean merge) {
 		CachedObjectNode root;
@@ -209,8 +207,8 @@ public class XmlImport {
 	}
 
 	/**
-	 * build the tree based on the references of the root node. Nodes are
-	 * resolved via the refNode of the references recursively.<br/>
+	 * build the tree based on the references of the root node. Nodes are resolved
+	 * via the refNode of the references recursively.<br/>
 	 * CachedReferences are added, but not BrowseName and TypeDefinition of
 	 * CachedReferences can only be set, after this process has finished.
 	 * 
@@ -480,14 +478,13 @@ public class XmlImport {
 			}
 		} catch (UaRuntimeException e) {
 			// node.getDataType() was an alias
-			return NodeId
-					.parse("ns=" + namespaceIndex + ";" + aliases.getAlias().stream().filter(a -> str.equals(a.getAlias())).map(NodeIdAlias::getValue).findFirst().orElse(null));
+			return NodeId.parse(aliases.getAlias().stream().filter(a -> str.equals(a.getAlias())).map(NodeIdAlias::getValue).findFirst().orElse(null));
 		}
 	}
 
 	/**
-	 * ReferenceType and ReferredNodeId are set here, while the BrowseName and
-	 * the TypeDefinition are set in steps 2 and 3.
+	 * ReferenceType and ReferredNodeId are set here, while the BrowseName and the
+	 * TypeDefinition are set in steps 2 and 3.
 	 * 
 	 * @return a list of CachedReferences from <i>ref</i>. *
 	 */

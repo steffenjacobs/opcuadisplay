@@ -22,10 +22,9 @@ import org.eclipse.swt.widgets.Text;
 /** @author Steffen Jacobs */
 public class XmlPage extends WizardPage {
 
-	private Text textUrl, textNS;
+	private Text textUrl;
 	private Button checkboxBaseTypesImplicit, checkboxFreeOpcUaModelerCompatibility;
 	private Composite container;
-	private Label lblNS;
 	private final boolean isImport, merge;
 
 	/** type: true = import, false = export */
@@ -118,9 +117,6 @@ public class XmlPage extends WizardPage {
 				public void widgetSelected(SelectionEvent arg0) {
 					if (checkboxFreeOpcUaModelerCompatibility.getSelection()) {
 						checkboxBaseTypesImplicit.setSelection(true);
-						if (textNS != null) {
-							showNamespaceSelection(true);
-						}
 					}
 				}
 			});
@@ -130,12 +126,7 @@ public class XmlPage extends WizardPage {
 				public void widgetSelected(SelectionEvent arg0) {
 					if (!checkboxBaseTypesImplicit.getSelection()) {
 						checkboxFreeOpcUaModelerCompatibility.setSelection(false);
-						if (textNS != null) {
-							showNamespaceSelection(false);
-						}
-					} else if (textNS != null) {
-						showNamespaceSelection(true);
-					}
+					} 
 				}
 			});
 
@@ -144,29 +135,11 @@ public class XmlPage extends WizardPage {
 		Composite spc2 = new Composite(container, SWT.NONE);
 		spc2.setLayoutData(gd);
 
-		if (!isImport) {
-			lblNS = new Label(container, SWT.NONE);
-			lblNS.setText("Namespace ID:");
-			lblNS.setToolTipText("Namespace ID for the modified nodes");
-
-			textNS = new Text(container, SWT.BORDER | SWT.SINGLE);
-			textNS.setLayoutData(gd);
-			textNS.setText("2");
-			textNS.setToolTipText("Namespace ID for the modified nodes");
-			textNS.setSelection(0, textNS.getText().length());
-			showNamespaceSelection(false);
-		}
-
 		// required to avoid an error in the system
 		setControl(container);
 		revalidate();
 
 		((WizardWithUrlAndType) getWizard()).setUrl(getUrl());
-	}
-
-	private void showNamespaceSelection(boolean value) {
-		textNS.setVisible(value);
-		lblNS.setVisible(value);
 	}
 
 	/** checks & updates page completeness */
@@ -195,10 +168,6 @@ public class XmlPage extends WizardPage {
 
 	public String getUrl() {
 		return textUrl.getText();
-	}
-
-	public String getNamespaceId() {
-		return textNS == null ? "" : textNS.getText();
 	}
 
 	public boolean isBaseTypesImplicit() {
