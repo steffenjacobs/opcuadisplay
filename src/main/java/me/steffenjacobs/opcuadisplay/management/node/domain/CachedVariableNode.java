@@ -107,6 +107,9 @@ public class CachedVariableNode extends CachedBaseNode implements HasValueRank {
 	}
 
 	public UInteger[] getArrayDimensions() {
+		if(arrayDimensions==null){
+			arrayDimensions = new UInteger[0];
+		}
 		return arrayDimensions;
 	}
 
