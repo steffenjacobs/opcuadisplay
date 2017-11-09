@@ -474,7 +474,13 @@ public class XmlExport {
 
 	/** @return the converted NodeId based on <i>id</i> */
 	private String parseNodeId(NodeId id) {
-		return "ns=" + id.getNamespaceIndex() + ";i=" + id.getIdentifier().toString();
+		try {
+			Integer.parseInt(id.getIdentifier().toString());
+			return "ns=" + id.getNamespaceIndex() + ";i=" + id.getIdentifier().toString();
+		}
+		catch(NumberFormatException e) {
+			return "ns=" + id.getNamespaceIndex() + ";s=" + id.getIdentifier().toString();
+		}
 	}
 
 	/**
