@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -108,13 +109,29 @@ public class XmlExport {
 	 *            true, if compatibility with the free opc ua modeler should be
 	 *            ensured
 	 */
-	public void writeToFile(String xmlFile, CachedBaseNode cbn, boolean baseDataTypesImplicit, boolean freeOpcUaModelerCompatibility) {
-		
+	public void writeToFile(String xmlFile, CachedBaseNode cbn, boolean baseDataTypesImplicit, boolean freeOpcUaModelerCompatibility, String namespace) {
+
 		UANodeSet nodeSet = new UANodeSet();
 
 		nodeSet.getUAObjectOrUAVariableOrUAMethod().addAll(parseObjectTree(cbn));
 
 		Map<String, UANode> nodesById = new HashMap<>();
+
+		// filter by namespace
+		if (namespace != null && !namespace.equals("")) {
+			Iterator<UANode> it = nodeSet.getUAObjectOrUAVariableOrUAMethod().iterator();
+			while (it.hasNext()) {
+				UANode node = it.next();
+				try {
+					String ns = node.getNodeId().split(";")[0].split("=")[1];
+					if (!namespace.equals(ns)) {
+						it.remove();
+					}
+				} catch (ArrayIndexOutOfBoundsException e) {
+					// nothing to do
+				}
+			}
+		}
 
 		for (UANode node : nodeSet.getUAObjectOrUAVariableOrUAMethod()) {
 			nodesById.put(node.getNodeId(), node);
@@ -146,9 +163,9 @@ public class XmlExport {
 				JAXBContext context = JAXBContext.newInstance(UANodeSet.class);
 				Unmarshaller um = context.createUnmarshaller();
 				UANodeSet nodeSetBase = (UANodeSet) um.unmarshal(new InputStreamReader(is));
-				
-				for(UANode n : nodeSetBase.getUAObjectOrUAVariableOrUAMethod()) {
-					if(!n.getNodeId().contains("ns=")) {
+
+				for (UANode n : nodeSetBase.getUAObjectOrUAVariableOrUAMethod()) {
+					if (!n.getNodeId().contains("ns=")) {
 						n.setNodeId("ns=0;" + n.getNodeId());
 					}
 				}
@@ -477,8 +494,7 @@ public class XmlExport {
 		try {
 			Integer.parseInt(id.getIdentifier().toString());
 			return "ns=" + id.getNamespaceIndex() + ";i=" + id.getIdentifier().toString();
-		}
-		catch(NumberFormatException e) {
+		} catch (NumberFormatException e) {
 			return "ns=" + id.getNamespaceIndex() + ";s=" + id.getIdentifier().toString();
 		}
 	}

@@ -40,7 +40,7 @@ public class OpcUaExportWizard extends Wizard implements IWorkbenchWizard, Wizar
 	@Override
 	public boolean performFinish() {
 		EventBus.getInstance().fireEvent(new ExportWizardFinishEvent(this.getUrl(), xmlPage.isBaseTypesImplicit(),
-				xmlPage.isFreeOpcUaModelerCompatibility()));
+				xmlPage.isFreeOpcUaModelerCompatibility(), xmlPage.getNamespace()));
 		return true;
 	}
 

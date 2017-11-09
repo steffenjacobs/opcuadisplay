@@ -45,7 +45,7 @@ public class TestXml {
 
 		long now = System.currentTimeMillis();
 		String filename = "testXml_" + now + ".xml";
-		XmlExport.getInstance().writeToFile(filename, NodeNavigator.getInstance().getRoot(), false, false);
+		XmlExport.getInstance().writeToFile(filename, NodeNavigator.getInstance().getRoot(), false, false, "0");
 
 		SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 		Schema schema = factory
