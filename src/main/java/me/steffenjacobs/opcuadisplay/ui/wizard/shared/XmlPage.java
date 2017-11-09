@@ -22,8 +22,8 @@ import org.eclipse.swt.widgets.Text;
 /** @author Steffen Jacobs */
 public class XmlPage extends WizardPage {
 
-	private Text textUrl;
-	private Button checkboxBaseTypesImplicit, checkboxFreeOpcUaModelerCompatibility;
+	private Text textUrl, textNamespace;
+	private Button checkboxBaseTypesImplicit, checkboxFreeOpcUaModelerCompatibility, checkboxNamespace;
 	private Composite container;
 	private final boolean isImport, merge;
 
@@ -129,12 +129,21 @@ public class XmlPage extends WizardPage {
 					} 
 				}
 			});
+			
+			Composite spc2 = new Composite(container, SWT.NONE);
+			spc2.setLayoutData(gd);
 
+			
+			checkboxNamespace = new Button(container, SWT.CHECK);
+			checkboxNamespace.setLayoutData(gd);
+
+			checkboxNamespace.setText("Export only selected namespace: ");
+			checkboxNamespace.setSelection(false);
+			
+			textNamespace = new Text(container, SWT.BORDER | SWT.SINGLE);
+			textNamespace.setLayoutData(gd);
 		}
-
-		Composite spc2 = new Composite(container, SWT.NONE);
-		spc2.setLayoutData(gd);
-
+		
 		// required to avoid an error in the system
 		setControl(container);
 		revalidate();
@@ -157,7 +166,7 @@ public class XmlPage extends WizardPage {
 			((WizardWithUrlAndType) getWizard()).setUrl(getUrl());
 			return true;
 		}
-
+ 
 		File f = new File(textUrl.getText());
 		if (f.exists() && !f.isDirectory()) {
 			((WizardWithUrlAndType) getWizard()).setUrl(getUrl());
@@ -182,5 +191,12 @@ public class XmlPage extends WizardPage {
 			return false;
 		}
 		return checkboxFreeOpcUaModelerCompatibility.getSelection();
+	}
+	
+	public String getNamespace() {
+		if(checkboxNamespace!=null && checkboxNamespace.getSelection()) {
+			return textNamespace.getText();
+		}
+		return null;
 	}
 }
