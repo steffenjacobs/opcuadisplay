@@ -1,7 +1,8 @@
 # OpcUaDisplay
 OPC UA Modeler for Eclipse
 
-This prototype created is n modeler for OPC UA Information Models as an Eclipse Plugin. 
+This prototype was created in the course of my Bachelor Thesis at University of Mannheim. 
+It contains a modeler for OPC UA Information Models as an Eclipse Plugin. 
 
 ## Features:
 - create an new OPC UA Information Model from scratch or with the basic types and variables
