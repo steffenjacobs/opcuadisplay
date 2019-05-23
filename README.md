@@ -6,12 +6,15 @@ It contains a modeler for OPC UA Information Models as an Eclipse Plugin.
 
 The software was also been presented in the course of the Modellierung 2018 conference. [Link to the paper](http://ceur-ws.org/Vol-2060/mekes1.pdf) 
 
+<img src="./OPC UA Perspective.jpg" />
+
 ## Features:
 - create a new OPC UA Information Model from scratch or with the basic types and variables
 - load an existing OPC UA Information Model from a running OPC UA Server
 - import an existing OPC UA Information Model from an XML File
 - merge an existing OPC UA Information Model from an XML File into the current model
 - edit the model (Nodes with Objects, Variables, Methods, Types, etc. can be edited, added and removed)
+
 
 ## Manual:
 <object data="./Manual.pdf" type="application/pdf" width="100%" height="100%">
