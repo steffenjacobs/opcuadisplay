@@ -72,8 +72,10 @@ public class NodeGenerator {
 			break;
 		case DATA_TYPE:
 			createAndInsertDataType(namespaceIndex, name, nodeId, parent);
+			break;
 		case VARIABLE_TYPE:
 			createAndInsertVariableType(namespaceIndex, name, nodeId, (CachedVariableTypeNode) type, parent);
+			break;
 		default:
 		}
 

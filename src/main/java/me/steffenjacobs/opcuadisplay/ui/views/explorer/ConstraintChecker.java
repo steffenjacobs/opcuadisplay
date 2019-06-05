@@ -15,7 +15,7 @@ public class ConstraintChecker {
 
 	private static ConstraintChecker instance;
 
-	public static ConstraintChecker getIntsance() {
+	public static ConstraintChecker getInstance() {
 		if (instance == null) {
 			instance = new ConstraintChecker();
 		}
@@ -36,7 +36,7 @@ public class ConstraintChecker {
 
 	// node cannot be root node or directly in types folder or a variable
 	public boolean isAddObjectAllowed(CachedBaseNode node) {
-		return !NodeNavigator.getInstance().getRoot().equals(node) && !Identifiers.TypesFolder.equals(node.getParent())
+		return !NodeNavigator.getInstance().getRoot().equals(node) && !Identifiers.TypesFolder.equals(node.getParent().getNodeId())
 				&& !NodeClass.Variable.equals(node.getNodeClass());
 	}
 
@@ -53,7 +53,7 @@ public class ConstraintChecker {
 
 	// node cannot be root node or directly in types folder or a variable
 	public boolean isAddMethodAllowed(CachedBaseNode node) {
-		return !NodeNavigator.getInstance().getRoot().equals(node) && !Identifiers.TypesFolder.equals(node.getParent())
+		return !NodeNavigator.getInstance().getRoot().equals(node) && !Identifiers.TypesFolder.equals(node.getParent().getNodeId())
 				&& !NodeClass.Variable.equals(node.getNodeClass());
 	}
 

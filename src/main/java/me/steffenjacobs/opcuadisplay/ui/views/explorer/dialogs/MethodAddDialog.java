@@ -58,7 +58,7 @@ public class MethodAddDialog extends SimpleAddDialog {
 	@Override
 	protected Control createDialogArea(Composite parent) {
 		Composite area = (Composite) super.createDialogArea(parent);
-		createHorizontalSeperator(area);
+		createHorizontalSeparator(area);
 
 		Composite bottom = new Composite(area, SWT.NONE);
 		bottom.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
@@ -66,20 +66,20 @@ public class MethodAddDialog extends SimpleAddDialog {
 		bottom.setLayout(layout);
 
 		createArgumentsPanel(bottom, "Input Arguments", inputArgs);
-		createVerticalSeperator(bottom);
+		createVerticalSeparator(bottom);
 		createArgumentsPanel(bottom, "Output Arguments", outputArgs);
 
 		return area;
 	}
 
 	/** create a vertical separator */
-	private void createVerticalSeperator(Composite parent) {
+	private void createVerticalSeparator(Composite parent) {
 		Label separator = new Label(parent, SWT.VERTICAL | SWT.SEPARATOR);
 		separator.setLayoutData(new GridData(GridData.FILL_VERTICAL));
 	}
 
 	/** create a horizontal separator */
-	private void createHorizontalSeperator(Composite parent) {
+	private void createHorizontalSeparator(Composite parent) {
 		Label separator = new Label(parent, SWT.HORIZONTAL | SWT.SEPARATOR);
 		separator.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 	}
