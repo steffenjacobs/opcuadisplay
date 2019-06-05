@@ -236,28 +236,28 @@ public class OpcUaExplorerView extends CloseableView {
 
 	/** adds the available edit options */
 	private void addAvailableEditOptions(IMenuManager manager, CachedBaseNode selectedNode) {
-		if (ConstraintChecker.getIntsance().isRemovalAllowed(selectedNode)) {
+		if (ConstraintChecker.getInstance().isRemovalAllowed(selectedNode)) {
 			manager.add(removeAction);
 		}
-		if (ConstraintChecker.getIntsance().isAddObjectAllowed(selectedNode)) {
+		if (ConstraintChecker.getInstance().isAddObjectAllowed(selectedNode)) {
 			manager.add(addObject);
 		}
-		if (ConstraintChecker.getIntsance().isAddMethodAllowed(selectedNode)) {
+		if (ConstraintChecker.getInstance().isAddMethodAllowed(selectedNode)) {
 			manager.add(addMethod);
 		}
-		if (ConstraintChecker.getIntsance().isAddVariableAllowed(selectedNode)) {
+		if (ConstraintChecker.getInstance().isAddVariableAllowed(selectedNode)) {
 			manager.add(addVariable);
 		}
-		if (ConstraintChecker.getIntsance().isAddPropertyAllowed(selectedNode)) {
+		if (ConstraintChecker.getInstance().isAddPropertyAllowed(selectedNode)) {
 			manager.add(addProperty);
 		}
-		if (ConstraintChecker.getIntsance().isAddDataTypeAllowed(selectedNode)) {
+		if (ConstraintChecker.getInstance().isAddDataTypeAllowed(selectedNode)) {
 			manager.add(addDataType);
 		}
-		if (ConstraintChecker.getIntsance().isAddObjectTypeAllowed(selectedNode)) {
+		if (ConstraintChecker.getInstance().isAddObjectTypeAllowed(selectedNode)) {
 			manager.add(addObjectType);
 		}
-		if (ConstraintChecker.getIntsance().isAddVariableTypeAllowed(selectedNode)) {
+		if (ConstraintChecker.getInstance().isAddVariableTypeAllowed(selectedNode)) {
 			manager.add(addVariableType);
 		}
 	}
